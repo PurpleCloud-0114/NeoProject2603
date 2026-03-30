@@ -43,7 +43,7 @@ public class UserInfo
     }
 }
 
-public class SQL_Manager : MonoBehaviour
+public class SQLManager : MonoBehaviour
 {
     //private 변수는 _camelCase
     [SerializeField] private string _db_path = string.Empty;
@@ -53,7 +53,7 @@ public class SQL_Manager : MonoBehaviour
     //public 변수는 snake_case (또는 명시된 규칙 적용)
     public UserInfo user_info { get; private set; }
     //싱글톤은 Instance 고정
-    public static SQL_Manager Instance = null;
+    public static SQLManager Instance = null;
 
     private void Awake()
     {
