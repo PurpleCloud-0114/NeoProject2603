@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -55,14 +54,14 @@ public class ServerChecker : MonoBehaviour
 
         if (!File.Exists(_path + "/License.json"))
         {
-            Defalut_data(_path);
+            DefalutData(_path);
         }
         _path = _path + "/License.json";
         _manager = NetworkManager.singleton;
         _transport = (KcpTransport)_manager.transport;
     }
 
-    private void Defalut_data(string path)
+    private void DefalutData(string path)
     {
         List<Item> item = new List<Item>();
         item.Add(new Item("0", "127.0.0.1", "7777"));
@@ -71,7 +70,7 @@ public class ServerChecker : MonoBehaviour
         File.WriteAllText(path + "/License.json", data.ToString());
     }
 
-    private Type License_type(string path)
+    private Type LicenseType(string path)
     {
         Type type = Type.enum_Empty;
         /*
@@ -81,15 +80,15 @@ public class ServerChecker : MonoBehaviour
          */
         try
         {
-            string jsonstring = File.ReadAllText(path);
-            JsonData itemdata = JsonMapper.ToObject(jsonstring);
-            string string_type = itemdata[0]["License"].ToString();
-            string string_serverIP = itemdata[0]["ServerIP"].ToString();
-            string string_port = itemdata[0]["Port"].ToString();
+            string stringjson = File.ReadAllText(path);
+            JsonData itemdata = JsonMapper.ToObject(stringjson);
+            string stringtype = itemdata[0]["License"].ToString();
+            string stringserverip = itemdata[0]["ServerIP"].ToString();
+            string stringport = itemdata[0]["Port"].ToString();
 
-            server_ip = string_serverIP;
-            server_port = string_port;
-            type = (Type)Enum.Parse(typeof(Type), string_type);
+            server_ip = stringserverip;
+            server_port = stringport;
+            type = (Type)Enum.Parse(typeof(Type), stringtype);
 
             _manager.networkAddress = server_ip;
             _transport.port = ushort.Parse(server_port);//부호가 없음
@@ -106,7 +105,7 @@ public class ServerChecker : MonoBehaviour
 
     private void Start()
     {
-        type = License_type(_path);
+        type = LicenseType(_path);
 
         //type 별로 각자 행동을 넣을 것...
 

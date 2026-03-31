@@ -24,7 +24,7 @@ public class LoginController : MonoBehaviour
         //_signup_button.onClick.AddListener(OpenSignUpPage);
     }
 
-    private void LogTextViewing(string text) { _log_text.text = text; }
+    public void LogTextViewing(string text) { _log_text.text = text; }
 
     public void LoginEvent()
     {
