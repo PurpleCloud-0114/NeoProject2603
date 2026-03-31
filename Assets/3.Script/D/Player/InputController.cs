@@ -4,28 +4,45 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InputController : MonoBehaviour {
-	public Vector2 base_point;
-	public Vector2 move_point;
+	public Vector2 BasePoint;
+	public Vector2 MovePoint;
 
-	public Vector3 gravity;
+	public Vector3 Gravity;
+
+	private Vector3 _calibratedGravity;
+	private Quaternion _calibrationRotation = Quaternion.identity;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
 	private void Start() {
-		if (Accelerometer.current != null) {
-			InputSystem.EnableDevice(Accelerometer.current);
+		if (GravitySensor.current != null) {
+			InputSystem.EnableDevice(GravitySensor.current);
 		} else {
-			Debug.LogError("Accelerometer not found on this device");
+			Debug.LogError("GravitySensor not found on this device");
 		}
-		if (Accelerometer.current.enabled) Debug.Log("Accelerometer is enabled");
+		if (GravitySensor.current.enabled) Debug.Log("GravitySensor is enabled");
 		Application.targetFrameRate = 60;
 	}
 #endif
 	public void OnMouseMove(InputAction.CallbackContext context) {
-		move_point = context.ReadValue<Vector2>();
+		MovePoint = context.ReadValue<Vector2>();
 	}
 	public void OnAccelMove(InputAction.CallbackContext context) {
-		gravity = context.ReadValue<Vector3>();
-		move_point = new Vector2(gravity.x, gravity.y);
+		Gravity = context.ReadValue<Vector3>();
+		_calibratedGravity = _calibrationRotation * Gravity;
+		MovePoint = new Vector2(_calibratedGravity.x, _calibratedGravity.y);
+	}
+
+	public void Calibrate() {
+		if(GravitySensor.current != null) {
+			//현재 플레이어가 들고 있는 상태 그대로의 중력 벡터를 가져옵니다.
+			Vector3 rawGravity = GravitySensor.current.gravity.ReadValue();
+			BasePoint = rawGravity;
+
+			//핵심 원리: '현재 기울기(rawGravity)'를 '완벽한 평면(Vector3.back)'으로 
+			//강제로 돌려버리는 회전값을 계산해서 저장해 둡니다.
+			//(참고: Vector3.back은 (0, 0, -1)로, 스마트폰 화면이 하늘을 똑바로 보는 평면 상태를 의미합니다)
+			_calibrationRotation = Quaternion.FromToRotation(rawGravity, Vector3.back);
+		}
 	}
 }
 

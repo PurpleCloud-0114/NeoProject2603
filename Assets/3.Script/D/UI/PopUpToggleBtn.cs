@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PopUpToggleBtn : MonoBehaviour {
-	[SerializeField] private GameObject popup;
+	[SerializeField] private GameObject[] _popupList;
 
 	public void OnClickBtn() {
-		popup.SetActive(!popup.activeSelf);
+		foreach(GameObject popup in _popupList) {
+			popup.SetActive(!popup.activeSelf);
+		}
 	}
 }

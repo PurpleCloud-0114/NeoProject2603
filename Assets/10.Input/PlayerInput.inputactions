@@ -40,7 +40,7 @@
                 {
                     "name": "",
                     "id": "1bc1a26b-09e9-436c-b5aa-cbee2821d03f",
-                    "path": "<Accelerometer>/acceleration",
+                    "path": "<GravitySensor>/gravity",
                     "interactions": "",
                     "processors": "",
                     "groups": "Mobile",
@@ -62,7 +62,7 @@
                     "isOR": false
                 },
                 {
-                    "devicePath": "<Accelerometer>",
+                    "devicePath": "<GravitySensor>",
                     "isOptional": false,
                     "isOR": false
                 }

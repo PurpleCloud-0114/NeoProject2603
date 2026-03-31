@@ -12,10 +12,11 @@ public class Test_Start : MonoBehaviour {
 
 	public void OnBtnClick() {
 #if UNITY_EDITOR
-		_inputController.base_point = _inputController.move_point;
+		_inputController.BasePoint = _inputController.MovePoint;
 #elif UNITY_ANDROID && !UNITY_EDITOR
-		_inputController.base_point = _inputController.gravity;
+		_inputController.Calibrate();
 #endif
+
 		Time.timeScale = 1f;
 		gameObject.SetActive(false);
 	}
