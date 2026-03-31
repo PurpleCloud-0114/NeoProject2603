@@ -14,9 +14,14 @@ public class LoginController : MonoBehaviour
     [SerializeField] private TMP_Text _log_text;
     [SerializeField] private Button _login_button;
 
+    [SerializeField] private Button _signup_button;
+    //[SerializeField] private _signup_controller;
+
     private void Start()
     {
+        LogTextViewing(string.Empty);
         _login_button.onClick.AddListener(LoginEvent);
+        //_signup_button.onClick.AddListener(OpenSignUpPage);
     }
 
     private void LogTextViewing(string text) { _log_text.text = text; }
@@ -32,15 +37,21 @@ public class LoginController : MonoBehaviour
         if (SQLManager.Instance.Login(_name_input.text, _pw_input.text))
         {
             GameObject manager = NetworkManager.singleton.gameObject;
-            //if(manager.TryGetComponent(out ServerChecker checker))
-            //{
-            //    checker.StartClient();
-            //}
-            gameObject.SetActive(false);
+            if(manager.TryGetComponent(out ServerChecker checker))
+            {
+                checker.Start_Client();
+            }
+            //gameObject.SetActive(false);
         }
         else
         {
             LogTextViewing("아이디와 비밀번호를 입력하세요");
         }
+    }
+
+    public void OpenSignUpPage()
+    {
+        //_signup_controller.gameObject.SetActive(true);
+        gameObject.SetActive(false);
     }
 }
