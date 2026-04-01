@@ -9,9 +9,9 @@ public class NickNameSync : NetworkBehaviour
 
     [SerializeField] private TMP_Text _nicknamecard_tmp;
     [SerializeField] private GameObject _nicknameard_ob;
-    public override void OnStartClient()
+    public override void OnStartLocalPlayer()
     {
-        base.OnStartClient();
+        base.OnStartLocalPlayer();
         string nickname = SQLManager.Instance.user_info.user_nickname;
         CmdSendNameToServer(nickname);
     }
