@@ -14,7 +14,7 @@ public class ServerJsonItem
     public string id_json { get; private set; }
     public string pw_json { get; private set; }
     public string port_json { get; private set; }
-    
+
     public ServerJsonItem(string ip, string table, string id, string pw, string port)
     {
         ip_json = ip;
@@ -28,33 +28,23 @@ public class ServerJsonItem
 public class UserInfo
 {
     public string user_name { get; private set; }
+    public string user_nickname { get; private set; }
     public int user_score;
-    //public string user_password { get; private set; }
-    
-    /// <summary>
-    /// 추가 UserInfo 필요하면 여기서 추가
-    /// </summary>
-    //public string user_addmore { get; private set; }
 
-    public UserInfo(string name, int score)//string _addmore
+    public UserInfo(string name, string nickname, int score)
     {
         user_name = name;
+        user_nickname = nickname;
         user_score = score;
-        //user_password = password;
-        //user_addmore = _addmore;
     }
 }
 
 public class SQLManager : MonoBehaviour
 {
-    //private 변수는 _camelCase
     [SerializeField] private string _db_path = string.Empty;
     private MySqlConnection _connection;
-    private MySqlDataReader _reader;
 
-    //public 변수는 snake_case (또는 명시된 규칙 적용)
     public UserInfo user_info { get; private set; }
-    //싱글톤은 Instance 고정
     public static SQLManager Instance = null;
 
     private void Awake()
@@ -67,7 +57,7 @@ public class SQLManager : MonoBehaviour
     private void Start()
     {
         _db_path = Path.Combine(Application.persistentDataPath, "Database");
-        string serverinfo = ServerSet(_db_path);//경로지정
+        string serverinfo = ServerSet(_db_path);
 
         try
         {
@@ -89,7 +79,6 @@ public class SQLManager : MonoBehaviour
     private string ServerSet(string path)
     {
         CreateFile(path);
-
         string jsonString = File.ReadAllText(path + "/config.json");
         JsonData itemData = JsonMapper.ToObject(jsonString);
 
@@ -118,15 +107,13 @@ public class SQLManager : MonoBehaviour
         {
             Directory.CreateDirectory(path);
         }
-        path += "/config.json";
-        if (!File.Exists(path))
+        string filePath = path + "/config.json";
+        if (!File.Exists(filePath))
         {
             List<ServerJsonItem> item = new List<ServerJsonItem>();
-            item.Add(
-                new ServerJsonItem
-                ("192.168.1.45", "programming", "root", "250930", "3306")); // DB설정
+            item.Add(new ServerJsonItem("192.168.1.45", "programming", "root", "250930", "3306"));
             JsonData data = JsonMapper.ToJson(item);
-            File.WriteAllText(path, data.ToString());
+            File.WriteAllText(filePath, data.ToString());
         }
     }
 
@@ -145,44 +132,35 @@ public class SQLManager : MonoBehaviour
         try
         {
             if (!ConnectionCheck(_connection)) return false;
-            /* 
-             SELECT User_Name,User_Password,User_PhoneNum
-             FROM user_info 
-             WHERE User_Name='박희수' AND User_Password='0204';
-            //전화 번호등(_addmore) 추가 시 변경
-            */
 
-            string sqlCommand = "SELECT user_name, user_password, user_score FROM user_info WHERE user_name=@name AND user_password=@pw";
+            string sqlCommand = "SELECT user_name, user_nickname, user_score FROM user_info WHERE user_name=@name AND user_password=@pw";
 
             using (MySqlCommand command = new MySqlCommand(sqlCommand, _connection))
             {
                 command.Parameters.AddWithValue("@name", name);
                 command.Parameters.AddWithValue("@pw", password);
 
-                using (_reader = command.ExecuteReader())
+                using (MySqlDataReader reader = command.ExecuteReader())
                 {
-                    if (_reader.Read())
+                    if (reader.Read())
                     {
-                        string readName = _reader["user_name"].ToString();
-                        // GetOrdinal을 쓰면 인덱스 번호를 직접 계산 안 해도 되어 안전
-                        int readScore = _reader.IsDBNull(_reader.GetOrdinal("user_score")) ? 0 : Convert.ToInt32(_reader["user_score"]);
+                        string readName = reader["user_name"].ToString();
+                        string readNickname = reader["user_nickname"].ToString();
+                        int readScore = reader.IsDBNull(reader.GetOrdinal("user_score")) ? 0 : Convert.ToInt32(reader["user_score"]);
 
-                        user_info = new UserInfo(readName, readScore);
+                        user_info = new UserInfo(readName, readNickname, readScore);
                         return true;
                     }
                 }
             }
-            if (!_reader.IsClosed) _reader.Close();
             return false;
         }
         catch (Exception e)
         {
-            Debug.Log(e.Message);
-            if (!_reader.IsClosed) _reader.Close();
+            Debug.LogError($"Login Error: {e.Message}");
             return false;
         }
     }
-
 
     public bool SignupIDCheck(string name)
     {
@@ -194,10 +172,9 @@ public class SQLManager : MonoBehaviour
             using (MySqlCommand command = new MySqlCommand(sqlCommand, _connection))
             {
                 command.Parameters.AddWithValue("@name", name);
-                using (var reader = command.ExecuteReader())
+                using (MySqlDataReader reader = command.ExecuteReader())
                 {
-                    bool hasRows = reader.HasRows;
-                    return hasRows; // 데이터가 있으면 이미 존재하는 아이디(true)
+                    return reader.HasRows;
                 }
             }
         }
@@ -207,17 +184,42 @@ public class SQLManager : MonoBehaviour
             return false;
         }
     }
-    public bool Signup(string name,string password)
+
+    public bool SignupNicknameCheck(string nickname)
     {
         try
         {
             if (!ConnectionCheck(_connection)) return false;
 
-            string sqlCommand = "INSERT INTO user_info (user_name, user_password, user_score) VALUES (@name, @pw, @score)";
+            string sqlCommand = "SELECT user_nickname FROM user_info WHERE user_nickname=@nickname";
+            using (MySqlCommand command = new MySqlCommand(sqlCommand, _connection))
+            {
+                command.Parameters.AddWithValue("@nickname", nickname);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    return reader.HasRows;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Nickname Check Error: {e.Message}");
+            return false;
+        }
+    }
+
+    public bool Signup(string name, string password, string nickname)
+    {
+        try
+        {
+            if (!ConnectionCheck(_connection)) return false;
+
+            string sqlCommand = "INSERT INTO user_info (user_name, user_password, user_nickname, user_score) VALUES (@name, @pw, @nickname, @score)";
             using (MySqlCommand command = new MySqlCommand(sqlCommand, _connection))
             {
                 command.Parameters.AddWithValue("@name", name);
                 command.Parameters.AddWithValue("@pw", password);
+                command.Parameters.AddWithValue("@nickname", nickname);
                 command.Parameters.AddWithValue("@score", 0);
 
                 return command.ExecuteNonQuery() == 1;
@@ -229,25 +231,47 @@ public class SQLManager : MonoBehaviour
             return false;
         }
     }
+
+    public string GetNickname(string name)
+    {
+        try
+        {
+            if (!ConnectionCheck(_connection)) return "";
+
+            string sqlCommand = "SELECT user_nickname FROM user_info WHERE user_name=@name";
+            using (MySqlCommand command = new MySqlCommand(sqlCommand, _connection))
+            {
+                command.Parameters.AddWithValue("@name", name);
+                object result = command.ExecuteScalar();
+                return result != null ? result.ToString() : "";
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"GetNickname Error: {e.Message}");
+            return "";
+        }
+    }
+
     public bool GetScore(string name)
     {
         try
         {
             if (!ConnectionCheck(_connection)) return false;
 
-            string sqlcommand = "SELECT user_name, user_score FROM user_info WHERE user_name=@name";
+            string sqlcommand = "SELECT user_name, user_nickname, user_score FROM user_info WHERE user_name=@name";
             using (MySqlCommand command = new MySqlCommand(sqlcommand, _connection))
             {
                 command.Parameters.AddWithValue("@name", name);
-                // 내부 로컬 변수 reader 사용 (using으로 자동 Close)
-                using (var reader = command.ExecuteReader())
+                using (MySqlDataReader reader = command.ExecuteReader())
                 {
                     if (reader.Read())
                     {
                         string nametemp = reader["user_name"].ToString();
+                        string nicktemp = reader["user_nickname"].ToString();
                         int score = reader.IsDBNull(reader.GetOrdinal("user_score")) ? 0 : Convert.ToInt32(reader["user_score"]);
 
-                        user_info = new UserInfo(nametemp, score);
+                        user_info = new UserInfo(nametemp, nicktemp, score);
                         return true;
                     }
                 }
@@ -260,6 +284,7 @@ public class SQLManager : MonoBehaviour
             return false;
         }
     }
+
     public bool SetScore(string name, int score)
     {
         try
@@ -273,8 +298,6 @@ public class SQLManager : MonoBehaviour
                 command.Parameters.AddWithValue("@name", name);
 
                 int affectedrows = command.ExecuteNonQuery();
-
-                // Null 체크 추가 (안정성 강화)
                 if (user_info != null) user_info.user_score = score;
 
                 return affectedrows >= 0;
@@ -284,6 +307,15 @@ public class SQLManager : MonoBehaviour
         {
             Debug.LogError($"SetScore Error: {e.Message}");
             return false;
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        if (_connection != null && _connection.State == System.Data.ConnectionState.Open)
+        {
+            _connection.Close();
+            Debug.Log("SQL Connection Closed.");
         }
     }
 }
