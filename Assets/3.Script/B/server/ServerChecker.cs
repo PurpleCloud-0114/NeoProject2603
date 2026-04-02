@@ -42,13 +42,21 @@ public class ServerChecker : MonoBehaviour
 
     private void Awake()
     {
-        _path = Application.dataPath + "/License";
+        // dataPath 대신 persistentDataPath 사용 (모바일 권한 문제 해결)
+        _path = Application.persistentDataPath + "/License";
 
         if (!Directory.Exists(_path)) Directory.CreateDirectory(_path);
-        if (!File.Exists(_path + "/License.json")) CreateDefaultData(_path);
 
-        _path = _path + "/License.json";
+        string fullFilePath = _path + "/License.json";
+        if (!File.Exists(fullFilePath)) CreateDefaultData(_path);
+
+        _path = fullFilePath;
         _manager = NetworkManager.singleton;
+
+        if (_manager.transport == null)
+        {
+            Debug.LogError("NetworkManager에 Transport가 할당되지 않았습니다!");
+        }
         _transport = (KcpTransport)_manager.transport;
     }
 
@@ -56,7 +64,7 @@ public class ServerChecker : MonoBehaviour
     {
         // LitJson은 프로퍼티명 그대로 직렬화하므로 소문자 키로 통일
         List<LicenseItem> items = new List<LicenseItem>();
-        items.Add(new LicenseItem("Empty", "127.0.0.1", "7777"));
+        items.Add(new LicenseItem("Client", "127.0.0.1", "7777"));
         JsonData data = JsonMapper.ToJson(items);
         File.WriteAllText(path + "/License.json", data.ToString());
     }
