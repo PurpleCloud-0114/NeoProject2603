@@ -10,7 +10,8 @@ public class LoginController : MonoBehaviour
     [SerializeField] private TMP_Text _log_text;
     [SerializeField] private Button _login_button;
     [SerializeField] private Button _signup_button;
-    [SerializeField] private SignupController _signupController; // ¿¬°á¿ë
+    [SerializeField] private SignupController _signupController;
+    [SerializeField] private GameObject _title_ob;
 
     private void Start()
     {
@@ -36,6 +37,11 @@ public class LoginController : MonoBehaviour
             {
                 checker.Start_Client();
             }
+
+            if (_title_ob != null)
+                _title_ob.SetActive(true);
+
+            gameObject.SetActive(false);
         }
         else
         {
