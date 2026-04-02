@@ -1,7 +1,3 @@
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -16,52 +12,48 @@ public class SignupController : MonoBehaviour
     [SerializeField] private TMP_InputField _pw_input;
     [SerializeField] private TMP_Text _log_text;
     [SerializeField] private Button _signup_button;
+
     private void Start()
     {
         LogTextViewing(string.Empty);
         _signup_button.onClick.AddListener(SignupEvent);
     }
 
-    private void LogTextViewing(string text)
-    {
-        _log_text.text = text;
-    }
+    private void LogTextViewing(string text) { _log_text.text = text; }
+
     public void SignupEvent()
     {
         if (_name_input.text.Equals(string.Empty) || _pw_input.text.Equals(string.Empty) || _nickname_input.text.Equals(string.Empty))
         {
-            LogTextViewing("Name, Nic, PassWord check Please");
+            LogTextViewing("이름, 닉네임, 비밀번호를 모두 입력하세요");
             return;
         }
 
         if (SQLManager.Instance.SignupIDCheck(_name_input.text))
         {
-            LogTextViewing("This Name is already uesed");
+            LogTextViewing("이미 사용 중인 아이디입니다");
             return;
         }
 
         if (SQLManager.Instance.SignupNicknameCheck(_nickname_input.text))
         {
-            LogTextViewing("This Nick Name is already uesed");
+            LogTextViewing("이미 사용 중인 닉네임입니다");
             return;
         }
 
         if (SQLManager.Instance.Signup(_name_input.text, _pw_input.text, _nickname_input.text))
         {
-           
             _name_input.text = string.Empty;
             _pw_input.text = string.Empty;
             _nickname_input.text = string.Empty;
-            
-            _login.gameObject.SetActive(true);
-            _logincontroller.LogTextViewing("생성되었습니다.");
-            _logincontroller.LogTextViewing("Success Sign UP.");
+
+            _login.SetActive(true);
+            _logincontroller.LogTextViewing("회원가입이 완료되었습니다."); // 하나만
             _signup_ob.SetActive(false);
         }
         else
         {
-            LogTextViewing("이름, 닉네임 또는 비밀번호를 확인 해주세요");
-            LogTextViewing("Name, Nick Name or PassWord check Please");
+            LogTextViewing("회원가입에 실패했습니다. 다시 시도해주세요");
         }
     }
 }

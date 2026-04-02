@@ -6,150 +6,116 @@ using kcp2k;
 using LitJson;
 using System.IO;
 
-
-public enum Type
+public enum NetworkType
 {
-    enum_Empty = 0, //라이센스용
-    enum_Server,
-    enum_Client
+    Empty = 0,
+    Server,
+    Client
 }
 
-public class Item
+// JSON 직렬화 키와 프로퍼티명 통일
+public class LicenseItem
 {
     public string license { get; private set; }
     public string server_ip { get; private set; }
     public string port { get; private set; }
 
-    public Item(string L_index, string _ip, string _port)
+    public LicenseItem(string license, string ip, string port)
     {
-        license = L_index;
-        server_ip = _ip;
-        port = _port;
+        this.license = license;
+        server_ip = ip;
+        this.port = port;
     }
 }
 
 public class ServerChecker : MonoBehaviour
 {
-    [SerializeField] public Type type;
+    public NetworkType networkType;
 
     private NetworkManager _manager;
     private KcpTransport _transport;
 
-    public string server_ip { get; private set; } //캡슐화
+    public string server_ip { get; private set; }
     public string server_port { get; private set; }
 
     private string _path = string.Empty;
 
     private void Awake()
     {
-        if (_path.Equals(string.Empty))
-        {
-            _path = Application.dataPath + "/License";
-        }
+        _path = Application.dataPath + "/License";
 
-        if (!Directory.Exists(_path))
-        {
-            Directory.CreateDirectory(_path);
-        }
+        if (!Directory.Exists(_path)) Directory.CreateDirectory(_path);
+        if (!File.Exists(_path + "/License.json")) CreateDefaultData(_path);
 
-        if (!File.Exists(_path + "/License.json"))
-        {
-            DefalutData(_path);
-        }
         _path = _path + "/License.json";
         _manager = NetworkManager.singleton;
         _transport = (KcpTransport)_manager.transport;
     }
 
-    private void DefalutData(string path)
+    private void CreateDefaultData(string path)
     {
-        List<Item> item = new List<Item>();
-        item.Add(new Item("0", "127.0.0.1", "7777"));
-
-        JsonData data = JsonMapper.ToJson(item);
+        // LitJson은 프로퍼티명 그대로 직렬화하므로 소문자 키로 통일
+        List<LicenseItem> items = new List<LicenseItem>();
+        items.Add(new LicenseItem("Empty", "127.0.0.1", "7777"));
+        JsonData data = JsonMapper.ToJson(items);
         File.WriteAllText(path + "/License.json", data.ToString());
     }
 
-    private Type LicenseType(string path)
+    private NetworkType ReadLicenseType(string path)
     {
-        Type type = Type.enum_Empty;
-        /*
-         public string License { get; private set; }
-         public string ServerIP { get; private set; }
-         public string Port { get; private set; }
-         */
         try
         {
-            string stringjson = File.ReadAllText(path);
-            JsonData itemdata = JsonMapper.ToObject(stringjson);
-            string stringtype = itemdata[0]["License"].ToString();
-            string stringserverip = itemdata[0]["ServerIP"].ToString();
-            string stringport = itemdata[0]["Port"].ToString();
+            string jsonString = File.ReadAllText(path);
+            JsonData itemData = JsonMapper.ToObject(jsonString);
 
-            server_ip = stringserverip;
-            server_port = stringport;
-            type = (Type)Enum.Parse(typeof(Type), stringtype);
+            // 소문자 키로 읽기 (LicenseItem 프로퍼티명과 일치)
+            string typeStr = itemData[0]["license"].ToString();
+            server_ip = itemData[0]["server_ip"].ToString();
+            server_port = itemData[0]["port"].ToString();
 
             _manager.networkAddress = server_ip;
-            _transport.port = ushort.Parse(server_port);//부호가 없음
+            _transport.port = ushort.Parse(server_port);
 
-            return type;
+            return (NetworkType)Enum.Parse(typeof(NetworkType), typeStr);
         }
         catch (Exception e)
         {
-            Debug.Log(e.Message);
-            return Type.enum_Empty;
+            Debug.LogError($"License Read Error: {e.Message}");
+            return NetworkType.Empty;
         }
-
     }
 
     private void Start()
     {
-        type = LicenseType(_path);
+        networkType = ReadLicenseType(_path);
 
-        //type 별로 각자 행동을 넣을 것...
-
-        if (type.Equals(Type.enum_Server)) { Start_Server(); }
-        //else if(type.Equals(Type.Client)){ Start_Client(); };
+        if (networkType == NetworkType.Server) StartServer();
     }
 
-    private void Start_Server()
+    private void StartServer()
     {
         if (Application.platform == RuntimePlatform.WebGLPlayer)
         {
-            Debug.Log("cannot webGL Server");
+            Debug.LogWarning("WebGL cannot run as server.");
+            return;
         }
-        else
-        {
-            _manager.StartServer();
-            Debug.Log($"{_manager.networkAddress}: Start Server");
 
-            NetworkServer.OnConnectedEvent += (NetworkConnectionToClient) =>
-            {
-                Debug.Log($"new client connect : {NetworkConnectionToClient.address}");
-            };
-            NetworkServer.OnDisconnectedEvent += (NetworkConnectionToClient) =>
-            {
-                Debug.Log($"client connect : {NetworkConnectionToClient.address}");
-            };
-        }
+        _manager.StartServer();
+        Debug.Log($"{_manager.networkAddress}: Server Started");
+
+        NetworkServer.OnConnectedEvent += (conn) => Debug.Log($"Client connected: {conn.address}");
+        NetworkServer.OnDisconnectedEvent += (conn) => Debug.Log($"Client disconnected: {conn.address}");
     }
 
     public void Start_Client()
     {
         _manager.StartClient();
-        Debug.Log($"{_manager.networkAddress}: Start Client");
+        Debug.Log($"{_manager.networkAddress}: Client Started");
     }
 
     private void OnApplicationQuit()
-    {//프로그램이 꺼졌을때
-        if (NetworkClient.isConnected)//클라이언트 입장
-        {
-            _manager.StopClient();
-        }
-        if (NetworkServer.active)
-        {
-            _manager.StopServer();
-        }
+    {
+        if (NetworkClient.isConnected) _manager.StopClient();
+        if (NetworkServer.active) _manager.StopServer();
     }
 }
