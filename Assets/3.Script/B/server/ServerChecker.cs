@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -42,22 +43,37 @@ public class ServerChecker : MonoBehaviour
 
     private void Awake()
     {
-        // dataPath 대신 persistentDataPath 사용 (모바일 권한 문제 해결)
+        // 경로 설정은 즉시 수행
         _path = Application.persistentDataPath + "/License";
-
         if (!Directory.Exists(_path)) Directory.CreateDirectory(_path);
-
         string fullFilePath = _path + "/License.json";
         if (!File.Exists(fullFilePath)) CreateDefaultData(_path);
-
         _path = fullFilePath;
+    }
+
+    private IEnumerator Start()
+    {
+        // NetworkManager.singleton이 할당될 때까지 대기
+        while (NetworkManager.singleton == null)
+        {
+            yield return null;
+        }
+
         _manager = NetworkManager.singleton;
 
-        if (_manager.transport == null)
+        while (_manager.transport == null)
         {
-            Debug.LogError("NetworkManager에 Transport가 할당되지 않았습니다!");
+            yield return null;
         }
+
         _transport = (KcpTransport)_manager.transport;
+
+        networkType = ReadLicenseType(_path);
+
+        if (networkType == NetworkType.Server)
+        {
+            StartServer();
+        }
     }
 
     private void CreateDefaultData(string path)
@@ -91,13 +107,6 @@ public class ServerChecker : MonoBehaviour
             Debug.LogError($"License Read Error: {e.Message}");
             return NetworkType.Empty;
         }
-    }
-
-    private void Start()
-    {
-        networkType = ReadLicenseType(_path);
-
-        if (networkType == NetworkType.Server) StartServer();
     }
 
     private void StartServer()
