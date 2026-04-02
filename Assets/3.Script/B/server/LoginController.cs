@@ -49,4 +49,14 @@ public class LoginController : MonoBehaviour
             _signupController.gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
+    private void OnDisable()
+    {
+        ClearInputs();
+    }
+    private void ClearInputs()
+    {
+        if (_name_input != null) _name_input.text = string.Empty;
+        if (_pw_input != null) _pw_input.text = string.Empty;
+        LogTextViewing(string.Empty);
+    }
 }
