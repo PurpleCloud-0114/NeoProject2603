@@ -180,6 +180,14 @@ public class SQLManager : MonoBehaviour
         }
     }
 
+    public void Logout()
+    {
+        user_info = null;
+        if (_connection != null && _connection.State == System.Data.ConnectionState.Open)
+        {
+            _connection.Close();
+        }
+    }
     public bool SignupIDCheck(string name)
     {
         try
