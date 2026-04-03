@@ -42,17 +42,17 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        float bgmVol = PlayerPrefs.GetFloat("BGMVolume", 0.75f);
-        float sfxVol = PlayerPrefs.GetFloat("SFXVolume", 0.75f);
+        float bgmVol = PlayerPrefs.GetFloat("BGM", 0.75f);
+        float sfxVol = PlayerPrefs.GetFloat("SFX", 0.75f);
 
-        SetVolume("BGMVolume", bgmVol);
-        SetVolume("SFXVolume", sfxVol);
+        SetVolume("BGM", bgmVol);
+        SetVolume("SFX", sfxVol);
 
     }
 
     public void SetVolume(string parametername, float slidervalue)
     {
-        float dB = Mathf.Log10(slidervalue) * 20;
+        float dB = Mathf.Log10(Mathf.Max(0.0001f, slidervalue)) * 20;
 
         _audio_mixer.SetFloat(parametername, dB);
     }
