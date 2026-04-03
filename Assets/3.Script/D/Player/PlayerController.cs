@@ -30,11 +30,13 @@ public class PlayerController : MonoBehaviour {
 	[SerializeField, Range(5f, 50f)] private float _deathSpeedCount = 30f;
 
 	[Header("Mobile용 감도 조절")]
-	[Range(0.1f, 3f)] public float MoveMobileSensitive = 1f;
+	[Range(1f, 10f)] public float MoveMobileSensitive = 5f;
 
 	private Vector2 _moveVector;
 	private Vector3 _moveDir;
 	private float _dropSpeed;
+
+	private float _lastAngleY = 0f;
 
 	private bool _isWingOpened = false;
 	private bool _isArriveEndPoint = false;
@@ -71,26 +73,28 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		_dropSpeed = Mathf.Clamp(_dropSpeed, -1 * _dropLimitSpeed, 0);
-
-		//방향 구하기.
-		_moveVector = _inputController.MovePoint;
-
-		//방향 + 낙하
-		_moveDir = new Vector3(_moveVector.x, 0, _moveVector.y) * _moveSpeed;
+		_moveVector = _inputController.MovePoint * MoveMobileSensitive; //방향 구하기.
+		_moveDir = new Vector3(Mathf.Clamp(_moveVector.x, -1, 1), 0, Mathf.Clamp(_moveVector.y, -1, 1)) * _moveSpeed; //방향 + 낙하
 
 		//반영
 		_rigidBody.linearVelocity = _moveDir + new Vector3(0, _dropSpeed, 0);
 
-		if (_moveDir.sqrMagnitude > 0.01f) {
-			//Atan2를 사용하여 X, Z 평면에서의 이동 방향 각도를 구함 (라디안을 각도로 변환)
-			float targetAngleY = Mathf.Atan2(_moveDir.x, _moveDir.z) * Mathf.Rad2Deg;
+		// 3. 틸트(기울기) 회전 처리
+		// 입력값(_moveVector)은 보통 -1 ~ 1 사이의 값입니다.
 
-			//현재 X축 회전값 유지, Y축은 목표 방향, Z축은 0으로 설정한 목표 회전값
-			Quaternion targetRotation = Quaternion.Euler(165, targetAngleY, 0f);
-			//10f는 회전 속도입니다. 모바일 조작감에 맞춰 값을 조절해 보세요.
-			//transform.rotation = targetRotation;
-			transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
-		}
+		// 앞뒤 조작(y)에 따라 X축(Pitch) 각도 계산
+		// 방향키 위를 눌렀을 때 고개를 더 숙이게 하려면 + 기호를 사용합니다. (반대면 - 로 변경)
+		float targetX = 90f + (_moveVector.y * 20f);
+
+		// 좌우 조작(x)에 따라 Z축(Roll) 각도 계산
+		// 유니티에서는 오른쪽으로 기울어질 때 Z값이 음수(-)가 되어야 자연스럽습니다.
+		float targetZ = _moveVector.x * -20f;
+
+		// Y축(바라보는 방향)은 0으로 고정하고, X와 Z축만 기울입니다.
+		Quaternion targetRotation = Quaternion.Euler(targetX, 0f, targetZ);
+
+		// 현재 상태에서 목표 기울기로 부드럽게 Slerp
+		transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 15f);
 	}
 
 	private void OnCollisionEnter(Collision collision) {
