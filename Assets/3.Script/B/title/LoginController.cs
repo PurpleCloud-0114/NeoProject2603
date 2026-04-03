@@ -40,7 +40,7 @@ public class LoginController : MonoBehaviour
             if (manager.TryGetComponent(out ServerChecker checker))
             {
                 checker.Start_Client();
-                SceneManager.LoadScene("1.B_Prototypeloginscene"); //추후 제거
+                SceneManager.LoadScene("1.B_Prototypelogin"); //추후 제거
             }
 
             if (_title_ob != null)
