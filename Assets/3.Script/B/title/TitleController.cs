@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 using TMPro;
+using UnityEngine.SceneManagement; //추후 제거
 
 public class TitleController : MonoBehaviour
 {
@@ -71,5 +72,8 @@ public class TitleController : MonoBehaviour
         }
 
         gameObject.SetActive(false);
+
+        SceneManager.LoadScene("0.B_Prototype");//추후 제거
+
     }
 }
