@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
+using TMPro;
 
 public class TitleController : MonoBehaviour
 {
@@ -13,11 +14,24 @@ public class TitleController : MonoBehaviour
     [SerializeField] private Button _option_button;
     [SerializeField] private Button _logout_button;
 
+    [Header("Greeting UI")]
+    [SerializeField] private TextMeshProUGUI _welcome_text;
+
     private void Start()
     {
         _start_button.onClick.AddListener(StartGameEvent);
         _option_button.onClick.AddListener(OpenOptionPage);
         _logout_button.onClick.AddListener(LogoutEvent);
+    }
+
+    private void OnEnable()
+    {
+        if (_welcome_text != null)
+        {
+            string playerName = PlayerPrefs.GetString("PlayerNickname");
+
+            _welcome_text.text = $"{playerName} 님\n환영합니다!";
+        }
     }
 
     public void StartGameEvent()

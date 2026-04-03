@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Mirror;
+using UnityEngine.SceneManagement;
 
 public class LoginController : MonoBehaviour
 {
@@ -32,16 +33,21 @@ public class LoginController : MonoBehaviour
 
         if (SQLManager.Instance.Login(_name_input.text, _pw_input.text))
         {
+            PlayerPrefs.SetString("PlayerNickname", _name_input.text);
+            PlayerPrefs.Save();
+
             GameObject manager = NetworkManager.singleton.gameObject;
             if (manager.TryGetComponent(out ServerChecker checker))
             {
                 checker.Start_Client();
+                SceneManager.LoadScene("1.B_Prototypeloginscene"); //추후 제거
             }
 
             if (_title_ob != null)
                 _title_ob.SetActive(true);
 
             gameObject.SetActive(false);
+            //여기까지 제거
         }
         else
         {
