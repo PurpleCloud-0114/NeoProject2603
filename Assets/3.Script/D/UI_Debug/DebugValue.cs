@@ -14,7 +14,7 @@ public class DebugValue : MonoBehaviour {
 
 	private void Update() {
 		
-		_moveSpeedText.text = $"이동 가속도 - x : {_playerController.Velocity.x.ToString("F2")} y : {_playerController.Velocity.y.ToString("F2")} z : {_playerController.Velocity.z.ToString("F2")}";
+		_moveSpeedText.text = $"이동 가속도 - x : {_playerController.VelocityTracker.x.ToString("F2")} y : {_playerController.VelocityTracker.y.ToString("F2")} z : {_playerController.VelocityTracker.z.ToString("F2")}";
 		_gyroPointText.text = $"자이로 기준 - x : {_inputController.BasePoint.x.ToString("F2")} y : {_inputController.BasePoint.y.ToString("F2")}";
 		_gyroVectorText.text = $"자이로 기준 - x : {_inputController.MovePoint.x.ToString("F2")} y : {_inputController.MovePoint.y.ToString("F2")}";
 	}

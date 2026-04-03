@@ -4,12 +4,12 @@
     "maps": [
         {
             "name": "Player",
-            "id": "6e256f27-9b95-44a6-bb13-e69225b5826e",
+            "id": "13f9e898-7c08-4f2b-ae81-7ff696aa2db5",
             "actions": [
                 {
                     "name": "Move(Vector2)",
                     "type": "Value",
-                    "id": "79ca35cd-5d4e-4db3-b4b3-768462b1f803",
+                    "id": "c9024130-e335-415f-9d3f-58ec5ae57188",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
@@ -17,8 +17,8 @@
                 },
                 {
                     "name": "Move(Vector3)",
-                    "type": "PassThrough",
-                    "id": "e83f3e4d-2d72-4a6a-a22d-1c8d6148a7bc",
+                    "type": "Value",
+                    "id": "af8cf4bd-d2dc-46ee-a2c1-65196795fa9e",
                     "expectedControlType": "Vector3",
                     "processors": "",
                     "interactions": "",
@@ -28,22 +28,77 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "dcff3aba-242c-4b0e-bedd-8dd716e52887",
-                    "path": "<Mouse>/position",
+                    "id": "80acbe2d-ad1d-4407-b1ec-2d4e8ce32619",
+                    "path": "<Gamepad>/leftStick",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Debug",
+                    "groups": ";Gamepad",
                     "action": "Move(Vector2)",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "2D Vector",
+                    "id": "ddf47c53-3a92-45d4-887a-8c180870ab3e",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move(Vector2)",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "ca8d15e1-a74c-4cf5-af20-6337dd922752",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move(Vector2)",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "6737b01b-7c78-44a3-898e-439b3d338d21",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move(Vector2)",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "692de457-6eaa-46c3-86ab-6d7c2954ef3f",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move(Vector2)",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "14efeda2-dbfe-4e78-99e3-5e289f1e4bf1",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move(Vector2)",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
-                    "id": "1bc1a26b-09e9-436c-b5aa-cbee2821d03f",
+                    "id": "601037b1-042e-4407-9aa1-626a2d770891",
                     "path": "<GravitySensor>/gravity",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Mobile",
+                    "groups": "",
                     "action": "Move(Vector3)",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -51,33 +106,5 @@
             ]
         }
     ],
-    "controlSchemes": [
-        {
-            "name": "Mobile",
-            "bindingGroup": "Mobile",
-            "devices": [
-                {
-                    "devicePath": "<Touchscreen>",
-                    "isOptional": false,
-                    "isOR": false
-                },
-                {
-                    "devicePath": "<GravitySensor>",
-                    "isOptional": false,
-                    "isOR": false
-                }
-            ]
-        },
-        {
-            "name": "Debug",
-            "bindingGroup": "Debug",
-            "devices": [
-                {
-                    "devicePath": "<Mouse>",
-                    "isOptional": false,
-                    "isOR": false
-                }
-            ]
-        }
-    ]
+    "controlSchemes": []
 }

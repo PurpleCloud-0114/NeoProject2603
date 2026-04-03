@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - EndPoint
+  - Obstacle
+  - DangerZone
   layers:
   - Default
   - TransparentFX

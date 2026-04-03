@@ -31,7 +31,7 @@ public class DebugSetting : MonoBehaviour {
 		_debugMoveSpeedText.text = _debugMoveSpeed.value.ToString();
 	}
 	public void OnDropSpeedValueChange() {
-		_playerController._dropLimitSpeed = _debugDropSpeed.value * -1;
+		_playerController._dropLimitSpeed = _debugDropSpeed.value;
 		_debugDropSpeedText.text = _debugDropSpeed.value.ToString();
 	}
 	public void OnFOVcoefficientValueChange() {
