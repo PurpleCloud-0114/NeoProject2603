@@ -49,10 +49,21 @@ public class AuthPlayer : NetworkBehaviour
     }
 
     // 서버에서 플레이어가 나갈 때 번호 반납
-    public override void OnStopServer()
+    //public override void OnStopServer()
+    //{
+    //    base.OnStopServer();
+    //    if (player_num != -1) ReleasePlayerNum(player_num);
+    //}
+
+    [Command]
+    public void CmdLeaveRoom()
     {
-        base.OnStopServer();
-        if (player_num != -1) ReleasePlayerNum(player_num);
+        if (player_num != -1)
+        {
+            ReleasePlayerNum(player_num);
+            player_num = -1;
+        }
+        // 클라이언트를 로그인 씬으로 보내야될거임
     }
 
     public void OnPlayerNumChange(int oldVal, int newVal)
@@ -80,7 +91,7 @@ public class AuthPlayer : NetworkBehaviour
         {
             player_ID = name;
             is_authenticated = true;
-            player_num = AssignPlayerNum(); // 번호 부여
+            //player_num = AssignPlayerNum(); // 번호 부여
             TargetRpcLoginResult(connectionToClient, true, nickname, score, "");
         }
         else
@@ -90,6 +101,21 @@ public class AuthPlayer : NetworkBehaviour
             StartCoroutine(DelayDisconnect(connectionToClient));
         }
     }
+
+    /* 
+    //RoomScene등에서 시작될 때 호출하여 번호 부여
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        // 만약 로그인된 사용자라면 룸 입장 시점에 번호 부여
+        if (is_authenticated && player_num == -1)
+        {
+            player_num = AssignPlayerNum();
+            Debug.Log($"[Server] Player {player_ID} joined room. Assigned Num: {player_num}");
+        }
+    }
+    */
 
     private System.Collections.IEnumerator DelayDisconnect(NetworkConnectionToClient conn)
     {
