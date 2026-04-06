@@ -15,9 +15,8 @@ public class StageSystem : MonoBehaviour {
 	}
 
 	public void SetStage() {
-		float rnd_height = Random.Range(2500f,3500f);
 		float rnd_dangerzone = Random.Range(300f, 500f);
-		stage_data = new StageData(rnd_height, rnd_dangerzone);
+		stage_data = new StageData(3000f, rnd_dangerzone);
 		_dangerZoneTrigger.position = new Vector3(0, rnd_dangerzone, 0);
 	}
 }

@@ -20,33 +20,37 @@ public class RandomSpawner : MonoBehaviour {
     public float minScale = 0.5f;
     public float maxScale = 2.0f;
 
-    public void SpawnObstacles() {
+    private GameObject[] _obstaclePooling;
+
+	public void Start() {
+        _obstaclePooling = new GameObject[spawnCount];
+
         for (int i = 0; i < spawnCount; i++) {
-            SpawnRandomObject();
+            GameObject prefabToSpawn = (Random.Range(0, 2) == 0) ? cubePrefab : spherePrefab;
+            _obstaclePooling[i] = Instantiate(prefabToSpawn, transform);
         }
     }
 
-    private void SpawnRandomObject() {
-        // 1. 큐브와 스피어 중 무작위로 하나 선택 (0 또는 1)
-        GameObject prefabToSpawn = (Random.Range(0, 2) == 0) ? cubePrefab : spherePrefab;
+	public void SetObstacles() {
+        for(int i = 0; i < spawnCount; i++) {
+            // 1. 설정된 범위 내에서 무작위 위치 계산
+            float randomX = Random.Range(minPosition.x, maxPosition.x);
+            float randomY = Random.Range(StageSystem.Instance.stage_data.map_dangerzone, StageSystem.Instance.stage_data.map_height);
+            float randomZ = Random.Range(minPosition.z, maxPosition.z);
+            Vector3 randomPos = new Vector3(randomX, randomY, randomZ);
 
-        // 2. 설정된 범위 내에서 무작위 위치 계산
-        float randomX = Random.Range(minPosition.x, maxPosition.x);
-        float randomY = Random.Range(StageSystem.Instance.stage_data.map_dangerzone, StageSystem.Instance.stage_data.map_height);
-        float randomZ = Random.Range(minPosition.z, maxPosition.z);
-        Vector3 randomPos = new Vector3(randomX, randomY, randomZ);
+            // 2. 오브젝트 배치
+            _obstaclePooling[i].transform.position = randomPos;
 
-        // 3. 오브젝트 생성 (Instantiate)
-        GameObject newObject = Instantiate(prefabToSpawn, randomPos, Quaternion.identity);
+            // 3. 무작위 크기 적용 (XYZ 동일한 비율로 크기 조절)
+            float randomScale = Random.Range(minScale, maxScale);
+            _obstaclePooling[i].transform.localScale = new Vector3(randomScale, randomScale, randomScale);
 
-        // 4. 무작위 크기 적용 (XYZ 동일한 비율로 크기 조절)
-        float randomScale = Random.Range(minScale, maxScale);
-        newObject.transform.localScale = new Vector3(randomScale, randomScale, randomScale);
-
-        // 5. 무작위 색상 적용
-        if (newObject.TryGetComponent(out Renderer objRenderer)) {
-            // Random.ColorHSV()를 사용하면 좀 더 선명하고 예쁜 무작위 색상이 나옵니다.
-            objRenderer.material.color = Random.ColorHSV(0f, 1f, 0.5f, 1f, 0.5f, 1f);
-        }
+            // 4. 무작위 색상 적용
+            if (_obstaclePooling[i].TryGetComponent(out Renderer objRenderer)) {
+                // Random.ColorHSV()를 사용하면 좀 더 선명하고 예쁜 무작위 색상이 나옵니다.
+                objRenderer.material.color = Random.ColorHSV(0f, 1f, 0.5f, 1f, 0.5f, 1f);
+            }
+		}
     }
 }

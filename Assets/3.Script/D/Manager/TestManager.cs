@@ -24,7 +24,7 @@ public class TestManager : MonoBehaviour {
 		StageSystem.Instance.SetStage();
 
 
-		_randomSpawner.SpawnObstacles();
+		_randomSpawner.SetObstacles();
 
 		_player.transform.position = new Vector3(0, StageSystem.Instance.stage_data.map_height + 150f, 0);
 
