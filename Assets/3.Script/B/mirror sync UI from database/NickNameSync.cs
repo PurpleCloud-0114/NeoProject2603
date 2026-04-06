@@ -10,7 +10,7 @@ public class NickNameSync : NetworkBehaviour
     //캐릭터 프리팹 내부에 Canvas를 생성이후
     //Canvas 컴포넌트의 Render Mode를 World Space로 변경하여 사용(닉네임 카드가 플레이어 따라다니게 됨)
     
-        [SerializeField] private TMP_Text _nicknamecard_tmp;
+    [SerializeField] private TMP_Text _nicknamecard_tmp;
     [SerializeField] private GameObject _nicknameard_ob;
     public override void OnStartLocalPlayer()
     {

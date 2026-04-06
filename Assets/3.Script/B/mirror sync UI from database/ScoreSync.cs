@@ -15,7 +15,7 @@ public class ScoreSync : NetworkBehaviour
         CommandSendScoreToServer(score);
     }
 
-    public void SetScore(int score) // 오타 수정: SetScrore → SetScore
+    public void SetScore(int score)
     {
         _player_score = score;
     }

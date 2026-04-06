@@ -29,8 +29,9 @@ public class UserInfo
 {
     public string user_name { get; private set; }
     public string user_nickname { get; private set; }
-    public int user_score;
-    public int player_num;
+    public int user_score; //DB에 저장될 점수(레이팅) 입니다.
+    public int player_num = -1;
+    public int round_total_score = 0; //10 라운드 동안 사용할 점수입니다. 게임을 새로 시작하거나 끝날때 0으로 초기화 해줘야됩니다.
 
     public UserInfo(string name, string nickname, int score)
     {
@@ -45,7 +46,7 @@ public class SQLManager : MonoBehaviour
     private string _db_path = string.Empty;
     private MySqlConnection _connection;
 
-    public UserInfo user_info { get; private set; } // DB데이터 받아올때 SQLManager.Instance.user_info.user_name 또는 user_score로 받아오면 됩니다.
+    public UserInfo user_info { get; private set; } // DB데이터 받아올때 SQLManager.Instance.user_info.user_nickname 또는 user_score로 받아오기
     public static SQLManager Instance = null;
 
     private void Awake()
