@@ -48,12 +48,12 @@ public class AuthPlayer : NetworkBehaviour
         if (isLocalPlayer) LocalInstance = null;
     }
 
-    // 서버에서 플레이어가 나갈 때 번호 반납
-    //public override void OnStopServer()
-    //{
-    //    base.OnStopServer();
-    //    if (player_num != -1) ReleasePlayerNum(player_num);
-    //}
+    //서버에서 플레이어가 나갈 때 번호 반납
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        if (player_num != -1) ReleasePlayerNum(player_num);
+    }
 
     [Command]
     public void CmdLeaveRoom()
