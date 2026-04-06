@@ -977,7 +977,7 @@ GameObject:
   - component: {fileID: 447355087}
   - component: {fileID: 447355086}
   m_Layer: 5
-  m_Name: medal
+  m_Name: 8th
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1876,7 +1876,7 @@ GameObject:
   - component: {fileID: 663595902}
   - component: {fileID: 663595901}
   m_Layer: 5
-  m_Name: medal
+  m_Name: 7th
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2603,7 +2603,7 @@ GameObject:
   - component: {fileID: 1288289888}
   - component: {fileID: 1288289887}
   m_Layer: 5
-  m_Name: medal
+  m_Name: 6th
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3207,7 +3207,7 @@ GameObject:
   - component: {fileID: 1470332228}
   - component: {fileID: 1470332227}
   m_Layer: 5
-  m_Name: medal
+  m_Name: 1st
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5188,7 +5188,7 @@ GameObject:
   - component: {fileID: 1838875925}
   - component: {fileID: 1838875924}
   m_Layer: 5
-  m_Name: medal
+  m_Name: 3rd
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5732,7 +5732,7 @@ GameObject:
   - component: {fileID: 1954572464}
   - component: {fileID: 1954572463}
   m_Layer: 5
-  m_Name: medal
+  m_Name: 2nd
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6094,7 +6094,7 @@ GameObject:
   - component: {fileID: 2047515317}
   - component: {fileID: 2047515316}
   m_Layer: 5
-  m_Name: medal
+  m_Name: 4th
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6230,7 +6230,7 @@ GameObject:
   - component: {fileID: 2051718144}
   - component: {fileID: 2051718143}
   m_Layer: 5
-  m_Name: medal
+  m_Name: 5th
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6620,7 +6620,7 @@ GameObject:
   - component: {fileID: 2134809431}
   - component: {fileID: 2134809430}
   m_Layer: 5
-  m_Name: medal
+  m_Name: 10th
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6756,7 +6756,7 @@ GameObject:
   - component: {fileID: 2147035539}
   - component: {fileID: 2147035538}
   m_Layer: 5
-  m_Name: medal
+  m_Name: 9th
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
