@@ -30,6 +30,7 @@ public class UserInfo
     public string user_name { get; private set; }
     public string user_nickname { get; private set; }
     public int user_score;
+    public int player_num;
 
     public UserInfo(string name, string nickname, int score)
     {
@@ -44,7 +45,7 @@ public class SQLManager : MonoBehaviour
     private string _db_path = string.Empty;
     private MySqlConnection _connection;
 
-    public UserInfo user_info { get; private set; }
+    public UserInfo user_info { get; private set; } // DB데이터 받아올때 SQLManager.Instance.user_info.user_name 또는 user_score로 받아오면 됩니다.
     public static SQLManager Instance = null;
 
     private void Awake()
