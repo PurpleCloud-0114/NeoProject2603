@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Mirror;
 
 public class SignupController : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class SignupController : MonoBehaviour
     [SerializeField] private Button _signup_button;
     [SerializeField] private Button _back_button;
 
+    private bool _isWaiting = false;
+
     private void Start()
     {
         LogTextViewing(string.Empty);
@@ -26,61 +29,63 @@ public class SignupController : MonoBehaviour
 
     public void SignupEvent()
     {
+        if (_isWaiting) return;
+
         if (_name_input.text.Equals(string.Empty) || _pw_input.text.Equals(string.Empty) ||
             _nickname_input.text.Equals(string.Empty) || _pw_confirm_input.text.Equals(string.Empty))
         {
-            LogTextViewing("모든 정보를 입력하세요");
-            return;
-        }
-
-        if (SQLManager.Instance.SignupIDCheck(_name_input.text))
-        {
-            LogTextViewing("이미 사용 중인 아이디입니다");
-            return;
-        }
-
-        if (SQLManager.Instance.SignupNicknameCheck(_nickname_input.text))
-        {
-            LogTextViewing("이미 사용 중인 닉네임입니다");
-            return;
+            LogTextViewing("모든 항목을 입력하세요"); return;
         }
 
         if (!_pw_input.text.Equals(_pw_confirm_input.text))
         {
             LogTextViewing("비밀번호가 일치하지 않습니다");
             _pw_confirm_input.text = string.Empty;
-            _pw_confirm_input.ActivateInputField();
-            return;
+            _pw_confirm_input.ActivateInputField(); return;
         }
 
         if (_pw_input.text.Length < 4)
         {
-            LogTextViewing("비밀번호는 4자 이상이어야 합니다.");
-            return;
+            LogTextViewing("비밀번호는 4자 이상이어야 합니다"); return;
         }
 
-        if (SQLManager.Instance.Signup(_name_input.text, _pw_input.text, _nickname_input.text))
+        if (AuthPlayer.LocalInstance == null)
         {
-            ClearInputs();
+            LogTextViewing("서버에 연결되어 있지 않습니다"); return;
+        }
 
-            _login.SetActive(true);
-            _logincontroller.LogTextViewing("회원가입이 완료되었습니다.");
-            _signup_ob.SetActive(false);
-        }
-        else
+        _isWaiting = true;
+        _signup_button.interactable = false;
+        LogTextViewing("처리 중...");
+
+        // 콜백 등록
+        AuthPlayer.LocalInstance.OnSignupResult = (success, message) =>
         {
-            LogTextViewing("회원가입에 실패했습니다. 다시 시도해주세요");
-        }
+            _isWaiting = false;
+            _signup_button.interactable = true;
+
+            if (success)
+            {
+                ClearInputs();
+                _login.SetActive(true);
+                _logincontroller.LogTextViewing(message);
+                _signup_ob.SetActive(false);
+            }
+            else
+            {
+                LogTextViewing(message);
+            }
+        };
+
+        AuthPlayer.LocalInstance.CmdRequestSignup(_name_input.text, _pw_input.text, _nickname_input.text);
     }
+
     public void BackToLogin()
     {
         ClearInputs();
-
         LogTextViewing(string.Empty);
-
         _login.SetActive(true);
         _signup_ob.SetActive(false);
-
         _logincontroller.LogTextViewing(string.Empty);
     }
 
@@ -90,5 +95,7 @@ public class SignupController : MonoBehaviour
         _pw_input.text = string.Empty;
         _pw_confirm_input.text = string.Empty;
         _nickname_input.text = string.Empty;
+        _isWaiting = false;
+        _signup_button.interactable = true;
     }
 }

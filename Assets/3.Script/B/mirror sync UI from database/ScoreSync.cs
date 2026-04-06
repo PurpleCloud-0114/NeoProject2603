@@ -7,12 +7,12 @@ public class ScoreSync : NetworkBehaviour
     [SyncVar] public string player_ID;
 
     [SyncVar(hook = nameof(OnScoreChange))]
-    public int player_score = 0; // DB 누적 점수
+    public int player_score = 0;
 
     [SyncVar(hook = nameof(OnRoundScoreChange))]
-    public int round_total_score = 0; // 현재 게임 세션 점수
+    public int round_total_score = 0;
 
-    [Header("Local Display Variables (Inspector)")]
+    [Header("Local Display (Inspector 확인용)")]
     [SerializeField] private int _player_score;
     [SerializeField] private int _player_roundscore;
 
@@ -20,44 +20,44 @@ public class ScoreSync : NetworkBehaviour
     {
         base.OnStartLocalPlayer();
 
-        if (SQLManager.Instance.user_info != null)
+        // AuthPlayer의 점수 저장 결과를 ScoreSync에 반영
+        if (AuthPlayer.LocalInstance != null)
         {
-            string myName = SQLManager.Instance.user_info.user_name;
-            CmdInitializePlayer(myName);
+            AuthPlayer.LocalInstance.OnScoreSaveResult = (success, newTotal) =>
+            {
+                if (success) Debug.Log($"[ScoreSync] 점수 저장 완료: {newTotal}");
+                else Debug.LogWarning("[ScoreSync] 점수 저장 실패");
+            };
         }
+    }
+
+    // 라운드 점수 추가 (클라이언트에서 호출)
+    public void AddRoundScore(int amount)
+    {
+        if (!isLocalPlayer) return;
+        CmdAddRoundScore(amount);
     }
 
     [Command]
-    private void CmdInitializePlayer(string name)
-    {
-        player_ID = name;
-
-        if (SQLManager.Instance.GetScore(name))
-        {
-            player_score = SQLManager.Instance.user_info.user_score;
-        }
-
-        round_total_score = 0;
-        Debug.Log($"[Server] Player {name} Init. DB Score: {player_score}");
-    }
-
-    [Server]
-    public void AddRoundScore(int amount)
+    private void CmdAddRoundScore(int amount)
     {
         round_total_score += amount;
     }
 
-    [Server]
+    // 라운드 종료 시 저장 (클라이언트에서 호출)
     public void SaveAndResetScores()
     {
-        int newTotal = player_score + round_total_score;
+        if (!isLocalPlayer) return;
+        if (AuthPlayer.LocalInstance == null) { Debug.LogWarning("[ScoreSync] AuthPlayer 없음"); return; }
 
-        if (SQLManager.Instance.SetScore(player_ID, newTotal))
-        {
-            player_score = newTotal;
-            round_total_score = 0;
-            Debug.Log($"[Server] {player_ID}'s score saved successfully.");
-        }
+        AuthPlayer.LocalInstance.CmdSaveAndResetScores(round_total_score);
+        CmdResetRoundScore();
+    }
+
+    [Command]
+    private void CmdResetRoundScore()
+    {
+        round_total_score = 0;
     }
 
     public void OnScoreChange(int oldVal, int newVal) => _player_score = newVal;

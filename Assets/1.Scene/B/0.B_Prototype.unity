@@ -4442,50 +4442,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1696001119}
   m_CullTransparentMesh: 1
---- !u!1 &1727424716
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1727424718}
-  - component: {fileID: 1727424717}
-  m_Layer: 0
-  m_Name: SQLManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1727424717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1727424716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d60e3975c9650264db5790c065a9c3d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SQLManager
---- !u!4 &1727424718
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1727424716}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1744264059
 GameObject:
   m_ObjectHideFlags: 0
@@ -5706,8 +5662,8 @@ MonoBehaviour:
   headlessStartMode: 0
   editorAutoStart: 0
   sendRate: 60
-  offlineScene: 
-  onlineScene: 
+  offlineScene: Assets/1.Scene/B/0.B_Prototype.unity
+  onlineScene: Assets/1.Scene/B/1.B_Prototypelogin.unity
   offlineSceneLoadDelay: 0
   transport: {fileID: 2018531226}
   networkAddress: localhost
@@ -5715,7 +5671,7 @@ MonoBehaviour:
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
-  playerPrefab: {fileID: 0}
+  playerPrefab: {fileID: 8855299607379426255, guid: d8ed113e236d54347a4369e0069c0578, type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
   spawnPrefabs: []
@@ -6773,7 +6729,6 @@ SceneRoots:
   - {fileID: 2064957299}
   - {fileID: 929223720}
   - {fileID: 2018531225}
-  - {fileID: 1727424718}
   - {fileID: 4255866386696191741}
   - {fileID: 1060180972}
   - {fileID: 1656865549}
