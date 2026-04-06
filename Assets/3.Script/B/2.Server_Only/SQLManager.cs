@@ -106,7 +106,7 @@ public class SQLManager : MonoBehaviour
         if (!File.Exists(filePath))
         {
             List<ServerJsonItem> item = new List<ServerJsonItem>();
-            item.Add(new ServerJsonItem("192.168.1.45", "neoproject", "root", "yourpassword", "3306"));
+            item.Add(new ServerJsonItem("192.168.1.45", "neoproject", "root", "1234", "3306"));
             JsonData data = JsonMapper.ToJson(item);
             File.WriteAllText(filePath, data.ToString());
         }

@@ -12,8 +12,9 @@ public class PlayerSlotUI : MonoBehaviour
     private NickNameSync _nickSync;
 
     // 플레이어 스폰 시 외부에서 호출
-    public void SetPlayer(ScoreSync score, NickNameSync nick)
+    public void SetPlayer(AuthPlayer auth, ScoreSync score, NickNameSync nick)
     {
+        _playernum_text.text = $"P{auth.player_num}";
         _scoreSync = score;
         _nickSync = nick;
         gameObject.SetActive(true);
