@@ -4,30 +4,48 @@ using Mirror;
 
 public class NickNameSync : NetworkBehaviour
 {
-    [SyncVar(hook = "OnNameChange")]
-    public string player_nickname = "Empty";
+    [Header("Sync Variable")]
+    [SyncVar(hook = nameof(OnNameChange))]
+    public string player_nickname = "";
 
-    //캐릭터 프리팹 내부에 Canvas를 생성이후
-    //Canvas 컴포넌트의 Render Mode를 World Space로 변경하여 사용(닉네임 카드가 플레이어 따라다니게 됨)
-    
+    [Header("UI Reference")]
     [SerializeField] private TMP_Text _nicknamecard_tmp;
-    [SerializeField] private GameObject _nicknameard_ob;
+    [SerializeField] private GameObject _nicknamecard_ob;
+
+    private Camera _maincamera;
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        SetNickName(player_nickname);
+    }
+
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
-        string nickname = SQLManager.Instance.user_info.user_nickname;
-        CmdSendNameToServer(nickname);
+        _maincamera = Camera.main;
+
+        if (SQLManager.Instance.user_info != null)
+        {
+            string mynickname = SQLManager.Instance.user_info.user_nickname;
+            CmdSendNameToServer(mynickname);
+        }
     }
-    void Update()
+
+    void LateUpdate()
     {
-        if (Camera.main == null) return;
-        _nicknameard_ob.transform.LookAt(Camera.main.transform);
+        if (_maincamera == null) _maincamera = Camera.main;
+        if (_maincamera == null || _nicknamecard_ob == null) return;
+
+        _nicknamecard_ob.transform.rotation = _maincamera.transform.rotation;
     }
+
     public void SetNickName(string name)
     {
-        _nicknamecard_tmp.text = name;
+        if (_nicknamecard_tmp != null)
+            _nicknamecard_tmp.text = name;
     }
-    //-------Server한테 닉네임 보고
+
     [Command]
     public void CmdSendNameToServer(string name)
     {
