@@ -1107,7 +1107,7 @@ GameObject:
   - component: {fileID: 254046188}
   - component: {fileID: 254046191}
   m_Layer: 5
-  m_Name: Debug_Pause
+  m_Name: Debug_TP_RedZone (Script)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1239,6 +1239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f428b6e7836ee345ab77c48a7cf1293, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DebugPauseBtn
+  player: {fileID: 2141239481}
 --- !u!1 &262384380
 GameObject:
   m_ObjectHideFlags: 0
@@ -2328,6 +2329,7 @@ MonoBehaviour:
   cubePrefab: {fileID: 4781422554631409939, guid: fc50cef1f128e3c49838b98e0f0e3988, type: 3}
   spherePrefab: {fileID: 6619355653168289742, guid: 14d9a5157add9d74eb00fa465a3c3426, type: 3}
   spawnCount: 2000
+  padding: 100
   minPosition: {x: -50, y: 50, z: -50}
   maxPosition: {x: 50, y: 2400, z: 50}
   minScale: 0.5
@@ -2860,7 +2862,7 @@ GameObject:
   - component: {fileID: 697850815}
   - component: {fileID: 697850814}
   m_Layer: 5
-  m_Name: DangerZone
+  m_Name: RedZone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2882,8 +2884,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 75, y: 300}
+  m_AnchoredPosition: {x: 0, y: 200}
+  m_SizeDelta: {x: 75, y: 200}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &697850814
 MonoBehaviour:
@@ -3463,6 +3465,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageSystem
   _dangerZoneTrigger: {fileID: 951239201}
+  rnd_RZY: 0
+  rnd_RZH: 0
+  rnd_RZHY: 0
 --- !u!1 &811762860
 GameObject:
   m_ObjectHideFlags: 0
@@ -4062,13 +4067,13 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 100, y: 100, z: 100}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 150, y: 1, z: 150}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 554918462}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &951239202
-MeshCollider:
+--- !u!65 &951239202
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4085,10 +4090,9 @@ MeshCollider:
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &996707230
 GameObject:
   m_ObjectHideFlags: 0
@@ -4225,7 +4229,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: TP_RedZone
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5828,7 +5832,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StageProgressUi
   _player: {fileID: 2141239481}
   _curPointBar: {fileID: 285567984}
-  _dangerZone: {fileID: 697850813}
+  _redZone: {fileID: 697850813}
   _mapHeight: 0
   _progressPercent: 0
 --- !u!1 &1384013306
@@ -7489,7 +7493,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2e012736afdae74d8cb9dcd9b1942a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestManager
-  _player: {fileID: 2141239481}
+  _player: {fileID: 2141239476}
   _inputController: {fileID: 1574221436}
   _randomSpawner: {fileID: 587048765}
   _stageProgressUi: {fileID: 1363986115}
@@ -9067,6 +9071,22 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2051657841}
     - target: {fileID: 8956398484907838093, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+      propertyPath: _moveSpeed
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 8956398484907838093, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+      propertyPath: _dropMaxSpeed
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8956398484907838093, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+      propertyPath: _deathSpeedCount
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 8956398484907838093, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+      propertyPath: _dropSpeedOnWing
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 8956398484907838093, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
       propertyPath: _endPointPopUpUI
       value: 
       objectReference: {fileID: 739338784}
@@ -9074,6 +9094,10 @@ PrefabInstance:
       propertyPath: _inputController
       value: 
       objectReference: {fileID: 1574221436}
+    - target: {fileID: 8956398484907838093, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+      propertyPath: _dropSmoothOnWing
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8956398484907838093, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
       propertyPath: _endPointPopUpUITitle
       value: 

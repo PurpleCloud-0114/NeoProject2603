@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class StageData {
 	public float map_height { get; private set; }
-	public float map_dangerzone { get; private set; }
+	public float map_redzone { get; private set; }
+	public float map_redzone_height { get; private set; }
+	public float map_redzone_height_Y { get; private set; }
 
-	public StageData(float mapHeight, float mapDangerzone) {
+	public StageData(float mapHeight, float mapRedZone, float mapRedZoneHeight) {
 		map_height = mapHeight;
-		map_dangerzone = mapDangerzone;
+		map_redzone = mapRedZone;
+		map_redzone_height = mapRedZoneHeight;
+		map_redzone_height_Y = mapRedZone + mapRedZoneHeight;
 	}
 }

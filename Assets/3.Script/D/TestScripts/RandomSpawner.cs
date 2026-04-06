@@ -12,6 +12,9 @@ public class RandomSpawner : MonoBehaviour {
     [Header("생성 개수")]
     public int spawnCount = 10;
 
+    [Header("Padding")]
+    public float padding = 100f;
+
     [Header("위치 무작위 범위 (최소/최대)")]
     public Vector3 minPosition = new Vector3(-5f, 0f, -5f);
     public Vector3 maxPosition = new Vector3(5f, 5f, 5f);
@@ -35,11 +38,12 @@ public class RandomSpawner : MonoBehaviour {
         for(int i = 0; i < spawnCount; i++) {
             // 1. 설정된 범위 내에서 무작위 위치 계산
             float randomX = Random.Range(minPosition.x, maxPosition.x);
-            float randomY = Random.Range(StageSystem.Instance.stage_data.map_dangerzone, StageSystem.Instance.stage_data.map_height);
+            float randomY = Random.Range(StageSystem.Instance.stage_data.map_redzone_height_Y + padding, StageSystem.Instance.stage_data.map_height - padding);
             float randomZ = Random.Range(minPosition.z, maxPosition.z);
             Vector3 randomPos = new Vector3(randomX, randomY, randomZ);
 
             // 2. 오브젝트 배치
+            Debug.Log(i);
             _obstaclePooling[i].transform.position = randomPos;
 
             // 3. 무작위 크기 적용 (XYZ 동일한 비율로 크기 조절)

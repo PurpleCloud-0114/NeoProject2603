@@ -20,13 +20,13 @@ public class PlayerController : MonoBehaviour {
 	[SerializeField, Range(0,500)] public float _moveSpeed = 25f;				//임시 퍼블릭
 
 	[Header("낙하 이동속도 조절")]
-	[SerializeField, Range(25f, 100f)] public float _dropMaxSpeed = 70f;   //임시 퍼블릭
+	[SerializeField, Range(1f, 200f)] public float _dropMaxSpeed = 70f;   //임시 퍼블릭
+	private float _SaveDropMaxSpeed = 70f;   //임시 퍼블릭
 
 	[SerializeField, Range(25, 100)] private float _decreaseDropSpeedFromHittingObstacle = 30f;
 
-	[Header("날개")]
 	[SerializeField, Range(5, 50f)] private float _dropSpeedOnWing = 15f;
-	[SerializeField, Range(1f, 10f)] private float _dropSmoothOnWing = 3f;
+	[SerializeField] private float _dropSmoothOnWing;
 
 
 
@@ -51,6 +51,10 @@ public class PlayerController : MonoBehaviour {
 		TryGetComponent(out _rigidBody);
 	}
 
+	private void Start() {
+		_SaveDropMaxSpeed = _dropMaxSpeed;
+	}
+
 	private void Update() {
 		VelocityTracker = _rigidBody.linearVelocity;
 		if(!_isArriveEndPoint) {
@@ -62,6 +66,7 @@ public class PlayerController : MonoBehaviour {
 		_wingBtn.interactable = false;
 		_isArriveEndPoint = false;
 		transform.position = new Vector3(0, StageSystem.Instance.stage_data.map_height + 100f, 0);
+		_dropMaxSpeed = _SaveDropMaxSpeed;
 	}
 
 	private void Drop() {
@@ -106,8 +111,21 @@ public class PlayerController : MonoBehaviour {
 		_wingBtn.interactable = true;
 	}
 
+	public void SetDecreaseDropSpeedTimeOnWing(float mapRedZone) {
+		//_dropSmoothOnWing = mapRedZone / _dropMaxSpeed * 1.5f; 
+		_dropSmoothOnWing = (3f * mapRedZone) / (_dropMaxSpeed + 2f * _dropSpeedOnWing);
+	}
+
 	public void OnWingOpen() {
 		//_dropMaxSpeed
 		DOTween.To(() => _dropMaxSpeed, x => _dropMaxSpeed = x, _dropSpeedOnWing, _dropSmoothOnWing).SetEase(Ease.OutQuad);
+		/*
+		 Ease.OutQuad의 수학적 접근.
+		Distance = Time * (Vstart + 2 * Vtarget) / 3
+		-> Time = 3 * Distance / (Vstart + 2 * Vtarget) 이 된다.
+		즉, 변수를 대입한다면
+		mapRedZone = _dropSmoothOnWing * (_DropMaxSpeed + 2f * _dropSpeedOnWing) / 3
+		_dropSmoothOnWing = 3 * mapRedZone / (_DropMaxSpeed + 2f * _dropSpeedOnWing)
+		 */
 	}
 }

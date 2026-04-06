@@ -5,7 +5,7 @@ using UnityEngine;
 public class TestManager : MonoBehaviour {
 	public static TestManager Instance = null;
 
-	[SerializeField] private Transform _player;
+	[SerializeField] private GameObject _player;
 
 	[SerializeField] private InputController _inputController;
 	[SerializeField] private RandomSpawner _randomSpawner;
@@ -27,6 +27,9 @@ public class TestManager : MonoBehaviour {
 		_randomSpawner.SetObstacles();
 
 		_player.transform.position = new Vector3(0, StageSystem.Instance.stage_data.map_height + 150f, 0);
+		if(_player.TryGetComponent(out PlayerController playerController)) {
+			playerController.SetDecreaseDropSpeedTimeOnWing(StageSystem.Instance.stage_data.map_redzone);
+		}
 
 		_inputController.Calibrate();
 
