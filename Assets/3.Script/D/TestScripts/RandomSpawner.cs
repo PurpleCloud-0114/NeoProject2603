@@ -43,7 +43,6 @@ public class RandomSpawner : MonoBehaviour {
             Vector3 randomPos = new Vector3(randomX, randomY, randomZ);
 
             // 2. 오브젝트 배치
-            Debug.Log(i);
             _obstaclePooling[i].transform.position = randomPos;
 
             // 3. 무작위 크기 적용 (XYZ 동일한 비율로 크기 조절)

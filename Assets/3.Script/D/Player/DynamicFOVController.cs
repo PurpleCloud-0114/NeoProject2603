@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Cinemachine;
 
 public class DynamicFOVController : MonoBehaviour {
 	[SerializeField] private GameObject _player;
-	
-	private Camera _mainCamera;
+
+	private CinemachineCamera _mainCamera;
 	private Rigidbody _rigidBody;
 
 	[Header("카메라 FOV 증가 계수 조절")]
@@ -20,9 +21,10 @@ public class DynamicFOVController : MonoBehaviour {
 	private float _stretchFOVvalue;
 
 	private void Awake() {
-		TryGetComponent(out _mainCamera);
+		if (TryGetComponent(out _mainCamera)) {
+			_defaultFOVvalue = _mainCamera.Lens.FieldOfView;
+		}
 		_player.TryGetComponent(out _rigidBody);
-		_defaultFOVvalue = _mainCamera.fieldOfView;
 	}
 
 	private void Update() {
@@ -38,6 +40,6 @@ public class DynamicFOVController : MonoBehaviour {
 		float targetFOV = _defaultFOVvalue + Mathf.Abs(_rigidBody.linearVelocity.y * _extendCoefficient);
 		targetFOV = Mathf.Clamp(targetFOV, _defaultFOVvalue, _limitFOVValue);
 
-		_mainCamera.fieldOfView = Mathf.Lerp(_mainCamera.fieldOfView, targetFOV, Time.deltaTime * _smoothSpeed);
+		_mainCamera.Lens.FieldOfView = Mathf.Lerp(_mainCamera.Lens.FieldOfView, targetFOV, Time.deltaTime * _smoothSpeed);
 	}
 }

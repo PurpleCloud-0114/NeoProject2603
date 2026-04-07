@@ -73,13 +73,13 @@ public class PlayerController : MonoBehaviour {
 		_dropSpeed = _rigidBody.linearVelocity.y;
 		_dropSpeed = Mathf.Clamp(_dropSpeed, -1 * _dropMaxSpeed, 0);
 		_moveVector = _inputController.MovePoint * MoveMobileSensitive; //방향 구하기.
-		_moveDir = new Vector3(Mathf.Clamp(_moveVector.x, -1, 1), 0, Mathf.Clamp(_moveVector.y, -1, 1)) * _moveSpeed; //방향 + 낙하
-		_rigidBody.linearVelocity = _moveDir + new Vector3(0, _dropSpeed, 0);           //반영
+		_moveDir = new Vector3(Mathf.Clamp(_moveVector.x, -1, 1), 0, Mathf.Clamp(_moveVector.y, -1, 1)); //방향
+		_rigidBody.linearVelocity = _moveDir * _moveSpeed + new Vector3(0, _dropSpeed, 0);           //반영
 
-		float targetX = 90f + (_moveVector.y * 20f);
-		float targetZ = _moveVector.x * -20f;
+		float targetX = 90f + (_moveDir.z * 20f);
+		float targetZ = _moveDir.x * -20f;
 		Quaternion targetRotation = Quaternion.Euler(targetX, 0f, targetZ);
-		transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 15f);
+		transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 20f);
 	}
 
 	private void OnCollisionEnter(Collision collision) {
