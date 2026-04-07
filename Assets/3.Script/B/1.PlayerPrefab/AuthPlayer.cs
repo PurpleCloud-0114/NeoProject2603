@@ -1,41 +1,39 @@
 using UnityEngine;
 using Mirror;
+using System;
 using System.Collections.Generic;
 
 public class AuthPlayer : NetworkBehaviour
 {
     public static AuthPlayer LocalInstance { get; private set; }
 
-    public System.Action<bool, string, int, string> OnLoginResult;
-    public System.Action<bool, string> OnSignupResult;
-    public System.Action<bool, int> OnScoreSaveResult;
+    public Action<bool, string, int, string> OnLoginResult;
+    public Action<bool, string> OnSignupResult;
+    public Action<bool, int> OnScoreSaveResult;
 
     [SyncVar] public string player_ID = "";
     [SyncVar] public bool is_authenticated = false;
 
-    // 접속 순서 번호 (1번부터 시작)
     [SyncVar(hook = nameof(OnPlayerNumChange))]
     public int player_num = -1;
 
-    // ── 서버에서만 사용하는 번호 관리 ──
-    private static List<int> _usedNums = new List<int>(); // 사용 중인 번호들
+    private static List<int> _used_playernums = new List<int>();
 
     [Server]
-    private int AssignPlayerNum()
+    private int AssignPlayerNum() //번호부여. 방에 들어왔을때 호출해야됌
     {
         int num = 1;
-        while (_usedNums.Contains(num)) num++;
-        _usedNums.Add(num);
+        while (_used_playernums.Contains(num)) num++;
+        _used_playernums.Add(num);
         return num;
     }
 
     [Server]
     private void ReleasePlayerNum(int num)
     {
-        _usedNums.Remove(num);
+        _used_playernums.Remove(num);
     }
 
-    // ────────────────────────────────────────
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
@@ -48,7 +46,6 @@ public class AuthPlayer : NetworkBehaviour
         if (isLocalPlayer) LocalInstance = null;
     }
 
-    //서버에서 플레이어가 나갈 때 번호 반납
     public override void OnStopServer()
     {
         base.OnStopServer();
@@ -63,12 +60,10 @@ public class AuthPlayer : NetworkBehaviour
             ReleasePlayerNum(player_num);
             player_num = -1;
         }
-        // 클라이언트를 로그인 씬으로 보내야될거임
     }
 
     public void OnPlayerNumChange(int oldVal, int newVal)
     {
-        // UI 갱신은 InGameUIManager에서 처리
         if (isLocalPlayer)
             Debug.Log($"[AuthPlayer] 내 플레이어 번호: {newVal}");
     }
@@ -87,11 +82,22 @@ public class AuthPlayer : NetworkBehaviour
 
         int result = SQLManager.Instance.Login(name, password, out string nickname, out int score);
 
-        if (result == 0)
+        if (result == 0) // 로그인 성공
         {
             player_ID = name;
             is_authenticated = true;
-            //player_num = AssignPlayerNum(); // 번호 부여
+
+            // [핵심 변경점] 서버가 직접 NickNameSync와 ScoreSync에 값을 세팅합니다.
+            if (TryGetComponent<NickNameSync>(out var nickSync))
+            {
+                nickSync.player_nickname = nickname;
+            }
+            if (TryGetComponent<ScoreSync>(out var scoreSync))
+            {
+                scoreSync.player_ID = name;
+                scoreSync.player_score = score;
+            }
+
             TargetRpcLoginResult(connectionToClient, true, nickname, score, "");
         }
         else
@@ -101,21 +107,6 @@ public class AuthPlayer : NetworkBehaviour
             StartCoroutine(DelayDisconnect(connectionToClient));
         }
     }
-
-    /* 
-    //RoomScene등에서 시작될 때 호출하여 번호 부여
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-
-        // 만약 로그인된 사용자라면 룸 입장 시점에 번호 부여
-        if (is_authenticated && player_num == -1)
-        {
-            player_num = AssignPlayerNum();
-            Debug.Log($"[Server] Player {player_ID} joined room. Assigned Num: {player_num}");
-        }
-    }
-    */
 
     private System.Collections.IEnumerator DelayDisconnect(NetworkConnectionToClient conn)
     {
@@ -161,21 +152,31 @@ public class AuthPlayer : NetworkBehaviour
     // 점수 저장
     // ────────────────────────────────────────
     [Command]
-    public void CmdSaveAndResetScores(int round_score)
+    public void CmdRequestSaveScore() // 클라이언트가 값을 보내지 않도록 매개변수 제거
     {
         if (!is_authenticated || SQLManager.Instance == null) return;
 
-        SQLManager.Instance.GetScore(player_ID, out int currentScore);
-        int newTotal = currentScore + round_score;
+        if (TryGetComponent<ScoreSync>(out var scoreSync))
+        {
+            // [핵심 변경점] 클라이언트를 믿지 않고, 서버에 안전하게 기록된 라운드 점수를 읽어옴
+            int scoreToSave = scoreSync.round_total_score;
 
-        if (SQLManager.Instance.SetScore(player_ID, newTotal))
-        {
-            TargetRpcScoreSaveResult(connectionToClient, true, newTotal);
-            Debug.Log($"[Server] {player_ID} score saved: {newTotal}");
-        }
-        else
-        {
-            TargetRpcScoreSaveResult(connectionToClient, false, currentScore);
+            SQLManager.Instance.GetScore(player_ID, out int currentScore);
+            int newTotal = currentScore + scoreToSave;
+
+            if (SQLManager.Instance.SetScore(player_ID, newTotal))
+            {
+                // DB 저장이 성공했을 때만 점수를 리셋
+                scoreSync.ServerResetRoundScore();
+                scoreSync.player_score = newTotal; // 누적 점수도 갱신
+
+                TargetRpcScoreSaveResult(connectionToClient, true, newTotal);
+                Debug.Log($"[Server] {player_ID} score saved: {newTotal}");
+            }
+            else
+            {
+                TargetRpcScoreSaveResult(connectionToClient, false, currentScore);
+            }
         }
     }
 

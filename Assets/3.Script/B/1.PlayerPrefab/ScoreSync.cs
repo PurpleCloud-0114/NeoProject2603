@@ -20,7 +20,6 @@ public class ScoreSync : NetworkBehaviour
     {
         base.OnStartLocalPlayer();
 
-        // AuthPlayer의 점수 저장 결과를 ScoreSync에 반영
         if (AuthPlayer.LocalInstance != null)
         {
             AuthPlayer.LocalInstance.OnScoreSaveResult = (success, newTotal) =>
@@ -31,35 +30,55 @@ public class ScoreSync : NetworkBehaviour
         }
     }
 
-    // 라운드 점수 추가 (클라이언트에서 호출)
-    public void AddRoundScore(int amount)
-    {
-        if (!isLocalPlayer) return;
-        CmdAddRoundScore(amount);
-    }
-
-    [Command]
-    private void CmdAddRoundScore(int amount)
+    // Player 점수 (서버 전용)
+    [Server]
+    public void ServerAddRoundScore(int amount)
     {
         round_total_score += amount;
     }
 
-    // 라운드 종료 시 저장 (클라이언트에서 호출)
-    public void SaveAndResetScores()
-    {
-        if (!isLocalPlayer) return;
-        if (AuthPlayer.LocalInstance == null) { Debug.LogWarning("[ScoreSync] AuthPlayer 없음"); return; }
-
-        AuthPlayer.LocalInstance.CmdSaveAndResetScores(round_total_score);
-        CmdResetRoundScore();
-    }
-
-    [Command]
-    private void CmdResetRoundScore()
+    [Server]
+    public void ServerResetRoundScore()
     {
         round_total_score = 0;
     }
 
-    public void OnScoreChange(int oldVal, int newVal) => _player_score = newVal;
-    public void OnRoundScoreChange(int oldVal, int newVal) => _player_roundscore = newVal;
+    // 라운드 종료 시 저장 요청
+    public void RequestSaveScore()
+    {
+        if (!isLocalPlayer) return;
+        if (AuthPlayer.LocalInstance == null) { Debug.LogWarning("[ScoreSync] AuthPlayer 없음"); return; }
+
+        AuthPlayer.LocalInstance.CmdRequestSaveScore();
+    }
+
+    public void OnScoreChange(int oldVal, int newVal)
+    {
+        _player_score = newVal;
+        if (newVal > oldVal) TriggerSlotRefresh(false);
+    }
+
+    // 라운드 점수 변경 시 호출 (상대방 점수도 여기서 감지됨)
+    public void OnRoundScoreChange(int oldVal, int newVal)
+    {
+        _player_roundscore = newVal;
+        if (newVal > oldVal) TriggerSlotRefresh(true);
+    }
+
+    private void TriggerSlotRefresh(bool isRoundScore)
+    {
+        // 1. 내 전용 UI 애니메이션 (isLocalPlayer일 때만)
+        if (isLocalPlayer && InGameUIManager.Instance != null)
+        {
+            // InGameUIManager에 관련 함수가 있다면 호출
+        }
+
+        // 2. 전체 리스트 UI 애니메이션 (나 + 상대방 모두)
+        AuthPlayer auth = GetComponent<AuthPlayer>();
+        if (auth != null && PlayerListUIManager.Instance != null)
+        {
+            // player_num - 1 인덱스로 해당 슬롯 갱신 및 애니메이션 명령
+            PlayerListUIManager.Instance.PlaySlotAnimation(auth.player_num - 1, isRoundScore);
+        }
+    }
 }

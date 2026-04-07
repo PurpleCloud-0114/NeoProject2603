@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 using Mirror;
-using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class LoginController : MonoBehaviour
 {
@@ -14,7 +14,7 @@ public class LoginController : MonoBehaviour
     [SerializeField] private SignupController _signupController;
     [SerializeField] private GameObject _title_ob;
 
-    private bool _isWaiting = false; // 서버 응답 대기 중 중복 클릭 방지
+    private bool _isWaiting = false;
 
     private void Start()
     {
@@ -35,7 +35,6 @@ public class LoginController : MonoBehaviour
             return;
         }
 
-        // 1. 서버에 먼저 접속
         GameObject manager = NetworkManager.singleton.gameObject;
         if (!manager.TryGetComponent(out ServerChecker checker)) return;
 
@@ -45,14 +44,11 @@ public class LoginController : MonoBehaviour
 
         checker.Start_Client();
 
-        // 2. AuthPlayer가 생성되면 로그인 Command 전송
-        // NetworkManager의 OnClientConnect 시점에서 호출하기 위해 대기
         StartCoroutine(WaitAndSendLogin(_name_input.text, _pw_input.text));
     }
 
-    private System.Collections.IEnumerator WaitAndSendLogin(string name, string pw)
+    private IEnumerator WaitAndSendLogin(string name, string pw)
     {
-        // AuthPlayer.LocalInstance가 생길 때까지 대기 (최대 5초)
         float timeout = 5f;
         while (AuthPlayer.LocalInstance == null && timeout > 0f)
         {
@@ -68,7 +64,6 @@ public class LoginController : MonoBehaviour
             yield break;
         }
 
-        // 3. 로그인 결과 콜백 등록
         AuthPlayer.LocalInstance.OnLoginResult = (success, nickname, score, message) =>
         {
             _isWaiting = false;
@@ -76,7 +71,6 @@ public class LoginController : MonoBehaviour
 
             if (success)
             {
-                // PlayerPrefs에는 nickname 저장 (TitleController에서 사용)
                 PlayerPrefs.SetString("PlayerNickname", nickname);
                 PlayerPrefs.Save();
 
@@ -86,18 +80,15 @@ public class LoginController : MonoBehaviour
             else
             {
                 LogTextViewing(message);
-                // 실패 시 서버가 끊어주지만 클라이언트 측도 정리
                 if (NetworkClient.active) NetworkManager.singleton.StopClient();
             }
         };
 
-        // 4. 로그인 요청
         AuthPlayer.LocalInstance.CmdRequestLogin(name, pw);
     }
 
     public void OpenSignUpPage()
     {
-        // 회원가입은 서버 접속 후 가능 — 먼저 접속 후 패널 전환
         if (!NetworkClient.active)
         {
             GameObject manager = NetworkManager.singleton.gameObject;

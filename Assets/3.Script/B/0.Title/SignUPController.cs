@@ -58,7 +58,6 @@ public class SignupController : MonoBehaviour
         _signup_button.interactable = false;
         LogTextViewing("처리 중...");
 
-        // 콜백 등록
         AuthPlayer.LocalInstance.OnSignupResult = (success, message) =>
         {
             _isWaiting = false;

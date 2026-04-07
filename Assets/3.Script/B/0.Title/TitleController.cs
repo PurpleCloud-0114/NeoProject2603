@@ -2,12 +2,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 using TMPro;
-using UnityEngine.SceneManagement; //추후 제거
+using UnityEngine.SceneManagement;
 
 public class TitleController : MonoBehaviour
 {
     [Header("UI Panels")]
-    [SerializeField] private GameObject _loginPanel; 
+    [SerializeField] private GameObject _loginPanel;
     [SerializeField] private GameObject _optionPanel;
 
     [Header("Buttons")]
@@ -30,7 +30,6 @@ public class TitleController : MonoBehaviour
         if (_welcome_text != null)
         {
             string playerName = PlayerPrefs.GetString("PlayerNickname");
-
             _welcome_text.text = $"{playerName} 님\n환영합니다!";
         }
     }
@@ -42,16 +41,6 @@ public class TitleController : MonoBehaviour
 
     public void OpenOptionPage()
     {
-        if (SQLManager.Instance != null)
-        {
-            SQLManager.Instance.Logout();
-        }
-
-        if (NetworkClient.active)
-        {
-            NetworkManager.singleton.StopClient();
-        }
-
         if (_optionPanel != null)
             _optionPanel.SetActive(true);
 
@@ -60,8 +49,6 @@ public class TitleController : MonoBehaviour
 
     public void LogoutEvent()
     {
-        // 필요하다면 SQLManager에서 세션 정보를 지우는 로직 추가 가능
-
         if (_loginPanel != null)
             _loginPanel.SetActive(true);
 
@@ -73,7 +60,6 @@ public class TitleController : MonoBehaviour
 
         gameObject.SetActive(false);
 
-        SceneManager.LoadScene("0.B_Prototype");//추후 제거
-
+        SceneManager.LoadScene("0.B_Prototype");
     }
 }

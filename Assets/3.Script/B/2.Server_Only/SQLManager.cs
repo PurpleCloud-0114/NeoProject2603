@@ -127,10 +127,9 @@ public class SQLManager : MonoBehaviour
         catch (Exception e) { Debug.LogError($"Connection Error: {e.Message}"); return false; }
     }
 
-    // 반환: 0=성공, 1=아이디없음/비번틀림, 2=DB오류
-    public int Login(string name, string password, out string out_nickname, out int out_score)
+    public int Login(string name, string password, out string nickname, out int score)
     {
-        out_nickname = ""; out_score = 0;
+        nickname = ""; score = 0;
         try
         {
             if (!ConnectionCheck(_connection)) return 2;
@@ -144,9 +143,9 @@ public class SQLManager : MonoBehaviour
                 {
                     if (reader.Read())
                     {
-                        out_nickname = reader["user_nickname"].ToString();
-                        out_score = reader.IsDBNull(reader.GetOrdinal("user_score")) ? 0 : Convert.ToInt32(reader["user_score"]);
-                        user_info = new UserInfo(name, out_nickname, out_score);
+                        nickname = reader["user_nickname"].ToString();
+                        score = reader.IsDBNull(reader.GetOrdinal("user_score")) ? 0 : Convert.ToInt32(reader["user_score"]);
+                        user_info = new UserInfo(name, nickname, score);
                         return 0; // 성공
                     }
                 }
@@ -158,7 +157,6 @@ public class SQLManager : MonoBehaviour
 
     public void Logout() { user_info = null; }
 
-    // 반환: 0=성공, 1=아이디중복, 2=닉네임중복, 3=DB오류
     public int Signup(string name, string password, string nickname)
     {
         try

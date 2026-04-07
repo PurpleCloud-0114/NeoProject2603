@@ -198,7 +198,7 @@ MonoBehaviour:
   editorAutoStart: 0
   sendRate: 60
   offlineScene: Assets/1.Scene/B/0.B_Prototype.unity
-  onlineScene: Assets/1.Scene/B/1.B_Prototypelogin.unity
+  onlineScene: Assets/1.Scene/B/1.B_Prototype_login.unity
   offlineSceneLoadDelay: 0
   transport: {fileID: 0}
   networkAddress: localhost

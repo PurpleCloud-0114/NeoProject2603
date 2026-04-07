@@ -24,12 +24,6 @@ public class NickNameSync : NetworkBehaviour
     {
         base.OnStartLocalPlayer();
         _maincamera = Camera.main;
-
-        if (SQLManager.Instance.user_info != null)
-        {
-            string mynickname = SQLManager.Instance.user_info.user_nickname;
-            CmdSendNameToServer(mynickname);
-        }
     }
 
     void LateUpdate()

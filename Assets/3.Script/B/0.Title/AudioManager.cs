@@ -80,7 +80,7 @@ public class AudioManager : MonoBehaviour
         _bgm_player.Stop();
     }
 
-    public void PlaySFX(string name) //RPC로 해야됍니다
+    public void PlaySFX(string name) //RPC로 해야돼는 경우도 있음
     {
         foreach (Sound s in _sfx)
         {
@@ -90,4 +90,19 @@ public class AudioManager : MonoBehaviour
             }
         }
     }
+    /* 예시 대신 3D SFX를 써야하지 않을까 합니다.
+     [Command]
+    public void CmdPlayCrashSound()
+    {
+    // 서버가 모든 클라이언트에게 소리 재생 명령을 내림
+    RpcPlayCrashSound();
+    }
+
+    [ClientRpc]
+    private void RpcPlayCrashSound()
+    {
+    // 각 클라이언트의 AudioManager가 효과음을 재생
+    AudioManager.Instance.PlaySFX("Crash");
+    }
+    */
 }
