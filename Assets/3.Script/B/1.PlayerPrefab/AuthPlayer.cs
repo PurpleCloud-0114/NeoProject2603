@@ -68,9 +68,7 @@ public class AuthPlayer : NetworkBehaviour
             Debug.Log($"[AuthPlayer] 내 플레이어 번호: {newVal}");
     }
 
-    // ────────────────────────────────────────
     // 로그인
-    // ────────────────────────────────────────
     [Command]
     public void CmdRequestLogin(string name, string password)
     {
@@ -120,9 +118,7 @@ public class AuthPlayer : NetworkBehaviour
         OnLoginResult?.Invoke(success, nickname, score, message);
     }
 
-    // ────────────────────────────────────────
     // 회원가입
-    // ────────────────────────────────────────
     [Command]
     public void CmdRequestSignup(string name, string password, string nickname)
     {
@@ -148,17 +144,14 @@ public class AuthPlayer : NetworkBehaviour
         OnSignupResult?.Invoke(success, message);
     }
 
-    // ────────────────────────────────────────
     // 점수 저장
-    // ────────────────────────────────────────
     [Command]
-    public void CmdRequestSaveScore() // 클라이언트가 값을 보내지 않도록 매개변수 제거
+    public void CmdRequestSaveScore()
     {
         if (!is_authenticated || SQLManager.Instance == null) return;
 
         if (TryGetComponent<ScoreSync>(out var scoreSync))
         {
-            // [핵심 변경점] 클라이언트를 믿지 않고, 서버에 안전하게 기록된 라운드 점수를 읽어옴
             int scoreToSave = scoreSync.round_total_score;
 
             SQLManager.Instance.GetScore(player_ID, out int currentScore);

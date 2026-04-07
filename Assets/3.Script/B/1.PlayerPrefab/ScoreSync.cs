@@ -67,13 +67,6 @@ public class ScoreSync : NetworkBehaviour
 
     private void TriggerSlotRefresh(bool isRoundScore)
     {
-        // 1. 내 전용 UI 애니메이션 (isLocalPlayer일 때만)
-        if (isLocalPlayer && InGameUIManager.Instance != null)
-        {
-            // InGameUIManager에 관련 함수가 있다면 호출
-        }
-
-        // 2. 전체 리스트 UI 애니메이션 (나 + 상대방 모두)
         AuthPlayer auth = GetComponent<AuthPlayer>();
         if (auth != null && PlayerListUIManager.Instance != null)
         {
