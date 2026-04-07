@@ -35,7 +35,7 @@ public class PlayerListUIManager : MonoBehaviour
         }
 
         // 2. 현재 씬에 존재하는 모든 AuthPlayer 컴포넌트를 찾습니다.
-        AuthPlayer[] players = FindObjectsOfType<AuthPlayer>();
+        AuthPlayer[] players = FindObjectsByType<AuthPlayer>(FindObjectsSortMode.None);
 
         if (players == null || players.Length == 0) return;
 
