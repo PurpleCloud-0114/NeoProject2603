@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using Mirror;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : NetworkBehaviour {
 	//임시 ui
 	[Header("임시")]
 	[SerializeField] private GameObject _endPointPopUpUI;
@@ -12,7 +13,7 @@ public class PlayerController : MonoBehaviour {
 	[SerializeField] private Button _wingBtn;
 
 	[Header("Input Controller")]
-	[SerializeField] private InputController _inputController;
+	[SerializeField] private InputSystem _inputSystem;
 
 	private Rigidbody _rigidBody;
 
@@ -28,9 +29,6 @@ public class PlayerController : MonoBehaviour {
 	[SerializeField, Range(5, 50f)] private float _dropSpeedOnWing = 15f;
 	[SerializeField] private float _dropSmoothOnWing;
 
-
-
-
 	[Header("도착 속도 판정 (Death)")]
 	[SerializeField, Range(5f, 50f)] private float _deathSpeedCount = 30f;
 
@@ -42,6 +40,8 @@ public class PlayerController : MonoBehaviour {
 	private float _dropSpeed;
 
 	private bool _isArriveEndPoint = false;
+
+	private bool _isCutscene = false;
 	
 	public Vector3 VelocityTracker;
 	
@@ -57,22 +57,29 @@ public class PlayerController : MonoBehaviour {
 
 	private void Update() {
 		VelocityTracker = _rigidBody.linearVelocity;
-		if(!_isArriveEndPoint) {
+		if(!_isArriveEndPoint && !_isCutscene) {
 			Drop();
 		}
+	}
+
+	public void CutsceneStart() => _isCutscene = true;
+	public void CutsceneEnd() { 
+		_isCutscene = false;
+		_rigidBody.linearVelocity = new Vector3(0, -50f, 0);
+		Debug.Log(_rigidBody.linearVelocity);
 	}
 
 	public void Initialize() {
 		_wingBtn.interactable = false;
 		_isArriveEndPoint = false;
-		transform.position = new Vector3(0, StageSystem.Instance.stage_data.map_height + 100f, 0);
+		//transform.position = new Vector3(0, StageSystem.Instance.stage_data.map_height + 100f, 0);
 		_dropMaxSpeed = _SaveDropMaxSpeed;
 	}
 
 	private void Drop() {
 		_dropSpeed = _rigidBody.linearVelocity.y;
 		_dropSpeed = Mathf.Clamp(_dropSpeed, -1 * _dropMaxSpeed, 0);
-		_moveVector = _inputController.MovePoint * MoveMobileSensitive; //방향 구하기.
+		_moveVector = _inputSystem.MovePoint * MoveMobileSensitive; //방향 구하기.
 		_moveDir = new Vector3(Mathf.Clamp(_moveVector.x, -1, 1), 0, Mathf.Clamp(_moveVector.y, -1, 1)); //방향
 		_rigidBody.linearVelocity = _moveDir * _moveSpeed + new Vector3(0, _dropSpeed, 0);           //반영
 
@@ -97,6 +104,24 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	[Command]
+	//서버에게 보내는 도착 신호. (도착 성공 여부 / 시간,
+	private void SendArriveResult(bool result) {
+		//True : Success
+		if(result) {
+
+		}
+		//False : Fail
+		else {
+
+		}
+	}
+
+
+
+
+
+
 	private void OnTriggerEnter(Collider other) {
 		if(other.transform.CompareTag("Obstacle")) {
 			_rigidBody.linearVelocity = _rigidBody.linearVelocity + (Vector3.up * _decreaseDropSpeedFromHittingObstacle);
@@ -107,9 +132,7 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	private void ActivateWingBtn() {
-		_wingBtn.interactable = true;
-	}
+	private void ActivateWingBtn() => _wingBtn.interactable = true;
 
 	public void SetDecreaseDropSpeedTimeOnWing(float mapRedZone) {
 		//_dropSmoothOnWing = mapRedZone / _dropMaxSpeed * 1.5f; 
@@ -117,7 +140,6 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void OnWingOpen() {
-		//_dropMaxSpeed
 		DOTween.To(() => _dropMaxSpeed, x => _dropMaxSpeed = x, _dropSpeedOnWing, _dropSmoothOnWing).SetEase(Ease.OutQuad);
 		/*
 		 Ease.OutQuad의 수학적 접근.

@@ -7,7 +7,7 @@ public class TestManager : MonoBehaviour {
 
 	[SerializeField] private GameObject _player;
 
-	[SerializeField] private InputController _inputController;
+	[SerializeField] private InputSystem _inputSystem;
 	[SerializeField] private RandomSpawner _randomSpawner;
 
 	[SerializeField] private StageProgressUi _stageProgressUi;
@@ -23,19 +23,17 @@ public class TestManager : MonoBehaviour {
 	public void Initialize() {
 		StageSystem.Instance.SetStage();
 
-
 		_randomSpawner.SetObstacles();
 
-		_player.transform.position = new Vector3(0, StageSystem.Instance.stage_data.map_height + 150f, 0);
-		if(_player.TryGetComponent(out PlayerController playerController)) {
-			playerController.SetDecreaseDropSpeedTimeOnWing(StageSystem.Instance.stage_data.map_redzone);
+		//_player.transform.position = new Vector3(0, StageSystem.Instance.stage_data.map_height + 150f, 0);
+		if(_player.TryGetComponent(out PlayerState playerState)) {
+			playerState.SetDecreaseDropSpeedTimeOnWing(StageSystem.Instance.stage_data.map_redzone);
 		}
 
-		_inputController.Calibrate();
+		_inputSystem.Calibrate();
 
 		_stageProgressUi.Initialize();
 
 		Time.timeScale = 1f;
-		Timer.Instance.StartStopwatch();
 	}
 }

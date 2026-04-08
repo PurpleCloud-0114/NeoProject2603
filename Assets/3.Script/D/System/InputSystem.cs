@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Users;
 
-public class InputController : MonoBehaviour {
+public class InputSystem : MonoBehaviour {
 	public Vector2 BasePoint;
 	public Vector2 MovePoint;
 
@@ -57,7 +57,7 @@ public class InputController : MonoBehaviour {
 			//그래비티 활성화
 			_moveVector3.Enable();
 			_moveVector2.Disable();
-			Calibrate(); 
+			Calibrate();
 		}
 	}
 
@@ -74,6 +74,14 @@ public class InputController : MonoBehaviour {
 			//(참고: Vector3.back은 (0, 0, -1)로, 스마트폰 화면이 하늘을 똑바로 보는 평면 상태를 의미합니다)
 			_calibrationRotation = Quaternion.FromToRotation(rawGravity, Vector3.back);
 		}
+	}
+
+	public void DisableInputSystem() {
+		_playerInput.actions.Disable();
+	}
+
+	public void EnableInputSystem() {
+		_playerInput.actions.Enable();
 	}
 }
 

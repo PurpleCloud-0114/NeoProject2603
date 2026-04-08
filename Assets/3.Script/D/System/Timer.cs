@@ -29,7 +29,7 @@ public class Timer : MonoBehaviour {
 
 	private void Update() {
 		if(_isTimering) {
-			_curTimerText.text = _stopwatch.Elapsed.ToString();
+			_curTimerText.text = _stopwatch.Elapsed.ToString(@"mm\:ss\.ff");
 		}
 	}
 
@@ -37,6 +37,6 @@ public class Timer : MonoBehaviour {
 		_curTimer.SetActive(false);
 		_stopwatch.Stop();
 		_isTimering = false;
-		_endTimerText.text = _stopwatch.Elapsed.ToString();
+		_endTimerText.text = _stopwatch.Elapsed.ToString(@"mm\:ss\.ff");
 	}
 }

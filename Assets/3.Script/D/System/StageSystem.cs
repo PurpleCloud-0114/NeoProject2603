@@ -22,7 +22,6 @@ public class StageSystem : MonoBehaviour {
 	public void SetStage() {
 		float rnd_RedZone = Random.Range(250f, 400f);
 		float rnd_RedZoneHeight = Random.Range(50f, 300f);
-		float set_RedZoneTrigger = rnd_RedZoneHeight + rnd_RedZone;
 		stage_data = new StageData(3000f, rnd_RedZone, rnd_RedZoneHeight);
 		_dangerZoneTrigger.position = new Vector3(0, stage_data.map_redzone_height_Y, 0);
 		rnd_RZY = rnd_RedZone;
