@@ -2,7 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-using DG.Tweening;
+
+
+public enum State {
+	Wait,
+	Falling,
+	Finish
+}
 
 public class PlayerState : NetworkBehaviour {
 	private PlayerMovement _playerMovement;
@@ -10,13 +16,9 @@ public class PlayerState : NetworkBehaviour {
 
 	private Rigidbody _rigidbody;
 
-	[Header("날개")]
-	[SerializeField, Range(0, 500)] private float _dropWingSpeed = 30f;
-	private float _wingTime;
+	private GameObject _mainCamera;
 
-	[Header("도착 속도 판정 (Death)")]
-	[SerializeField, Range(5f, 50f)] private float _deathOverSpeed = 30f;
-
+	public State state = State.Wait;
 
 	//----- 메서드
 	private void Awake() {
@@ -25,44 +27,64 @@ public class PlayerState : NetworkBehaviour {
 		TryGetComponent(out _playerUIController);
 	}
 
-	private void OnCollisionEnter(Collision collision) {
-		if (collision.transform.CompareTag("EndPoint")) {
-			
-
-
-			//TODO : 추후 서버한테 도착했으니 1등이라고 알리는 이벤트 메시지 추가.
+	private void Start() {
+		if (isLocalPlayer) {
+			_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+			if (_mainCamera.TryGetComponent(out DynamicFOVController FOVController)) {
+				Debug.Log("Find Camera!");
+				FOVController.BindPlayer(gameObject);
+			} else {
+				Debug.Log("Can't Find Camera...");
+			}
 		}
 	}
 
-	[Command]
-	//서버에게 보내는 도착 신호. (도착 성공 여부 / 시간,
-	private void SendArriveResult(bool result) {
-
+	public override void OnStartLocalPlayer() {
+		RaceManager.Instance.CmdReportReady();
 	}
 
+	private void OnCollisionEnter(Collision collision) {
+		if (collision.transform.CompareTag("EndPoint")) {
+			state = State.Finish;
+			double myFinishTime = NetworkTime.time - RaceManager.Instance.race_start_time_sync;
+			float impactSpeed = Mathf.Abs(collision.relativeVelocity.y);
+			// Checked - TODO : 추후 서버한테 도착을 알리는 이벤트 메시지 추가.
+			SendArriveResult(impactSpeed, myFinishTime);
+		}
+	}
 
 	private void OnTriggerEnter(Collider other) {
 		if (other.transform.CompareTag("Obstacle")) {
-
+			_playerMovement.hitObstacle();
 		}
 		if (other.transform.CompareTag("DangerZone")) {
 			_playerUIController.ActivateWingBtn();
 		}
 	}
 
-	public void SetDecreaseDropSpeedTimeOnWing(float mapRedZone) {
-		//_dropSmoothOnWing = mapRedZone / _dropMaxSpeed * 1.5f; 
-		_wingTime = (3f * mapRedZone) / (_playerMovement.drop_max_speed + 2f * _dropWingSpeed);
+	[Command]
+	//서버에게 보내는 도착 신호. (도착 속도 / 시간,
+	private void SendArriveResult(float impactSpeed, double finishTime) {
+		RaceManager.Instance.GetArriveResult(impactSpeed, finishTime);
 	}
 
-	/* Ease.OutQuad의 수학적 접근.
-	Distance = Time * (Vstart + 2 * Vtarget) / 3
-	-> Time = 3 * Distance / (Vstart + 2 * Vtarget) 이 된다.
-	즉, 변수를 대입한다면
-	mapRedZone = _dropSmoothOnWing * (_DropMaxSpeed + 2f * _dropSpeedOnWing) / 3
-	_dropSmoothOnWing = 3 * mapRedZone / (_DropMaxSpeed + 2f * _dropSpeedOnWing)
-	 */
-	public void OpenWing() {
-		DOTween.To(() => _playerMovement.drop_max_speed, x => _playerMovement.drop_max_speed = x, _dropWingSpeed, _wingTime).SetEase(Ease.OutQuad);
+	public void UpdatePlayerStateByRace(RaceState raceState) {
+		switch (raceState) {
+			case RaceState.Waiting:
+				state = State.Wait;
+				_playerMovement._inputSystem.DisableInputSystem();
+				break;
+			case RaceState.Countdown:
+				_playerMovement.SetDecreaseDropSpeedTimeOnWing();
+				break;
+			case RaceState.Racing:
+				state = State.Falling;
+				_playerMovement._inputSystem.EnableInputSystem();
+				break;
+			case RaceState.Finished:
+				state = State.Finish;
+				_playerMovement._inputSystem.DisableInputSystem();
+				break;
+		}
 	}
 }

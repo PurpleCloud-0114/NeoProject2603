@@ -1,14 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using Mirror;
 
 public class UIManager : MonoBehaviour {
 	public static UIManager Instance = null;
+
+	[SerializeField] private Button _wingButton;
 
 	private void Awake() {
 		if (Instance == null) Instance = this;
 		else Destroy(gameObject);
 	}
+
+
 
 
 	/*
@@ -26,8 +32,11 @@ public class UIManager : MonoBehaviour {
 	 * 1. 게임 종료 시 - 결과 창
 	 * 2. 라운드 결과
 	 * 3. 다시하기?	 
+	  
+	 [ 메서드 기능 ] 
+	 레드존 
 	 */
 
-
-
+	[Client]
+	public Button BindWingButton() => _wingButton;
 }

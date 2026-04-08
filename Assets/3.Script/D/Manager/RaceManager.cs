@@ -10,20 +10,25 @@ public enum RaceState {
 	Finished
 }
 
-public class RoadManager : NetworkBehaviour {
-	public static RoadManager Instance = null;
+public class RaceManager : NetworkBehaviour {
+	public static RaceManager Instance = null;
 
 	//공통 데이터
 	[SyncVar(hook = nameof(OnStateChanged))]
 	public RaceState current_state_sync = RaceState.Waiting;
 
-	[SyncVar] public double race_state_time_sync;
+	[SyncVar] public double race_start_time_sync;
 
 	[SyncVar] private int _playersReadyCount = 0;
 	private int TotalPlayers => NetworkServer.connections.Count;
 
+	[Header("도착 속도 판정 (Death)")]
+	[SyncVar, SerializeField, Range(5f, 50f)] private float _deathOverSpeedSync = 30f;
+
 	private List<NetworkIdentity> finishers = new List<NetworkIdentity>();
 	
+	public int START_MAX_PLAYER = 10;
+
 	//----- 메서드
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -33,6 +38,12 @@ public class RoadManager : NetworkBehaviour {
 	// ==========================================
 	// [서버 영역] - 판정과 흐름 제어
 	// ==========================================
+	[ServerCallback]
+	private void Start() {
+		StageManager.Instance.SetStage();
+	}
+
+
 	[Server]
 	public void StartCountdown() {
 		//씬 로드 끝나고, 플레이들이 모두 스폰되면 호출.
@@ -40,7 +51,7 @@ public class RoadManager : NetworkBehaviour {
 
 		//NetworkTime.time = 서버 시간
 		//5초 뒤 출발 하는거. (나중에 수정)
-		race_state_time_sync = NetworkTime.time + 5.0;
+		race_start_time_sync = NetworkTime.time + 5.0;
 
 		//TODO - ClientRPC로 카운트다운 UI 넣을건가?
 	}
@@ -49,24 +60,28 @@ public class RoadManager : NetworkBehaviour {
 	//TODO - 코루틴으로 바꿀지 고민.
 	private void Update() {
 		if(current_state_sync == RaceState.Countdown) {
-			if(NetworkTime.time >= race_state_time_sync) {
+			if(NetworkTime.time >= race_start_time_sync) {
 				current_state_sync = RaceState.Racing;
+				race_start_time_sync = NetworkTime.time;
 			}
 		}
 	}
 
 	[Server]
 	//서버 수신 - 클라이언트 통과 정보 받기
-	public void GetArriveResult(bool result, NetworkIdentity player, double finishTime) {
+	public void GetArriveResult(float impactSpeed, double finishTime) {
 		//TODO - 순위 리스트 업데이트 및 결과 RPC 전송
 		if (current_state_sync != RaceState.Racing) return;
+		bool result = (impactSpeed > _deathOverSpeedSync) ? true : false;
+		//나중에 결과 알려주기.
 
-		if(!finishers.Contains(player)) {
-			finishers.Add(player);
 
+		if(!finishers.Contains(connectionToClient.identity)) {
+			finishers.Add(connectionToClient.identity);
 			if (finishers.Count >= TotalPlayers) {
 				EndRace();
 			}
+			//들어온 시간 보고 순위 정렬?
 		}
 	}
 
@@ -79,6 +94,9 @@ public class RoadManager : NetworkBehaviour {
 	// [클라이언트 영역] - 연출 및 입력 제어
 	// ==========================================
 	private void OnStateChanged(RaceState raceState, RaceState newState) {
+		if (NetworkClient.localPlayer != null && NetworkClient.localPlayer.TryGetComponent(out PlayerState _playerState)) {
+			_playerState.UpdatePlayerStateByRace(newState);
+		}
 		switch (newState) {
 			case RaceState.Waiting:
 				//없음.
@@ -101,7 +119,8 @@ public class RoadManager : NetworkBehaviour {
 		_playersReadyCount++;
 		Debug.Log($"플레이어 준비 완료: {_playersReadyCount} / {TotalPlayers}");
 
-		if(_playersReadyCount >= TotalPlayers && current_state_sync == RaceState.Waiting) {
+		//if(_playersReadyCount >= TotalPlayers && current_state_sync == RaceState.Waiting) {
+		if(_playersReadyCount >= START_MAX_PLAYER) { 
 			StartCountdown();
 		}
 	}

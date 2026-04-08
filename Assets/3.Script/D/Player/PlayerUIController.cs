@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Mirror;
 
-public class PlayerUIController : MonoBehaviour {
+public class PlayerUIController : NetworkBehaviour {
+	private PlayerMovement _playerMovement;
 	private PlayerState _playerState;
 
 	[SerializeField] private Button _wingButton;
@@ -11,15 +13,22 @@ public class PlayerUIController : MonoBehaviour {
 
 	//----- ¸Þ¼­µå
 	private void Awake() {
+		TryGetComponent(out _playerMovement);
 		TryGetComponent(out _playerState);
 	}
 
 	private void Start() {
+		if (!isLocalPlayer) return;
+		BindButton();
 		BindBtnAction();
 	}
 
+	private void BindButton() {
+		_wingButton = UIManager.Instance.BindWingButton();
+	}
+
 	private void BindBtnAction() {
-		_wingButton.onClick.AddListener(_playerState.OpenWing);
+		_wingButton.onClick.AddListener(_playerMovement.OpenWing);
 		_wingButton.onClick.AddListener(DeActivateWingBtn);
 	}
 
