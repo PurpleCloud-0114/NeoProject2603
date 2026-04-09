@@ -32,6 +32,14 @@ public class InGameUIManager : MonoBehaviour
         while (NetworkClient.localPlayer == null)
             yield return null;
 
+        AuthPlayer myAuth = NetworkClient.localPlayer.GetComponent<AuthPlayer>();
+        float timer = 0f;
+        while (myAuth != null && myAuth.player_num == -1 && timer < 2f)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
         _myScoreSync = NetworkClient.localPlayer.GetComponent<ScoreSync>();
         _myNickSync = NetworkClient.localPlayer.GetComponent<NickNameSync>();
 
@@ -41,14 +49,36 @@ public class InGameUIManager : MonoBehaviour
 
     private void InitialSetup()
     {
-        if (_myScoreSync == null || _myNickSync == null) return;
+        if (NetworkClient.localPlayer == null) { return; }
+        
+        if (_myScoreSync == null || _myNickSync == null)
+        {
+            Debug.LogError("[InGameUIManager] ScoreSync 또는 NickNameSync 컴포넌트를 찾을 수 없습니다.");
+            return;
+        }
 
-        if (_nickname_text != null) _nickname_text.text = _myNickSync.player_nickname;
-        if (_score_text != null) _score_text.text = $"총점: {_myScoreSync.player_score}";
-        if (_roundscore_text != null) _roundscore_text.text = $"라운드: {_myScoreSync.round_total_score}";
+        if (_nickname_text != null)
+            _nickname_text.text = _myNickSync.player_nickname;
 
-        // player_ID 대신 player_num을 사용하는 것이 UI상 더 깔끔할 수 있습니다.
-        if (_playernum_text != null) _playernum_text.text = $"P{_myScoreSync.player_ID}";
+        if (_score_text != null)
+            _score_text.text = $"총점: {_myScoreSync.player_score}";
+
+        if (_roundscore_text != null)
+            _roundscore_text.text = $"라운드: {_myScoreSync.round_total_score}";
+
+        // AuthPlayer 및 player_num 체크
+        AuthPlayer myAuth = NetworkClient.localPlayer.GetComponent<AuthPlayer>();
+        if (_playernum_text != null)
+        {
+            if (myAuth != null && myAuth.player_num != -1)
+            {
+                _playernum_text.text = $"P{myAuth.player_num + 1}";
+            }
+            else
+            {
+                _playernum_text.text = "준비 중...";
+            }
+        }
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Mirror;
 using System;
 using System.Collections.Generic;
@@ -7,6 +7,9 @@ public class AuthPlayer : NetworkBehaviour
 {
     public static AuthPlayer LocalInstance { get; private set; }
 
+    // ì¸ë±ìŠ¤ ê¸°ë°˜ í”Œë ˆì´ì–´ ìºì‹± ë”•ì…”ë„ˆë¦¬
+    public static Dictionary<int, AuthPlayer> AllPlayers = new Dictionary<int, AuthPlayer>();
+
     public Action<bool, string, int, string> OnLoginResult;
     public Action<bool, string> OnSignupResult;
     public Action<bool, int> OnScoreSaveResult;
@@ -14,25 +17,9 @@ public class AuthPlayer : NetworkBehaviour
     [SyncVar] public string player_ID = "";
     [SyncVar] public bool is_authenticated = false;
 
+    // ì„œë²„(RoomPlayer)ì—ì„œ í• ë‹¹ë°›ì€ ì¸ë±ìŠ¤
     [SyncVar(hook = nameof(OnPlayerNumChange))]
     public int player_num = -1;
-
-    private static List<int> _used_playernums = new List<int>();
-
-    [Server]
-    private int AssignPlayerNum() //¹øÈ£ºÎ¿©. ¹æ¿¡ µé¾î¿ÔÀ»¶§ È£ÃâÇØ¾ß‰Î
-    {
-        int num = 1;
-        while (_used_playernums.Contains(num)) num++;
-        _used_playernums.Add(num);
-        return num;
-    }
-
-    [Server]
-    private void ReleasePlayerNum(int num)
-    {
-        _used_playernums.Remove(num);
-    }
 
     public override void OnStartLocalPlayer()
     {
@@ -40,52 +27,87 @@ public class AuthPlayer : NetworkBehaviour
         LocalInstance = this;
     }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        RegisterPlayer(player_num);
+    }
+
     public override void OnStopClient()
     {
         base.OnStopClient();
         if (isLocalPlayer) LocalInstance = null;
-    }
-
-    public override void OnStopServer()
-    {
-        base.OnStopServer();
-        if (player_num != -1) ReleasePlayerNum(player_num);
-    }
-
-    [Command]
-    public void CmdLeaveRoom()
-    {
-        if (player_num != -1)
-        {
-            ReleasePlayerNum(player_num);
-            player_num = -1;
-        }
+        UnregisterPlayer(player_num);
     }
 
     public void OnPlayerNumChange(int oldVal, int newVal)
     {
-        if (isLocalPlayer)
-            Debug.Log($"[AuthPlayer] ³» ÇÃ·¹ÀÌ¾î ¹øÈ£: {newVal}");
+        UnregisterPlayer(oldVal);
+        RegisterPlayer(newVal);
+        if (isLocalPlayer) Debug.Log($"[AuthPlayer] ë‚´ ë²ˆí˜¸ í• ë‹¹ë¨: {newVal}");
     }
 
-    // ·Î±×ÀÎ
+    private void RegisterPlayer(int num)
+    {
+        if (num >= 0 && !AllPlayers.ContainsKey(num)) AllPlayers.Add(num, this);
+    }
+
+    private void UnregisterPlayer(int num)
+    {
+        if (num >= 0 && AllPlayers.ContainsKey(num)) AllPlayers.Remove(num);
+    }
+
+    // ì™¸ë¶€ ì°¸ì¡°ìš© ë°ì´í„° ì¶”ì¶œê¸°, ì¸ë±ìŠ¤ë§Œ ì¤˜ì„œ ë§¤ê°œë³€ìˆ˜ ë¹¼ì„œ ì“°ë©´ ë©ë‹ˆë‹¤
+    public static bool TryGetPlayerData(int index, out string nickname, out int roundScore, out int totalScore)
+    {
+        nickname = ""; roundScore = 0; totalScore = 0;
+        if (AllPlayers.TryGetValue(index, out AuthPlayer player))
+        {
+            if (player.TryGetComponent<NickNameSync>(out var n)) nickname = n.player_nickname;
+            if (player.TryGetComponent<ScoreSync>(out var s))
+            {
+                roundScore = s.round_total_score;
+                totalScore = s.player_score;
+            }
+            return true;
+        }
+        return false;
+    }
+    /* ì˜ˆì‹œ
+     void DisplayPlayerInfo(int targetIndex)
+    {
+        if (AuthPlayer.TryGetPlayerData(targetIndex, out string name, out int rScore, out int tScore))
+        {
+            // ì—¬ê¸°ì„œ name, rScore, tScoreëŠ” ì´ë¯¸ í•´ë‹¹ í”„ë¦¬í©ì—ì„œ ë½‘ì•„ì˜¨ ìµœì‹  ê°’ì…ë‹ˆë‹¤.
+            Debug.Log($"{targetIndex}ë²ˆ í”Œë ˆì´ì–´ ì´ë¦„: {name}, ë¼ìš´ë“œ ì ìˆ˜: {rScore}");
+        }
+        else
+        {
+            Debug.Log("í•´ë‹¹ ì¸ë±ìŠ¤ì˜ í”Œë ˆì´ì–´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+        }
+    }
+     */
+
+    // ë¡œê·¸ì¸ ìš”ì²­
     [Command]
     public void CmdRequestLogin(string name, string password)
     {
         if (SQLManager.Instance == null)
         {
-            TargetRpcLoginResult(connectionToClient, false, "", 0, "¼­¹ö ¿À·ù");
+            TargetRpcLoginResult(connectionToClient, false, "", 0, "ì„œë²„ DB ì—°ê²° ì˜¤ë¥˜");
             return;
         }
 
-        int result = SQLManager.Instance.Login(name, password, out string nickname, out int score);
+        string nickname;
+        int totalScore;
+        int result = SQLManager.Instance.Login(name, password, out nickname, out totalScore);
 
-        if (result == 0) // ·Î±×ÀÎ ¼º°ø
+        if (result == 0) // ë¡œê·¸ì¸ ì„±ê³µ
         {
             player_ID = name;
             is_authenticated = true;
 
-            // [ÇÙ½É º¯°æÁ¡] ¼­¹ö°¡ Á÷Á¢ NickNameSync¿Í ScoreSync¿¡ °ªÀ» ¼¼ÆÃÇÕ´Ï´Ù.
+            // ì„œë²„ì—ì„œ SyncVar ê°’ë“¤ì„ ì„¸íŒ…í•˜ë©´ í´ë¼ì´ì–¸íŠ¸ë“¤ë¡œ ìë™ ë™ê¸°í™”ë¨
             if (TryGetComponent<NickNameSync>(out var nickSync))
             {
                 nickSync.player_nickname = nickname;
@@ -93,23 +115,16 @@ public class AuthPlayer : NetworkBehaviour
             if (TryGetComponent<ScoreSync>(out var scoreSync))
             {
                 scoreSync.player_ID = name;
-                scoreSync.player_score = score;
+                scoreSync.player_score = totalScore;
             }
 
-            TargetRpcLoginResult(connectionToClient, true, nickname, score, "");
+            TargetRpcLoginResult(connectionToClient, true, nickname, totalScore, "ë¡œê·¸ì¸ ì„±ê³µ");
         }
         else
         {
-            string msg = result == 1 ? "¾ÆÀÌµğ ¶Ç´Â ºñ¹Ğ¹øÈ£¸¦ È®ÀÎÇÏ¼¼¿ä" : "¼­¹ö ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù";
+            string msg = result == 1 ? "ì•„ì´ë”” ë˜ëŠ” ë¹„ë°€ë²ˆí˜¸ê°€ í‹€ë ¸ìŠµë‹ˆë‹¤" : "ì„œë²„ ì˜¤ë¥˜";
             TargetRpcLoginResult(connectionToClient, false, "", 0, msg);
-            StartCoroutine(DelayDisconnect(connectionToClient));
         }
-    }
-
-    private System.Collections.IEnumerator DelayDisconnect(NetworkConnectionToClient conn)
-    {
-        yield return new WaitForSeconds(0.2f);
-        conn.Disconnect();
     }
 
     [TargetRpc]
@@ -118,64 +133,39 @@ public class AuthPlayer : NetworkBehaviour
         OnLoginResult?.Invoke(success, nickname, score, message);
     }
 
-    // È¸¿ø°¡ÀÔ
+    // íšŒì›ê°€ì… ë° ì ìˆ˜ ì €ì¥
     [Command]
     public void CmdRequestSignup(string name, string password, string nickname)
     {
-        if (SQLManager.Instance == null)
-        {
-            TargetRpcSignupResult(connectionToClient, false, "¼­¹ö ¿À·ù");
-            return;
-        }
-
+        if (SQLManager.Instance == null) { TargetRpcSignupResult(connectionToClient, false, "ì„œë²„ ì—°ê²° ì˜¤ë¥˜"); return; }
         int result = SQLManager.Instance.Signup(name, password, nickname);
-        switch (result)
-        {
-            case 0: TargetRpcSignupResult(connectionToClient, true, "È¸¿ø°¡ÀÔÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù."); break;
-            case 1: TargetRpcSignupResult(connectionToClient, false, "ÀÌ¹Ì »ç¿ë ÁßÀÎ ¾ÆÀÌµğÀÔ´Ï´Ù"); break;
-            case 2: TargetRpcSignupResult(connectionToClient, false, "ÀÌ¹Ì »ç¿ë ÁßÀÎ ´Ğ³×ÀÓÀÔ´Ï´Ù"); break;
-            default: TargetRpcSignupResult(connectionToClient, false, "È¸¿ø°¡ÀÔ¿¡ ½ÇÆĞÇß½À´Ï´Ù. ´Ù½Ã ½ÃµµÇÏ¼¼¿ä"); break;
-        }
+        string msg = result switch { 0 => "íšŒì›ê°€ì… ì™„ë£Œ", 1 => "ì¤‘ë³µëœ ì•„ì´ë””", 2 => "ì¤‘ë³µëœ ë‹‰ë„¤ì„", _ => "ê°€ì… ì‹¤íŒ¨" };
+        TargetRpcSignupResult(connectionToClient, result == 0, msg);
     }
 
     [TargetRpc]
     private void TargetRpcSignupResult(NetworkConnectionToClient target, bool success, string message)
-    {
-        OnSignupResult?.Invoke(success, message);
-    }
+    { OnSignupResult?.Invoke(success, message); }
 
-    // Á¡¼ö ÀúÀå
     [Command]
     public void CmdRequestSaveScore()
     {
         if (!is_authenticated || SQLManager.Instance == null) return;
-
         if (TryGetComponent<ScoreSync>(out var scoreSync))
         {
             int scoreToSave = scoreSync.round_total_score;
-
             SQLManager.Instance.GetScore(player_ID, out int currentScore);
             int newTotal = currentScore + scoreToSave;
-
             if (SQLManager.Instance.SetScore(player_ID, newTotal))
             {
-                // DB ÀúÀåÀÌ ¼º°øÇßÀ» ¶§¸¸ Á¡¼ö¸¦ ¸®¼Â
                 scoreSync.ServerResetRoundScore();
-                scoreSync.player_score = newTotal; // ´©Àû Á¡¼öµµ °»½Å
-
+                scoreSync.player_score = newTotal;
                 TargetRpcScoreSaveResult(connectionToClient, true, newTotal);
-                Debug.Log($"[Server] {player_ID} score saved: {newTotal}");
-            }
-            else
-            {
-                TargetRpcScoreSaveResult(connectionToClient, false, currentScore);
             }
         }
     }
 
     [TargetRpc]
     private void TargetRpcScoreSaveResult(NetworkConnectionToClient target, bool success, int newTotal)
-    {
-        OnScoreSaveResult?.Invoke(success, newTotal);
-    }
+    { OnScoreSaveResult?.Invoke(success, newTotal); }
 }

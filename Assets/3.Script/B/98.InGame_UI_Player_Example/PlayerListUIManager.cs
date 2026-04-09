@@ -28,34 +28,19 @@ public class PlayerListUIManager : MonoBehaviour
     /// </summary>
     public void UpdateAllSlots()
     {
-        // 1. 먼저 모든 슬롯을 비활성화/초기화합니다.
-        foreach (PlayerSlotUI slot in _slots)
+        foreach (PlayerSlotUI slot in _slots) if (slot != null) slot.ClearSlot();
+
+        foreach (var pair in AuthPlayer.AllPlayers)
         {
-            if (slot != null) slot.ClearSlot();
-        }
+            int index = pair.Key; // player_num
+            AuthPlayer auth = pair.Value;
 
-        // 2. 현재 씬에 존재하는 모든 AuthPlayer 컴포넌트를 찾습니다.
-        AuthPlayer[] players = FindObjectsByType<AuthPlayer>(FindObjectsSortMode.None);
-
-        if (players == null || players.Length == 0) return;
-
-        // 3. 각 플레이어의 player_num에 맞춰 슬롯에 데이터를 채웁니다.
-        foreach (AuthPlayer auth in players)
-        {
-            // player_num이 할당되지 않았거나 범위를 벗어나면 스킵
-            if (auth.player_num <= 0 || auth.player_num > _slots.Length) continue;
-
-            // player_num은 1부터 시작하므로 인덱스는 -1을 해줍니다.
-            int index = auth.player_num - 1;
-
-            if (_slots[index] != null)
+            if (index >= 0 && index < _slots.Length && _slots[index] != null)
             {
                 ScoreSync score = auth.GetComponent<ScoreSync>();
                 NickNameSync nick = auth.GetComponent<NickNameSync>();
-
                 if (score != null && nick != null)
                 {
-                    // 해당 슬롯에 데이터 전달 및 활성화
                     _slots[index].SetPlayer(auth, score, nick);
                 }
             }

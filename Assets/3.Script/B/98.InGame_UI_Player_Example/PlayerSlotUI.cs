@@ -46,7 +46,7 @@ public class PlayerSlotUI : MonoBehaviour
             _roundscore_text.text = $"{_scoreSync.round_total_score}";
 
         if (_playernum_text != null)
-            _playernum_text.text = $"P{_auth.player_num}";
+            _playernum_text.text = $"P{_auth.player_num + 1}";
     }
 
     // --- 추가된 애니메이션 로직 ---
