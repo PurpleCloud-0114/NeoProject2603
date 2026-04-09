@@ -13,12 +13,12 @@ public class ScoreSync : NetworkBehaviour
     public void OnScoreChange(int old, int newVal) { if (newVal > old) TriggerSlotRefresh(false); }
     public void OnRoundScoreChange(int old, int newVal) { if (newVal > old) TriggerSlotRefresh(true); }
 
-    private void TriggerSlotRefresh(bool isRoundScore)
+    private void TriggerSlotRefresh(bool isroundScore)
     {
         AuthPlayer auth = GetComponent<AuthPlayer>();
         if (auth != null && PlayerListUIManager.Instance != null)
         {
-            PlayerListUIManager.Instance.PlaySlotAnimation(auth.player_num, isRoundScore);
+            PlayerListUIManager.Instance.PlaySlotAnimation(auth.player_num, isroundScore);
         }
     }
 }

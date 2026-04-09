@@ -4,10 +4,11 @@ using UnityEngine.UI;
 public class OptionController : MonoBehaviour
 {
 
-    private const string PRESET_KEY = "ControlPreset";
-    private const string SENSITIVITY_KEY = "GyroSensitivity";
-    private const string BGM_KEY = "BGM";
-    private const string SFX_KEY = "SFX";
+    [SerializeField]private const string _PRESET_KEY = "ControlPreset";
+    //_currentPresetIndex = PlayerPrefs.GetInt(_PRESET_KEY, 0); 이런식으로 뽑아서 UI표시
+    private const string _SENSITIVITY_KEY = "GyroSensitivity";
+    private const string _BGM_KEY = "BGM";
+    private const string _SFX_KEY = "SFX";
 
     [Header("UI Panels")]
     [SerializeField] private GameObject _titlePanel;
@@ -44,10 +45,10 @@ public class OptionController : MonoBehaviour
     {
         InitSliderCaching();
 
-        _currentPresetIndex = PlayerPrefs.GetInt(PRESET_KEY, 0);
-        float savedSensitivity = PlayerPrefs.GetFloat(SENSITIVITY_KEY, 1.0f);
-        float savedBGM = PlayerPrefs.GetFloat(BGM_KEY, 0.75f);
-        float savedSFX = PlayerPrefs.GetFloat(SFX_KEY, 0.75f);
+        _currentPresetIndex = PlayerPrefs.GetInt(_PRESET_KEY, 0);
+        float savedSensitivity = PlayerPrefs.GetFloat(_SENSITIVITY_KEY, 1.0f);
+        float savedBGM = PlayerPrefs.GetFloat(_BGM_KEY, 0.75f);
+        float savedSFX = PlayerPrefs.GetFloat(_SFX_KEY, 0.75f);
 
         _sensitivity_slider.value = savedSensitivity;
         _bgm_slider.value = savedBGM;
@@ -60,17 +61,17 @@ public class OptionController : MonoBehaviour
         _back_button.onClick.AddListener(BackToTitle);
 
         _sensitivity_slider.onValueChanged.AddListener((val) => {
-            PlayerPrefs.SetFloat(SENSITIVITY_KEY, val);
+            PlayerPrefs.SetFloat(_SENSITIVITY_KEY, val);
         });
 
         _bgm_slider.onValueChanged.AddListener((val) => {
-            PlayerPrefs.SetFloat(BGM_KEY, val);
-            if (AudioManager.Instance != null) AudioManager.Instance.SetVolume(BGM_KEY, val);
+            PlayerPrefs.SetFloat(_BGM_KEY, val);
+            if (AudioManager.Instance != null) AudioManager.Instance.SetVolume(_BGM_KEY, val);
         });
 
         _sfx_slider.onValueChanged.AddListener((val) => {
-            PlayerPrefs.SetFloat(SFX_KEY, val);
-            if (AudioManager.Instance != null) AudioManager.Instance.SetVolume(SFX_KEY, val);
+            PlayerPrefs.SetFloat(_SFX_KEY, val);
+            if (AudioManager.Instance != null) AudioManager.Instance.SetVolume(_SFX_KEY, val);
         });
 
         UpdateControlUI();
@@ -96,7 +97,7 @@ public class OptionController : MonoBehaviour
     public void SetPreset(int index)
     {
         _currentPresetIndex = index;
-        PlayerPrefs.SetInt(PRESET_KEY, index); // 프리셋 변경 시 저장
+        PlayerPrefs.SetInt(_PRESET_KEY, index); // 프리셋 변경 시 저장
         PlayerPrefs.Save(); // 명시적 저장
         UpdateControlUI();
     }
@@ -108,26 +109,26 @@ public class OptionController : MonoBehaviour
         UpdateButtonStyle(_gyro_right_button, _currentPresetIndex == 2);
         UpdateButtonStyle(_gyro_left_button, _currentPresetIndex == 3);
 
-        bool isGyroMode = (_currentPresetIndex == 2 || _currentPresetIndex == 3);
-        _sensitivity_slider.interactable = isGyroMode;
+        bool isgyromode = (_currentPresetIndex == 2 || _currentPresetIndex == 3);
+        _sensitivity_slider.interactable = isgyromode;
 
         if (_sensitivity_fill_img != null)
         {
-            _sensitivity_fill_img.color = isGyroMode ? _original_fill_color : _slider_disabled_color;
+            _sensitivity_fill_img.color = isgyromode ? _original_fill_color : _slider_disabled_color;
         }
         if (_sensitivity_handle_img != null)
         {
-            _sensitivity_handle_img.color = isGyroMode ? _original_handle_color : _slider_disabled_color;
+            _sensitivity_handle_img.color = isgyromode ? _original_handle_color : _slider_disabled_color;
         }
     }
 
-    private void UpdateButtonStyle(Button btn, bool isSelected)
+    private void UpdateButtonStyle(Button btn, bool isselected)
     {
         if (btn.TryGetComponent(out Image img))
         {
-            img.color = isSelected ? _selected_color : _unselected_color;
+            img.color = isselected ? _selected_color : _unselected_color;
         }
-        btn.interactable = !isSelected;
+        btn.interactable = !isselected;
     }
 
     public void BackToTitle()

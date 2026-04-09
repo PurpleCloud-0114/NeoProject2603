@@ -16,7 +16,7 @@ public class SignupController : MonoBehaviour
     [SerializeField] private Button _signup_button;
     [SerializeField] private Button _back_button;
 
-    private bool _isWaiting = false;
+    private bool _is_waiting = false;
 
     private void Start()
     {
@@ -29,7 +29,7 @@ public class SignupController : MonoBehaviour
 
     public void SignupEvent()
     {
-        if (_isWaiting) return;
+        if (_is_waiting) return;
 
         if (_name_input.text.Equals(string.Empty) || _pw_input.text.Equals(string.Empty) ||
             _nickname_input.text.Equals(string.Empty) || _pw_confirm_input.text.Equals(string.Empty))
@@ -54,13 +54,13 @@ public class SignupController : MonoBehaviour
             LogTextViewing("서버에 연결되어 있지 않습니다"); return;
         }
 
-        _isWaiting = true;
+        _is_waiting = true;
         _signup_button.interactable = false;
         LogTextViewing("처리 중...");
 
         AuthPlayer.LocalInstance.OnSignupResult = (success, message) =>
         {
-            _isWaiting = false;
+            _is_waiting = false;
             _signup_button.interactable = true;
 
             if (success)
@@ -94,7 +94,7 @@ public class SignupController : MonoBehaviour
         _pw_input.text = string.Empty;
         _pw_confirm_input.text = string.Empty;
         _nickname_input.text = string.Empty;
-        _isWaiting = false;
+        _is_waiting = false;
         _signup_button.interactable = true;
     }
 }

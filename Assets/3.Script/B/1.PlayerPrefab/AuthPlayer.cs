@@ -17,7 +17,7 @@ public class AuthPlayer : NetworkBehaviour
     [SyncVar] public string player_ID = "";
     [SyncVar] public bool is_authenticated = false;
 
-    // 서버(RoomPlayer)에서 할당받은 인덱스
+    // 서버(RoomPlayer)에서 할당받을 인덱스
     [SyncVar(hook = nameof(OnPlayerNumChange))]
     public int player_num = -1;
 
@@ -58,15 +58,15 @@ public class AuthPlayer : NetworkBehaviour
     }
 
     // 외부 참조용 데이터 추출기, 인덱스만 줘서 매개변수 빼서 쓰면 됩니다
-    public static bool TryGetPlayerData(int index, out string nickname, out int roundScore, out int totalScore)
+    public static bool TryGetPlayerData(int index, out string nickname, out int roundscore, out int totalScore)
     {
-        nickname = ""; roundScore = 0; totalScore = 0;
+        nickname = ""; roundscore = 0; totalScore = 0;
         if (AllPlayers.TryGetValue(index, out AuthPlayer player))
         {
             if (player.TryGetComponent<NickNameSync>(out var n)) nickname = n.player_nickname;
             if (player.TryGetComponent<ScoreSync>(out var s))
             {
-                roundScore = s.round_total_score;
+                roundscore = s.round_total_score;
                 totalScore = s.player_score;
             }
             return true;
@@ -107,12 +107,12 @@ public class AuthPlayer : NetworkBehaviour
             player_ID = name;
             is_authenticated = true;
 
-            // 서버에서 SyncVar 값들을 세팅하면 클라이언트들로 자동 동기화됨
-            if (TryGetComponent<NickNameSync>(out var nickSync))
+            // 서버에서 SyncVar 값들을 세팅하면 클라이언트들로 자동 동기화
+            if (TryGetComponent<NickNameSync>(out NickNameSync nickSync))
             {
                 nickSync.player_nickname = nickname;
             }
-            if (TryGetComponent<ScoreSync>(out var scoreSync))
+            if (TryGetComponent<ScoreSync>(out ScoreSync scoreSync))
             {
                 scoreSync.player_ID = name;
                 scoreSync.player_score = totalScore;

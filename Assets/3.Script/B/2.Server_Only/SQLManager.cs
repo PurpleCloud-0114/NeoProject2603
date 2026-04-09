@@ -85,8 +85,8 @@ public class SQLManager : MonoBehaviour
     private string ServerSet(string path)
     {
         CreateFile(path);
-        string jsonString = File.ReadAllText(path + "/config.json");
-        JsonData itemData = JsonMapper.ToObject(jsonString);
+        string jsonstring = File.ReadAllText(path + "/config.json");
+        JsonData itemData = JsonMapper.ToObject(jsonstring);
         try
         {
             return $"Server={itemData[0]["ip_json"]};" +
@@ -102,13 +102,13 @@ public class SQLManager : MonoBehaviour
     private void CreateFile(string path)
     {
         if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-        string filePath = path + "/config.json";
-        if (!File.Exists(filePath))
+        string filepath = path + "/config.json";
+        if (!File.Exists(filepath))
         {
             List<ServerJsonItem> item = new List<ServerJsonItem>();
             item.Add(new ServerJsonItem("192.168.1.45", "neoproject", "root", "1234", "3306"));
             JsonData data = JsonMapper.ToJson(item);
-            File.WriteAllText(filePath, data.ToString());
+            File.WriteAllText(filepath, data.ToString());
         }
     }
 
@@ -209,9 +209,9 @@ public class SQLManager : MonoBehaviour
         catch (Exception e) { Debug.LogError($"Nickname Check Error: {e.Message}"); return false; }
     }
 
-    public bool GetScore(string name, out int out_score)
+    public bool GetScore(string name, out int outscore)
     {
-        out_score = 0;
+        outscore = 0;
         try
         {
             if (!ConnectionCheck(_connection)) return false;
@@ -220,7 +220,7 @@ public class SQLManager : MonoBehaviour
             {
                 cmd.Parameters.AddWithValue("@name", name);
                 object result = cmd.ExecuteScalar();
-                if (result != null) { out_score = Convert.ToInt32(result); return true; }
+                if (result != null) { outscore = Convert.ToInt32(result); return true; }
             }
             return false;
         }
