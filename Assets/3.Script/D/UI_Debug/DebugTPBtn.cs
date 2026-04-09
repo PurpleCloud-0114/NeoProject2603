@@ -7,7 +7,7 @@ public class DebugTPBtn : MonoBehaviour {
 
 	public void OnClickBtn() {
 		player.transform.position = new Vector3(player.transform.position.x,
-												StageSystem.Instance.stage_data.map_redzone_height_Y + 300f,
+												StageManager.Instance.stage_data_sync.map_redzone_height_Y + 300f,
 												player.transform.position.z);
 	}
 }

@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour {
 	public static UIManager Instance = null;
 
 	[SerializeField] private Button _wingButton;
+	[SerializeField] private Button _itemButton;
 
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -37,6 +38,6 @@ public class UIManager : MonoBehaviour {
 	 ·¹µåÁ¸ 
 	 */
 
-	[Client]
-	public Button BindWingButton() => _wingButton;
+	[Client] public Button BindWingButton() => _wingButton;
+	[Client] public Button BindItemButton() => _itemButton;
 }

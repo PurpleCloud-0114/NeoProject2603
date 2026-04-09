@@ -9,6 +9,7 @@ public class PlayerUIController : NetworkBehaviour {
 	private PlayerState _playerState;
 
 	[SerializeField] private Button _wingButton;
+	[SerializeField] private Button _itemButton;
 	//[SerializeField] private Button _itemButton;
 
 	//----- ¸Þ¼­µå
@@ -18,13 +19,14 @@ public class PlayerUIController : NetworkBehaviour {
 	}
 
 	private void Start() {
-		if (!isLocalPlayer) return;
-		BindButton();
+		if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
+		if (isLocalPlayer) BindButton();
 		BindBtnAction();
 	}
 
 	private void BindButton() {
 		_wingButton = UIManager.Instance.BindWingButton();
+		_itemButton = UIManager.Instance.BindItemButton();
 	}
 
 	private void BindBtnAction() {

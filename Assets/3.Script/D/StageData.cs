@@ -1,12 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
+[Serializable]
 public struct StageData {
-	public float map_height { get; private set; }
-	public float map_redzone { get; private set; }
-	public float map_redzone_height { get; private set; }
-	public float map_redzone_height_Y { get; private set; }
+	[field: SerializeField] public float map_height;
+	[field: SerializeField] public float map_redzone;
+	[field: SerializeField] public float map_redzone_height;
+	[field: SerializeField] public float map_redzone_height_Y;
 
 	public StageData(float mapHeight, float mapRedZone, float mapRedZoneHeight) {
 		map_height = mapHeight;

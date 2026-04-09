@@ -28,7 +28,7 @@ public class PlayerState : NetworkBehaviour {
 	}
 
 	private void Start() {
-		if (isLocalPlayer) {
+		if (isLocalPlayer || RaceManager.Instance.isSinglePlay) {
 			_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 			if (_mainCamera.TryGetComponent(out DynamicFOVController FOVController)) {
 				Debug.Log("Find Camera!");
@@ -44,6 +44,8 @@ public class PlayerState : NetworkBehaviour {
 	}
 
 	private void OnCollisionEnter(Collision collision) {
+		if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
+
 		if (collision.transform.CompareTag("EndPoint")) {
 			state = State.Finish;
 			double myFinishTime = NetworkTime.time - RaceManager.Instance.race_start_time_sync;
@@ -54,10 +56,13 @@ public class PlayerState : NetworkBehaviour {
 	}
 
 	private void OnTriggerEnter(Collider other) {
+		if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
 		if (other.transform.CompareTag("Obstacle")) {
 			_playerMovement.hitObstacle();
 		}
-		if (other.transform.CompareTag("DangerZone")) {
+		if (other.transform.CompareTag("Redzone")) {
+			Debug.Log($"레드존 진입합 Y좌표 : {other.transform.position.y}");
+			Debug.Log($"플레이어 현재 Y좌표 : {transform.position.y}");
 			_playerUIController.ActivateWingBtn();
 		}
 	}
@@ -65,7 +70,7 @@ public class PlayerState : NetworkBehaviour {
 	[Command]
 	//서버에게 보내는 도착 신호. (도착 속도 / 시간,
 	private void SendArriveResult(float impactSpeed, double finishTime) {
-		RaceManager.Instance.GetArriveResult(impactSpeed, finishTime);
+		RaceManager.Instance.GetArriveResult(connectionToClient, impactSpeed, finishTime);
 	}
 
 	public void UpdatePlayerStateByRace(RaceState raceState) {

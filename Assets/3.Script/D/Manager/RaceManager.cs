@@ -13,6 +13,8 @@ public enum RaceState {
 public class RaceManager : NetworkBehaviour {
 	public static RaceManager Instance = null;
 
+	public bool isSinglePlay = false;
+
 	//공통 데이터
 	[SyncVar(hook = nameof(OnStateChanged))]
 	public RaceState current_state_sync = RaceState.Waiting;
@@ -38,11 +40,11 @@ public class RaceManager : NetworkBehaviour {
 	// ==========================================
 	// [서버 영역] - 판정과 흐름 제어
 	// ==========================================
-	[ServerCallback]
+	//[ServerCallback]
 	private void Start() {
-		StageManager.Instance.SetStage();
+		if(isServer || isSinglePlay) StageManager.Instance.SetStage();
+		if (isSinglePlay) RandomSpawner.Instance.SetObstacles();
 	}
-
 
 	[Server]
 	public void StartCountdown() {
@@ -69,15 +71,15 @@ public class RaceManager : NetworkBehaviour {
 
 	[Server]
 	//서버 수신 - 클라이언트 통과 정보 받기
-	public void GetArriveResult(float impactSpeed, double finishTime) {
+	public void GetArriveResult(NetworkConnectionToClient sender, float impactSpeed, double finishTime) {
 		//TODO - 순위 리스트 업데이트 및 결과 RPC 전송
 		if (current_state_sync != RaceState.Racing) return;
 		bool result = (impactSpeed > _deathOverSpeedSync) ? true : false;
 		//나중에 결과 알려주기.
 
 
-		if(!finishers.Contains(connectionToClient.identity)) {
-			finishers.Add(connectionToClient.identity);
+		if(!finishers.Contains(sender.identity)) {
+			finishers.Add(sender.identity);
 			if (finishers.Count >= TotalPlayers) {
 				EndRace();
 			}

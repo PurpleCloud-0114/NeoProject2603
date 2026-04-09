@@ -439,7 +439,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1570589857971375806}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
   m_Name: 
@@ -473,7 +473,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1570589857971375806}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b20dc110904e47f8a154cdcf6433eae, type: 3}
   m_Name: 
@@ -516,9 +516,11 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _inputSystem: {fileID: 0}
+  _playerState: {fileID: 0}
   VelocityTracker: {x: 0, y: 0, z: 0}
   _moveSpeed: 45
-  drop_max_speed: 100
+  _dropMaxSpeed: 100
+  _dropWingSpeed: 30
   MoveMobileSensitive: 1
 --- !u!114 &5958828337014629271
 MonoBehaviour:
@@ -536,8 +538,6 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _wingButton: {fileID: 0}
-  _endPopup: {fileID: 0}
-  _endPopupTitle: {fileID: 0}
 --- !u!114 &4973022222252217015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -553,8 +553,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  _dropWingSpeed: 30
-  _deathOverSpeed: 31
+  state: 0
 --- !u!1 &1655414897174812396
 GameObject:
   m_ObjectHideFlags: 0

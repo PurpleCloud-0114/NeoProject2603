@@ -38,18 +38,17 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 
 	private void Start() {
-		if(isLocalPlayer) _inputSystem = FindAnyObjectByType<InputSystem>();
+		if(isLocalPlayer || RaceManager.Instance.isSinglePlay) _inputSystem = FindAnyObjectByType<InputSystem>();
 	}
 
 	private void FixedUpdate() {
-		if (!isLocalPlayer || _inputSystem == null) return;
-
 		VelocityTracker = _rigidBody.linearVelocity;
+		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _inputSystem == null) return;
 		if(_playerState.state == State.Falling) Drop();
 	}
 
 	private void Update() {
-		if (!isLocalPlayer || _inputSystem == null) return;
+		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _inputSystem == null) return;
 
 		_moveVector = _inputSystem.MovePoint * MoveMobileSensitive;
 		_moveDir = new Vector3(Mathf.Clamp(_moveVector.x, -1, 1), 0, Mathf.Clamp(_moveVector.y, -1, 1));

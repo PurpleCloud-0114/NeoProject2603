@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class RandomSpawner : MonoBehaviour {
+    public static RandomSpawner Instance = null;
+
     [Header("생성할 프리팹 설정")]
     [Tooltip("기본 큐브 프리팹을 넣으세요.")]
     public GameObject cubePrefab;
@@ -25,7 +27,12 @@ public class RandomSpawner : MonoBehaviour {
 
     private GameObject[] _obstaclePooling;
 
-	public void Start() {
+    private void Awake() {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
+
+    public void Start() {
         _obstaclePooling = new GameObject[spawnCount];
 
         for (int i = 0; i < spawnCount; i++) {
@@ -38,7 +45,7 @@ public class RandomSpawner : MonoBehaviour {
         for(int i = 0; i < spawnCount; i++) {
             // 1. 설정된 범위 내에서 무작위 위치 계산
             float randomX = Random.Range(minPosition.x, maxPosition.x);
-            float randomY = Random.Range(StageSystem.Instance.stage_data.map_redzone_height_Y + padding, StageSystem.Instance.stage_data.map_height - padding);
+            float randomY = Random.Range(StageManager.Instance.stage_data_sync.map_redzone_height_Y + padding, StageManager.Instance.stage_data_sync.map_height - padding);
             float randomZ = Random.Range(minPosition.z, maxPosition.z);
             Vector3 randomPos = new Vector3(randomX, randomY, randomZ);
 

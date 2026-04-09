@@ -6,7 +6,7 @@ TagManager:
   tags:
   - EndPoint
   - Obstacle
-  - DangerZone
+  - Redzone
   layers:
   - Default
   - TransparentFX

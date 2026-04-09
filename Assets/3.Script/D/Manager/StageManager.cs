@@ -6,8 +6,8 @@ using Mirror;
 public class StageManager : NetworkBehaviour {
 	public static StageManager Instance = null;
 
-	[SyncVar] public StageData stage_data_sync;
-	[SerializeField] private Transform _dangerZoneTrigger;
+	[SyncVar(hook = nameof(OnStageDataChanged))] public StageData stage_data_sync;
+	[SerializeField] private Transform _redzoneTrigger;
 
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -19,11 +19,11 @@ public class StageManager : NetworkBehaviour {
 		float rnd_RedZone = Random.Range(250f, 400f);
 		float rnd_RedZoneHeight = Random.Range(50f, 300f);
 		stage_data_sync = new StageData(3000f, rnd_RedZone, rnd_RedZoneHeight);
-		SetRedzonePosition();
 	}
 
-	[ClientRpc]
-	private void SetRedzonePosition() {
-		_dangerZoneTrigger.position = new Vector3(0, stage_data_sync.map_redzone_height_Y, 0);
+	private void OnStageDataChanged(StageData oldData, StageData newData) {
+		if (_redzoneTrigger != null) {
+			_redzoneTrigger.position = new Vector3(0, newData.map_redzone_height_Y, 0);
+		}
 	}
 }
