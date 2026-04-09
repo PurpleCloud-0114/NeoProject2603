@@ -4,27 +4,30 @@ using UnityEngine;
 using Mirror;
 
 
-public enum State {
+public enum PlayerGameState {
 	Wait,
 	Falling,
 	Finish
 }
 
-public class PlayerState : NetworkBehaviour {
+public class PlayerCore : NetworkBehaviour {
 	private PlayerMovement _playerMovement;
 	private PlayerUIController _playerUIController;
+	private PlayerItemController _playerItemController;
+	private PlayerEffectController playerEffectController;
 
 	private Rigidbody _rigidbody;
 
 	private GameObject _mainCamera;
 
-	public State state = State.Wait;
+	public PlayerGameState playerGameState = PlayerGameState.Wait;
 
 	//----- 메서드
 	private void Awake() {
 		TryGetComponent(out _rigidbody);
 		TryGetComponent(out _playerMovement);
 		TryGetComponent(out _playerUIController);
+		TryGetComponent(out _playerItemController);
 	}
 
 	private void Start() {
@@ -47,7 +50,7 @@ public class PlayerState : NetworkBehaviour {
 		if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
 
 		if (collision.transform.CompareTag("EndPoint")) {
-			state = State.Finish;
+			playerGameState = PlayerGameState.Finish;
 			double myFinishTime = NetworkTime.time - RaceManager.Instance.race_start_time_sync;
 			float impactSpeed = Mathf.Abs(collision.relativeVelocity.y);
 			// Checked - TODO : 추후 서버한테 도착을 알리는 이벤트 메시지 추가.
@@ -57,6 +60,12 @@ public class PlayerState : NetworkBehaviour {
 
 	private void OnTriggerEnter(Collider other) {
 		if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
+		if (other.transform.CompareTag("ItemBox")) {
+			IUseable randomItem = new WeightAccelerationItem();
+			_playerItemController.GetItem(randomItem);
+			_playerUIController.ActivateItemBtn();
+		}
+
 		if (other.transform.CompareTag("Obstacle")) {
 			_playerMovement.hitObstacle();
 		}
@@ -76,18 +85,18 @@ public class PlayerState : NetworkBehaviour {
 	public void UpdatePlayerStateByRace(RaceState raceState) {
 		switch (raceState) {
 			case RaceState.Waiting:
-				state = State.Wait;
+				playerGameState = PlayerGameState.Wait;
 				_playerMovement._inputSystem.DisableInputSystem();
 				break;
 			case RaceState.Countdown:
 				_playerMovement.SetDecreaseDropSpeedTimeOnWing();
 				break;
 			case RaceState.Racing:
-				state = State.Falling;
+				playerGameState = PlayerGameState.Falling;
 				_playerMovement._inputSystem.EnableInputSystem();
 				break;
 			case RaceState.Finished:
-				state = State.Finish;
+				playerGameState = PlayerGameState.Finish;
 				_playerMovement._inputSystem.DisableInputSystem();
 				break;
 		}

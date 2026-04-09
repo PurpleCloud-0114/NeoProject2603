@@ -339,16 +339,18 @@ GameObject:
   - component: {fileID: 4395999613780124348}
   - component: {fileID: 4365727281518258776}
   - component: {fileID: 1270397195654832615}
+  - component: {fileID: 4973022222252217015}
   - component: {fileID: 1706406939900078880}
   - component: {fileID: 5958828337014629271}
-  - component: {fileID: 4973022222252217015}
+  - component: {fileID: 5056254973488420845}
+  - component: {fileID: 5498041348698749379}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7079687531798887101
 Transform:
   m_ObjectHideFlags: 0
@@ -422,7 +424,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1570589857971375806}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
   m_Name: 
@@ -439,7 +441,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1570589857971375806}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
   m_Name: 
@@ -473,7 +475,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1570589857971375806}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b20dc110904e47f8a154cdcf6433eae, type: 3}
   m_Name: 
@@ -500,6 +502,22 @@ MonoBehaviour:
   positionSensitivity: 0.01
   rotationSensitivity: 0.01
   scaleSensitivity: 0.01
+--- !u!114 &4973022222252217015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570589857971375806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c663cd594ab51f84ea753a502e0e6b0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerState
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  playerGameState: 0
 --- !u!114 &1706406939900078880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -516,10 +534,10 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _inputSystem: {fileID: 0}
-  _playerState: {fileID: 0}
   VelocityTracker: {x: 0, y: 0, z: 0}
   _moveSpeed: 45
-  _dropMaxSpeed: 100
+  drop_max_speed: 100
+  base_drop_max_speed: 0
   _dropWingSpeed: 30
   MoveMobileSensitive: 1
 --- !u!114 &5958828337014629271
@@ -538,7 +556,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _wingButton: {fileID: 0}
---- !u!114 &4973022222252217015
+  _itemButton: {fileID: 0}
+--- !u!114 &5056254973488420845
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -547,13 +566,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1570589857971375806}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c663cd594ab51f84ea753a502e0e6b0a, type: 3}
+  m_Script: {fileID: 11500000, guid: 3e322ceb9b6ad9e47a3ae7eeee02f787, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerState
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  state: 0
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerItemController
+--- !u!114 &5498041348698749379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570589857971375806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d76b162a258f04846b4eeae24e9acf1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerEffectController
 --- !u!1 &1655414897174812396
 GameObject:
   m_ObjectHideFlags: 0

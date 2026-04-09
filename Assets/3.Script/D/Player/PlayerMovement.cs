@@ -7,8 +7,7 @@ using DG.Tweening;
 public class PlayerMovement : NetworkBehaviour {
 	public InputSystem _inputSystem;
 
-	public PlayerState _playerState;
-
+	private PlayerCore _playerCore;
 	private Rigidbody _rigidBody;
 
 	public Vector3 VelocityTracker;
@@ -17,7 +16,8 @@ public class PlayerMovement : NetworkBehaviour {
 	[SerializeField, Range(0, 100)] public float _moveSpeed = 45f;              //임시 퍼블릭
 
 	[Header("낙하 이동속도 조절")]
-	[Range(1f, 200f)] public float _dropMaxSpeed = 100f;                        //임시 퍼블릭
+	[Range(1f, 200f)] public float drop_max_speed = 100f;
+	[HideInInspector] public float base_drop_max_speed;
 	private float _dropSpeed;
 
 	private Vector2 _moveVector;
@@ -34,7 +34,9 @@ public class PlayerMovement : NetworkBehaviour {
 
 	private void Awake() {
 		TryGetComponent(out _rigidBody);
-		TryGetComponent(out _playerState);
+		TryGetComponent(out _playerCore);
+
+		base_drop_max_speed = drop_max_speed;
 	}
 
 	private void Start() {
@@ -44,7 +46,7 @@ public class PlayerMovement : NetworkBehaviour {
 	private void FixedUpdate() {
 		VelocityTracker = _rigidBody.linearVelocity;
 		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _inputSystem == null) return;
-		if(_playerState.state == State.Falling) Drop();
+		if(_playerCore.playerGameState == PlayerGameState.Falling) Drop();
 	}
 
 	private void Update() {
@@ -56,7 +58,7 @@ public class PlayerMovement : NetworkBehaviour {
 
 	private void Drop() {
 		_dropSpeed = _rigidBody.linearVelocity.y;
-		_dropSpeed = Mathf.Clamp(_dropSpeed, -1 * _dropMaxSpeed, 0);
+		_dropSpeed = Mathf.Clamp(_dropSpeed, -1 * drop_max_speed, 0);
 		_rigidBody.linearVelocity = _moveDir * _moveSpeed + new Vector3(0, _dropSpeed, 0); //반영
 
 		float targetX = 90f + (_moveDir.z * 35f);
@@ -71,18 +73,18 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 
 	public void SetDecreaseDropSpeedTimeOnWing() {
-		//_dropSmoothOnWing = mapRedZone / _dropMaxSpeed * 1.5f; 
-		_wingTime = (3f * StageManager.Instance.stage_data_sync.map_redzone) / (_dropMaxSpeed + 2f * _dropWingSpeed);
+		//_dropSmoothOnWing = mapRedZone / drop_max_speed * 1.5f; 
+		_wingTime = (3f * StageManager.Instance.stage_data_sync.map_redzone) / (drop_max_speed + 2f * _dropWingSpeed);
 	}
 
 	/* Ease.OutQuad의 수학적 접근.
 	Distance = Time * (Vstart + 2 * Vtarget) / 3
 	-> Time = 3 * Distance / (Vstart + 2 * Vtarget) 이 된다.
 	즉, 변수를 대입한다면
-	mapRedZone = _dropSmoothOnWing * (_DropMaxSpeed + 2f * _dropSpeedOnWing) / 3
-	_dropSmoothOnWing = 3 * mapRedZone / (_DropMaxSpeed + 2f * _dropSpeedOnWing)
+	mapRedZone = _dropSmoothOnWing * (drop_max_speed + 2f * _dropSpeedOnWing) / 3
+	_dropSmoothOnWing = 3 * mapRedZone / (drop_max_speed + 2f * _dropSpeedOnWing)
 	 */
 	public void OpenWing() {
-		DOTween.To(() => _dropMaxSpeed, x => _dropMaxSpeed = x, _dropWingSpeed, _wingTime).SetEase(Ease.OutQuad);
+		DOTween.To(() => drop_max_speed, x => drop_max_speed = x, _dropWingSpeed, _wingTime).SetEase(Ease.OutQuad);
 	}
 }

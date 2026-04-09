@@ -6,7 +6,7 @@ using Mirror;
 
 public class PlayerUIController : NetworkBehaviour {
 	private PlayerMovement _playerMovement;
-	private PlayerState _playerState;
+	private PlayerItemController _playerItemController;
 
 	[SerializeField] private Button _wingButton;
 	[SerializeField] private Button _itemButton;
@@ -15,7 +15,7 @@ public class PlayerUIController : NetworkBehaviour {
 	//----- ¸Þ¼­µå
 	private void Awake() {
 		TryGetComponent(out _playerMovement);
-		TryGetComponent(out _playerState);
+		TryGetComponent(out _playerItemController);
 	}
 
 	private void Start() {
@@ -32,8 +32,12 @@ public class PlayerUIController : NetworkBehaviour {
 	private void BindBtnAction() {
 		_wingButton.onClick.AddListener(_playerMovement.OpenWing);
 		_wingButton.onClick.AddListener(DeActivateWingBtn);
+		_itemButton.onClick.AddListener(_playerItemController.UseItem);
+		_itemButton.onClick.AddListener(DeActivateItemBtn);
 	}
 
 	public void ActivateWingBtn() => _wingButton.interactable = true;
 	public void DeActivateWingBtn() => _wingButton.interactable = false;
+	public void ActivateItemBtn() => _itemButton.interactable = true;
+	public void DeActivateItemBtn() => _itemButton.interactable = false;
 }

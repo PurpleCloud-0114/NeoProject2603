@@ -96,8 +96,8 @@ public class RaceManager : NetworkBehaviour {
 	// [클라이언트 영역] - 연출 및 입력 제어
 	// ==========================================
 	private void OnStateChanged(RaceState raceState, RaceState newState) {
-		if (NetworkClient.localPlayer != null && NetworkClient.localPlayer.TryGetComponent(out PlayerState _playerState)) {
-			_playerState.UpdatePlayerStateByRace(newState);
+		if (NetworkClient.localPlayer != null && NetworkClient.localPlayer.TryGetComponent(out PlayerCore playerCore)) {
+			playerCore.UpdatePlayerStateByRace(newState);
 		}
 		switch (newState) {
 			case RaceState.Waiting:
