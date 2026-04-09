@@ -1,7 +1,7 @@
 using UnityEngine;
 using Mirror;
 
-public class GameManagerExample : MonoBehaviour
+public class GameManagerExample : NetworkBehaviour
 {
     [SerializeField] private ObstacleSpawner _spawner;
 
