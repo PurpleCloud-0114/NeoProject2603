@@ -90,7 +90,7 @@ public class InGameUIManager : MonoBehaviour
         {
             if (_roundscore_text != null)
             {
-                _roundscore_text.text = $"라운드: {newValue}";
+                _roundscore_text.text = $"라운드스코어: {newValue}";
                 StartCoroutine(BounceRoutine(_roundscore_text.transform));
             }
         }
@@ -98,7 +98,7 @@ public class InGameUIManager : MonoBehaviour
         {
             if (_score_text != null)
             {
-                _score_text.text = $"총점: {newValue}";
+                _score_text.text = $"레이팅: {newValue}";
                 StartCoroutine(BounceRoutine(_score_text.transform));
             }
         }
@@ -106,7 +106,6 @@ public class InGameUIManager : MonoBehaviour
 
     private IEnumerator BounceRoutine(Transform target)
     {
-        // 간단한 팝 애니메이션
         target.localScale = Vector3.one * 1.2f;
         float elapsed = 0f;
         float duration = 0.2f;

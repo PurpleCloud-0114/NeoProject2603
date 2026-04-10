@@ -336,6 +336,7 @@ GameObject:
   - component: {fileID: 7079687531798887101}
   - component: {fileID: 3385466454216097362}
   - component: {fileID: 8718341287473590021}
+<<<<<<< HEAD
   - component: {fileID: 4395999613780124348}
   - component: {fileID: 4365727281518258776}
   - component: {fileID: 1270397195654832615}
@@ -345,6 +346,9 @@ GameObject:
   - component: {fileID: 5056254973488420845}
   - component: {fileID: 5498041348698749379}
   - component: {fileID: 4716730101983523587}
+=======
+  - component: {fileID: 8956398484907838093}
+>>>>>>> origin/B/0330/prototype
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -418,7 +422,11 @@ CapsuleCollider:
   m_Height: 2.2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
 --- !u!114 &4395999613780124348
+=======
+--- !u!114 &8956398484907838093
+>>>>>>> origin/B/0330/prototype
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -427,6 +435,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1570589857971375806}
   m_Enabled: 1
   m_EditorHideFlags: 0
+<<<<<<< HEAD
   m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Mirror::Mirror.NetworkIdentity
@@ -604,6 +613,23 @@ MonoBehaviour:
   showRoomGUI: 1
   readyToBegin: 0
   index: 0
+=======
+  m_Script: {fileID: 11500000, guid: 4919a95d3c8bd3642b665d2410255024, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  _endPointPopUpUI: {fileID: 0}
+  _endPointPopUpUITitle: {fileID: 0}
+  _wingBtn: {fileID: 0}
+  _inputController: {fileID: 0}
+  _moveSpeed: 50
+  _dropMaxSpeed: 70
+  _decreaseDropSpeedFromHittingObstacle: 30
+  _dropSpeedOnWing: 20
+  _dropSmoothOnWing: 3
+  _deathSpeedCount: 30
+  MoveMobileSensitive: 1
+  VelocityTracker: {x: 0, y: 0, z: 0}
+>>>>>>> origin/B/0330/prototype
 --- !u!1 &1655414897174812396
 GameObject:
   m_ObjectHideFlags: 0

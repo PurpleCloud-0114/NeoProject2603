@@ -6502,8 +6502,10 @@ MonoBehaviour:
   _gyro_left_button: {fileID: 929250949}
   _selected_color: {r: 0.9716981, g: 0.5921569, b: 0.2784314, a: 1}
   _unselected_color: {r: 0.5, g: 0.5, b: 0.5, a: 0.5294118}
-  _slider_disabled_color: {r: 0.5754717, g: 0.5673282, b: 0.5673282, a: 1}
   _sensitivity_slider: {fileID: 875886775}
+  _slider_disabled_color: {r: 0.5754717, g: 0.5673282, b: 0.5673282, a: 1}
+  _sensitivity_fill_img: {fileID: 0}
+  _sensitivity_handle_img: {fileID: 0}
   _bgm_slider: {fileID: 1788546266}
   _sfx_slider: {fileID: 1380605109}
   _back_button: {fileID: 1501891589}
