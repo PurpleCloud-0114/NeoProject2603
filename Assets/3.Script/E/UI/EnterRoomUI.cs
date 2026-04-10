@@ -13,7 +13,10 @@ public class EnterRoomUI : MonoBehaviour
     {
         _inputField.text = "EnterRoom";
         NetworkManager networkManager = NetworkManager.singleton;
-        networkManager.networkAddress = "192.168.45.104";
+        //lan
+        networkManager.networkAddress = "192.168.45.93";
+        //wifi
+        //networkManager.networkAddress = "192.168.45.104";
         _inputField.text = "Server Address: " + NetworkManager.singleton.networkAddress;
         networkManager.StartClient();
     }

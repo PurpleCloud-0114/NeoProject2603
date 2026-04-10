@@ -1,10 +1,6 @@
-
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-using TMPro;
 
 public class RoomManagement : NetworkRoomManager
 {
@@ -12,16 +8,23 @@ public class RoomManagement : NetworkRoomManager
     Coroutine _startCoroutine;
     public override void OnServerConnect(NetworkConnectionToClient conn)
     {
-        Debug.Log("클라이언트 접속 시도");
+        base.OnServerConnect(conn);
+        Debug.Log("[RoomManagement] 클라이언트 접속");
     }
+
+    public override void OnRoomServerAddPlayer(NetworkConnectionToClient conn)
+    {
+        base.OnRoomServerAddPlayer(conn);
+        Debug.Log("[RoomManagement] OnRoomServerAddPlayer 호출됨");
+        RefreshLobbyUI(); 
+    }
+
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
-        Debug.Log("클라이언트 연결 끊김");
-
+        Debug.Log("[RoomManagement] 클라이언트 연결 끊김");
         if (conn.identity != null)
         {
             var roomPlayer = conn.identity.GetComponent<NetworkRoomPlayer>();
-
             if (roomPlayer != null)
             {
                 roomSlots.Remove(roomPlayer);
@@ -29,71 +32,99 @@ public class RoomManagement : NetworkRoomManager
             }
         }
         base.OnServerDisconnect(conn);
+        RefreshLobbyUI();
     }
+
+    public override void ReadyStatusChanged()
+    {
+        base.ReadyStatusChanged(); 
+        Debug.Log("[RoomManagement] Ready 상태 변경됨");
+        RefreshLobbyUI(); 
+    }
+
+    void RefreshLobbyUI()
+    {
+        if (LobbyTextUI.Instance == null)
+        {
+            Debug.LogWarning("[RoomManagement] RefreshLobbyUI: LobbyTextUI.Instance가 null");
+            return;
+        }
+
+        LobbyTextUI.Instance.ClearAllUI();
+
+        int slot_index = 0;
+        foreach (NetworkRoomPlayer slot in roomSlots)
+        {
+            RoomPlayer rp = slot as RoomPlayer;
+            if (rp == null) continue;
+
+            string name = $"WoWPlayer {slot_index + 1}";
+            bool _isReady = rp.readyToBegin;
+            Debug.Log($"[RoomManagement] UI 갱신 slot={slot_index}, name={name}, isReady={_isReady}");
+
+            LobbyTextUI.Instance.UpdateUI(slot_index, name, _isReady);
+            slot_index++;
+        }
+    }
+
     public override void OnRoomServerPlayersReady()
     {
         Debug.Log("모두 Ready → 카운트다운 시작");
-
         if (_startCoroutine == null)
             _startCoroutine = StartCoroutine(StartGameCountdown_co());
     }
+
     public override void OnRoomServerPlayersNotReady()
     {
         Debug.Log("누군가 Ready 취소 → 카운트다운 중단");
-
         if (_startCoroutine != null)
         {
             StopCoroutine(_startCoroutine);
             _startCoroutine = null;
         }
+        CancelAllPlayersCountdown();
     }
+
     bool AllPlayersReady()
     {
-        foreach (var player in roomSlots)
+        foreach (NetworkRoomPlayer player in roomSlots)
         {
             if (player == null) continue;
-
-            if (player.connectionToClient == null)
-                continue; // 끊긴 유저 무시
-
-            if (!player.readyToBegin)
-                return false;
+            if (player.connectionToClient == null) continue;
+            if (!player.readyToBegin) return false;
         }
-
         return true;
     }
+
     IEnumerator StartGameCountdown_co()
     {
         float timer = start_delay;
-
         while (timer > 0f)
         {
-            // 중간에 조건 깨졌는지 체크
             if (!AllPlayersReady())
             {
                 Debug.Log("Ready 깨짐 → 카운트다운 취소");
                 _startCoroutine = null;
+                CancelAllPlayersCountdown();
                 yield break;
             }
-
-            Debug.Log($"게임 시작까지: {timer:F1}초");
+            UpdateAllPlayersCountdown(Mathf.CeilToInt(timer));
             yield return new WaitForSeconds(1f);
             timer -= 1f;
         }
-
         Debug.Log("게임 시작!");
+        UpdateAllPlayersCountdown(0);
         ServerChangeScene(GameplayScene);
         _startCoroutine = null;
     }
+
     void UpdateAllPlayersCountdown(int time)
     {
         foreach (var player in roomSlots)
         {
             if (player == null) continue;
             if (player.connectionToClient == null) continue;
-
-            //var p = player as CustomRoomPlayer;
-            //p?.RpcUpdateCountdown(time);
+            LobbyTextUI.Instance.ui?.SetTime(time);
         }
     }
 
@@ -103,9 +134,7 @@ public class RoomManagement : NetworkRoomManager
         {
             if (player == null) continue;
             if (player.connectionToClient == null) continue;
-
-            //var p = player as CustomRoomPlayer;
-            //p?.RpcCancelCountdown();
+            LobbyTextUI.Instance.ui?.Hide();
         }
     }
 }

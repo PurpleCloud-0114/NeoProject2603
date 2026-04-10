@@ -1,28 +1,21 @@
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
 public class RoomPlayer : NetworkRoomPlayer
 {
-    public CountDownUI ui;
-    public override void OnStartClient()
+    public override void OnStartLocalPlayer()
     {
-        base.OnStartClient();
-        // ¾À¿¡¼­ UI Ã£±â
-    }
+        base.OnStartLocalPlayer();
 
-    [ClientRpc]
-    public void RpcUpdateCountdown(int time)
-    {
-        ui?.SetTime(time);
+        GameObject btn = GameObject.Find("ReadyButton");
+        if (btn != null)
+        {
+            btn.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(OnClickReady);
+        }
     }
-
-    [ClientRpc]
-    public void RpcCancelCountdown()
+    public void OnClickReady()
     {
-        ui?.Hide();
+        if (!isLocalPlayer) return;
+        CmdChangeReadyState(!readyToBegin);
     }
 }
