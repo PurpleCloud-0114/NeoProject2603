@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 public class StageProgressUi : MonoBehaviour {
 	[SerializeField] private Transform _player;
@@ -12,25 +13,29 @@ public class StageProgressUi : MonoBehaviour {
 	[SerializeField] private float _progressPercent;
 
 	public void Initialize() {
-		_mapHeight = StageSystem.Instance.stage_data.map_height;
+		_mapHeight = StageManager.Instance.stage_data_sync.map_height;
 		float _uiBarHeight = 0f;
 		if (TryGetComponent(out RectTransform transform)) {
 			_uiBarHeight = transform.sizeDelta.y;
 		}
 
 		float uiRatio = _uiBarHeight / _mapHeight;
-		float calibrateRedZoneY = StageSystem.Instance.stage_data.map_redzone * uiRatio;
-		float calibrateRedZoneHeight = StageSystem.Instance.stage_data.map_redzone_height * uiRatio;
+		float calibrateRedZoneY = StageManager.Instance.stage_data_sync.map_redzone * uiRatio;
+		float calibrateRedZoneHeight = StageManager.Instance.stage_data_sync.map_redzone_height * uiRatio;
 
 		_redZone.anchoredPosition = new Vector3(0, calibrateRedZoneY, 0);
 		//_dangerZone.sizeDelta= new Vector2(_dangerZone.sizeDelta.x, StageSystem.Instance.stage_data.map_redzone);
 		_redZone.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, calibrateRedZoneHeight);
 	}
 
+	public void BindPlayer(Transform player) => _player = player;
+
 	private void Update() {
+		if (_player == null) return;
 		if (_player.position.y > _mapHeight) _progressPercent = 100;
 		else _progressPercent = (_player.position.y / _mapHeight) * 100;
 		UpdateProgress();
+		Debug.Log("ø¨ªÍ¡ﬂ");
 	}
 
 	private void UpdateProgress() {
