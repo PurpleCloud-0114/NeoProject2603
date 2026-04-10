@@ -3,98 +3,94 @@ using Mirror;
 using System.Collections.Generic;
 
 [System.Serializable]
-public struct ObstacleData
+public struct FloatingObstacleData
 {
-    public string obstacleName;
     public GameObject prefab;
-
-    [Header("3D 크기 설정 (겹침 방지용)")]
-    public float visualHeight;    // 수직(Y) 높이
-    public float visualRadius;    // 수평(X, Z) 반지름 크기
-
-    [Header("배치 개수 설정 (랜덤 범위)")]
-    public int minCountPerFloor;
-    public int maxCountPerFloor;
-
-    [Header("여백 설정 (랜덤 범위)")]
-    public float minGapY;         // 층간 최소 수직 여백
-    public float maxGapY;         // 층간 최대 수직 여백
-    public float angleOffset;     // 장애물 간 최소 각도 간격
+    [Header("겹침 체크 반경 (이 수치만큼 다른 물체와 떨어짐)")]
+    public float safeRadius;
 }
 
 public class ObstacleSpawner : NetworkBehaviour
 {
-    [Header("Tower Center Settings")]
+    [Header("Spawn Settings")]
     [SerializeField] private Vector3 _towerCenter = Vector3.zero;
-
-    [Header("Spawn Range Settings")]
-    [SerializeField] private float _minRadius = 2.0f;
-    [SerializeField] private float _maxRadius = 5.0f;
-
+    [SerializeField] private float _maxRadius = 5.0f; // 중심에서 생성될 최대 반경 (0 ~ 5 완전 랜덤)
     public float _startY = 0f;
     public float _endY = -500f;
 
-    [Header("Obstacle Templates")]
-    [SerializeField] private List<ObstacleData> _obstacleList;
+    [Header("생성 개수 (전체 맵 기준)")]
+    [SerializeField] private int _totalFloatingObstacles = 50;
+
+    [Header("Templates")]
+    [SerializeField] private List<FloatingObstacleData> _obstacleList;
 
     private List<GameObject> _obstaclePool = new List<GameObject>();
 
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-        GenerateCylindricalMap();
-    }
-
+    // 맵 생성이 끝난 직후에 호출하세요.
     [Server]
-    public void GenerateCylindricalMap()
+    public void GenerateFloatingObstacles(List<MapFloor> mapFloors)
     {
-        // 1. 기존 장애물 풀로 회수
         ReturnAllToPool();
 
-        Debug.Log("[Server] 가변 간격 및 3D 크기 기반 장애물 생성 시작...");
-        float currentY = _startY;
-
-        while (currentY > _endY)
+        // 1. 맵에 이미 '켜진' 부착형 장애물들의 위치를 모두 수집
+        List<Vector3> avoidPositions = new List<Vector3>();
+        foreach (var floor in mapFloors)
         {
-            // 장애물 종류 랜덤 선택
-            int randomIndex = Random.Range(0, _obstacleList.Count);
-            ObstacleData data = _obstacleList[randomIndex];
-            if (data.prefab == null) continue;
+            avoidPositions.AddRange(floor.GetActiveObstaclePositions());
+        }
 
-            // 층당 생성 개수 랜덤 결정
-            int spawnCount = Random.Range(data.minCountPerFloor, data.maxCountPerFloor + 1);
+        Debug.Log($"[Server] 공중부양 장애물 생성 시작... (피해야 할 맵 장애물 수: {avoidPositions.Count})");
 
-            // 수평 겹침 방지를 위한 각도 간격 계산
-            float safeAngleStep = Mathf.Max(data.angleOffset, 360f / spawnCount);
-            float baseAngle = Random.Range(0f, 360f);
+        int spawnedCount = 0;
+        int maxAttempts = 1000; // 무한 루프 방지
+        int attempts = 0;
 
-            for (int i = 0; i < spawnCount; i++)
+        while (spawnedCount < _totalFloatingObstacles && attempts < maxAttempts)
+        {
+            attempts++;
+
+            FloatingObstacleData data = _obstacleList[Random.Range(0, _obstacleList.Count)];
+
+            // 완전 랜덤 3D 좌표 생성 (원기둥 형태)
+            float randomAngle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+            float randomDist = Random.Range(0f, _maxRadius);
+            float randomY = Random.Range(_endY, _startY);
+
+            Vector3 spawnPos = new Vector3(
+                _towerCenter.x + Mathf.Cos(randomAngle) * randomDist,
+                randomY,
+                _towerCenter.z + Mathf.Sin(randomAngle) * randomDist
+            );
+
+            // 겹침 체크 (거리 계산)
+            bool isPositionSafe = true;
+            foreach (Vector3 posToAvoid in avoidPositions)
             {
-                float finalAngle = baseAngle + (i * safeAngleStep);
-                float radian = finalAngle * Mathf.Deg2Rad;
-                float randomRadius = Random.Range(_minRadius, _maxRadius);
+                if (Vector3.Distance(spawnPos, posToAvoid) < data.safeRadius)
+                {
+                    isPositionSafe = false;
+                    break;
+                }
+            }
 
-                Vector3 spawnPos = new Vector3(
-                    _towerCenter.x + Mathf.Cos(radian) * randomRadius,
-                    currentY,
-                    _towerCenter.z + Mathf.Sin(radian) * randomRadius
-                );
-
-                Quaternion rotation = Quaternion.Euler(0, -finalAngle + 90f, 0);
-
-                // 풀에서 가져오기
-                GameObject obstacle = GetFromPool(data.prefab, spawnPos, rotation);
+            // 자리가 안전하면 스폰
+            if (isPositionSafe)
+            {
+                Quaternion randomRot = Quaternion.Euler(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
+                GameObject obstacle = GetFromPool(data.prefab, spawnPos, randomRot);
 
                 if (!obstacle.activeSelf) obstacle.SetActive(true);
                 NetworkServer.Spawn(obstacle);
+
+                // 방금 스폰한 장애물 위치도 '피해야 할 위치' 리스트에 추가 (공중 장애물끼리 겹침 방지)
+                avoidPositions.Add(spawnPos);
+                spawnedCount++;
             }
+        }
 
-            // [수직 겹침 방지] 물체 높이 + 랜덤 여백 적용
-            float randomGapY = Random.Range(data.minGapY, data.maxGapY);
-            currentY -= (data.visualHeight + randomGapY);
-
-            // 무한 루프 방지 안전장치
-            if (data.visualHeight + randomGapY <= 0.1f) currentY -= 1.0f;
+        if (attempts >= maxAttempts)
+        {
+            Debug.LogWarning("[Server] 너무 좁아서 설정한 개수만큼 스폰하지 못했습니다. (공간 부족)");
         }
     }
 
@@ -102,7 +98,6 @@ public class ObstacleSpawner : NetworkBehaviour
     private GameObject GetFromPool(GameObject prefab, Vector3 pos, Quaternion rot)
     {
         GameObject obj = _obstaclePool.Find(x => !x.activeSelf && x.name.Equals(prefab.name + "(Clone)"));
-
         if (obj == null)
         {
             obj = Instantiate(prefab, pos, rot);

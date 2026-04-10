@@ -35,67 +35,40 @@ public class LoginController : MonoBehaviour
             return;
         }
 
-        GameObject manager = NetworkManager.singleton.gameObject;
-        if (!manager.TryGetComponent(out ServerChecker checker)) return;
-
         _isWaiting = true;
         _login_button.interactable = false;
-        LogTextViewing("서버에 연결 중...");
+        LogTextViewing("로그인 중...");
 
-        checker.Start_Client();
+        // SQLManager 직접 호출 (오프라인씬)
+        int result = SQLManager.Instance.Login(
+            _name_input.text, _pw_input.text,
+            out string nickname, out int score);
 
-        StartCoroutine(WaitAndSendLogin(_name_input.text, _pw_input.text));
-    }
-
-    private IEnumerator WaitAndSendLogin(string name, string pw)
-    {
-        float timeout = 5f;
-        while (AuthPlayer.LocalInstance == null && timeout > 0f)
+        if (result == 0)
         {
-            timeout -= Time.deltaTime;
-            yield return null;
+            // PlayerPrefs에 닉네임 저장 (TitleController 환영 메시지용)
+            PlayerPrefs.SetString("PlayerNickname", nickname);
+            PlayerPrefs.Save();
+
+            // Mirror 서버 접속 (Player Prefab 스폰 → AuthPlayer.CmdInitialize 자동 호출)
+            GameObject manager = NetworkManager.singleton.gameObject;
+            if (manager.TryGetComponent(out ServerChecker checker))
+                checker.Start_Client();
+
+            if (_title_ob != null) _title_ob.SetActive(true);
+            gameObject.SetActive(false);
         }
-
-        if (AuthPlayer.LocalInstance == null)
+        else
         {
-            LogTextViewing("서버에 연결할 수 없습니다");
+            string msg = result == 1 ? "ID 또는 Password 가 틀렸습니다" : "서버 오류가 발생했습니다";
+            LogTextViewing(msg);
             _isWaiting = false;
             _login_button.interactable = true;
-            yield break;
         }
-
-        AuthPlayer.LocalInstance.OnLoginResult = (success, nickname, score, message) =>
-        {
-            _isWaiting = false;
-            _login_button.interactable = true;
-
-            if (success)
-            {
-                PlayerPrefs.SetString("PlayerNickname", nickname);
-                PlayerPrefs.Save();
-
-                if (_title_ob != null) _title_ob.SetActive(true);
-                gameObject.SetActive(false);
-            }
-            else
-            {
-                LogTextViewing(message);
-                if (NetworkClient.active) NetworkManager.singleton.StopClient();
-            }
-        };
-
-        AuthPlayer.LocalInstance.CmdRequestLogin(name, pw);
     }
 
     public void OpenSignUpPage()
     {
-        if (!NetworkClient.active)
-        {
-            GameObject manager = NetworkManager.singleton.gameObject;
-            if (manager.TryGetComponent(out ServerChecker checker))
-                checker.Start_Client();
-        }
-
         if (_signupController != null)
             _signupController.gameObject.SetActive(true);
         gameObject.SetActive(false);

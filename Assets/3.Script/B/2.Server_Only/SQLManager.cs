@@ -1,7 +1,3 @@
-// ※ 이 스크립트는 서버 빌드에만 포함되어야 합니다.
-// 클라이언트(안드로이드) 빌드에는 포함하지 마세요.
-// 서버 GameObject에만 부착하고, 클라이언트 씬에는 배치하지 않습니다.
-
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -127,6 +123,8 @@ public class SQLManager : MonoBehaviour
         catch (Exception e) { Debug.LogError($"Connection Error: {e.Message}"); return false; }
     }
 
+    // ── 로그인 (오프라인씬, 클라이언트 직접 호출) ──
+    // 반환: 0=성공, 1=아이디/비번 불일치, 2=DB오류
     public int Login(string name, string password, out string nickname, out int score)
     {
         nickname = ""; score = 0;
@@ -146,17 +144,19 @@ public class SQLManager : MonoBehaviour
                         nickname = reader["user_nickname"].ToString();
                         score = reader.IsDBNull(reader.GetOrdinal("user_score")) ? 0 : Convert.ToInt32(reader["user_score"]);
                         user_info = new UserInfo(name, nickname, score);
-                        return 0; // 성공
+                        return 0;
                     }
                 }
             }
-            return 1; // 아이디/비번 불일치
+            return 1;
         }
         catch (Exception e) { Debug.LogError($"Login Error: {e.Message}"); return 2; }
     }
 
     public void Logout() { user_info = null; }
 
+    // ── 회원가입 (오프라인씬, 클라이언트 직접 호출) ──
+    // 반환: 0=성공, 1=아이디중복, 2=닉네임중복, 3=DB오류
     public int Signup(string name, string password, string nickname)
     {
         try
@@ -209,6 +209,7 @@ public class SQLManager : MonoBehaviour
         catch (Exception e) { Debug.LogError($"Nickname Check Error: {e.Message}"); return false; }
     }
 
+    // ── 점수 (서버에서만 호출, AuthPlayer 경유) ──
     public bool GetScore(string name, out int outscore)
     {
         outscore = 0;
