@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
+using TMPro;
 
 public class PlayerUIController : NetworkBehaviour {
 	private PlayerCore _playerCore;
@@ -11,7 +12,7 @@ public class PlayerUIController : NetworkBehaviour {
 
 	[SerializeField] private Button _wingButton;
 	[SerializeField] private Button _itemButton;
-	[SerializeField] private Text _itemName;
+	[SerializeField] private TextMeshProUGUI _itemName;
 	//[SerializeField] private Button _itemButton;
 
 	//----- ¸Þ¼­µå

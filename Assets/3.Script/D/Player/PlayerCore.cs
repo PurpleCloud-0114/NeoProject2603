@@ -17,6 +17,8 @@ public class PlayerCore : NetworkBehaviour {
 	private PlayerItemController _playerItemController;
 	private PlayerEffectController _playerEffectController;
 
+	private ClientPlayer _clientPlayer;
+
 	private Rigidbody _rigidbody;
 	private GameObject _mainCamera;
 
@@ -33,12 +35,15 @@ public class PlayerCore : NetworkBehaviour {
 		TryGetComponent(out _playerUIController);
 		TryGetComponent(out _playerItemController);
 		TryGetComponent(out _playerEffectController);
+		if (TryGetComponent(out _clientPlayer)) {
+			player_number = _clientPlayer.index;
+		}
 	}
 
 	private void Start() {
 		//int totalPlayer = RaceManager.Instance.total_players;
 		Debug.Log("배치할게요");
-		int totalPlayer = 10;
+		int totalPlayer = RaceManager.Instance.START_MAX_PLAYER;
 
 		float angle = player_number * Mathf.PI * 2f / totalPlayer;
 

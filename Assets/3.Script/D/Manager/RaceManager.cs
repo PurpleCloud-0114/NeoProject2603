@@ -121,8 +121,8 @@ public class RaceManager : NetworkBehaviour {
 		_playersReadyCount++;
 		Debug.Log($"플레이어 준비 완료: {_playersReadyCount} / {total_players}");
 
-		//if(_playersReadyCount >= total_players && current_state_sync == RaceState.Waiting) {
-		if(_playersReadyCount >= START_MAX_PLAYER) { 
+		if(_playersReadyCount >= total_players && current_state_sync == RaceState.Waiting) {
+		//if(_playersReadyCount >= START_MAX_PLAYER) { 
 			StartCountdown();
 		}
 	}

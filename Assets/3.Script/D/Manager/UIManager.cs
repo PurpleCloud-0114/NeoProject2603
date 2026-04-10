@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
+using TMPro;
 
 public class UIManager : MonoBehaviour {
 	public static UIManager Instance = null;
 
 	[SerializeField] private Button _wingButton;
 	[SerializeField] private Button _itemButton;
-	[SerializeField] private Text _itemText;
+	[SerializeField] private TextMeshProUGUI _itemText;
 	[SerializeField] private StageProgressUi _stageProgressUI;
 
 	private void Awake() {
@@ -42,6 +43,6 @@ public class UIManager : MonoBehaviour {
 
 	[Client] public Button BindWingButton() => _wingButton;
 	[Client] public Button BindItemButton() => _itemButton;
-	[Client] public Text BindItemText() => _itemText;
+	[Client] public TextMeshProUGUI BindItemText() => _itemText;
 	public void BindStageProgressUI(Transform player) => _stageProgressUI.BindPlayer(player);
 }

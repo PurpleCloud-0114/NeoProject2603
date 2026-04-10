@@ -344,13 +344,14 @@ GameObject:
   - component: {fileID: 5958828337014629271}
   - component: {fileID: 5056254973488420845}
   - component: {fileID: 5498041348698749379}
+  - component: {fileID: 4716730101983523587}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7079687531798887101
 Transform:
   m_ObjectHideFlags: 0
@@ -441,7 +442,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1570589857971375806}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
   m_Name: 
@@ -475,7 +476,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1570589857971375806}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b20dc110904e47f8a154cdcf6433eae, type: 3}
   m_Name: 
@@ -517,7 +518,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  playerGameState: 1
+  playerGameState: 0
   is_dummy: 0
   player_number: 1
 --- !u!114 &1706406939900078880
@@ -560,6 +561,7 @@ MonoBehaviour:
   syncInterval: 0
   _wingButton: {fileID: 0}
   _itemButton: {fileID: 0}
+  _itemName: {fileID: 0}
 --- !u!114 &5056254973488420845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -584,6 +586,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d76b162a258f04846b4eeae24e9acf1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEffectController
+--- !u!114 &4716730101983523587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570589857971375806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e9a0316e025c184cadc5cf652e2867e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClientPlayer
+  syncDirection: 1
+  syncMode: 0
+  syncInterval: 0
+  showRoomGUI: 1
+  readyToBegin: 0
+  index: 0
 --- !u!1 &1655414897174812396
 GameObject:
   m_ObjectHideFlags: 0
