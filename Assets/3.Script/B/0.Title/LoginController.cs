@@ -31,7 +31,7 @@ public class LoginController : MonoBehaviour
 
         if (_name_input.text.Equals(string.Empty) || _pw_input.text.Equals(string.Empty))
         {
-            LogTextViewing("이름이나 비밀번호를 입력하세요");
+            LogTextViewing("ID 와 Password 를 확인하세요");
             return;
         }
 

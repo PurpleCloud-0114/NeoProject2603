@@ -122,7 +122,7 @@ public class AuthPlayer : NetworkBehaviour
         }
         else
         {
-            string msg = result == 1 ? "아이디 또는 비밀번호가 틀렸습니다" : "서버 오류";
+            string msg = result == 1 ? "ID 또는 Password 가 틀렸습니다" : "서버 오류";
             TargetRpcLoginResult(connectionToClient, false, "", 0, msg);
         }
     }
@@ -139,7 +139,7 @@ public class AuthPlayer : NetworkBehaviour
     {
         if (SQLManager.Instance == null) { TargetRpcSignupResult(connectionToClient, false, "서버 연결 오류"); return; }
         int result = SQLManager.Instance.Signup(name, password, nickname);
-        string msg = result switch { 0 => "회원가입 완료", 1 => "중복된 아이디", 2 => "중복된 닉네임", _ => "가입 실패" };
+        string msg = result switch { 0 => "회원가입 완료", 1 => "중복된 ID", 2 => "중복된 NickName", _ => "가입 실패" };
         TargetRpcSignupResult(connectionToClient, result == 0, msg);
     }
 

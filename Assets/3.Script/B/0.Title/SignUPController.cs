@@ -39,14 +39,14 @@ public class SignupController : MonoBehaviour
 
         if (!_pw_input.text.Equals(_pw_confirm_input.text))
         {
-            LogTextViewing("비밀번호가 일치하지 않습니다");
+            LogTextViewing("Password 가 일치하지 않습니다");
             _pw_confirm_input.text = string.Empty;
             _pw_confirm_input.ActivateInputField(); return;
         }
 
         if (_pw_input.text.Length < 4)
         {
-            LogTextViewing("비밀번호는 4자 이상이어야 합니다"); return;
+            LogTextViewing("Password 는 4자 이상이어야 합니다"); return;
         }
 
         if (AuthPlayer.LocalInstance == null)
