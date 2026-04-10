@@ -4261,6 +4261,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d60e3975c9650264db5790c065a9c3d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SQLManager
+  _is_it_Client: 1
 --- !u!4 &2134283591
 Transform:
   m_ObjectHideFlags: 0
