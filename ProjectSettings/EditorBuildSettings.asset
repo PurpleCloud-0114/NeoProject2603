@@ -18,8 +18,8 @@ EditorBuildSettings:
     path: Assets/1.Scene/E/E_GameRoom.unity
     guid: dfa0400bc0d16b140be423b71130a6ff
   - enabled: 1
-    path: Assets/1.Scene/E/E_InGame.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
+    path: Assets/1.Scene/E/E_Prototype.unity
+    guid: d77b4415ea4b83c449ce6edb0c1c8c9d
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
   m_UseUCBPForAssetBundles: 0

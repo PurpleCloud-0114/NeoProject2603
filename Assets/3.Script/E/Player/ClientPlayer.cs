@@ -5,6 +5,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class ClientPlayer : NetworkBehaviour
+public class ClientPlayer : NetworkRoomPlayer
 {
 }

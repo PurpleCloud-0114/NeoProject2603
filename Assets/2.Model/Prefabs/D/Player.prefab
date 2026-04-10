@@ -337,6 +337,8 @@ GameObject:
   - component: {fileID: 3385466454216097362}
   - component: {fileID: 8718341287473590021}
   - component: {fileID: 8956398484907838093}
+  - component: {fileID: 6468672430867225980}
+  - component: {fileID: 4810395389341797580}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -434,6 +436,38 @@ MonoBehaviour:
   _deathSpeedCount: 30
   MoveMobileSensitive: 1
   VelocityTracker: {x: 0, y: 0, z: 0}
+--- !u!114 &6468672430867225980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570589857971375806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e9a0316e025c184cadc5cf652e2867e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClientPlayer
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+--- !u!114 &4810395389341797580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570589857971375806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mirror::Mirror.NetworkIdentity
+  sceneId: 0
+  _assetId: 1414554889
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0
 --- !u!1 &1655414897174812396
 GameObject:
   m_ObjectHideFlags: 0
