@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShockwaveMagicItem : MonoBehaviour, IUseable {
+public class ShockwaveMagicItem : IUseable {
+	public string Name => "충격파 마법";
 	public float range = 10f;
 	public float push_force = 25f;
+
 
 	public void Use(GameObject user) {
 		Collider[] hits = Physics.OverlapSphere(user.transform.position, range);

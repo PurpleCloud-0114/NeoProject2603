@@ -350,7 +350,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7079687531798887101
 Transform:
   m_ObjectHideFlags: 0
@@ -424,7 +424,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1570589857971375806}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
   m_Name: 
@@ -517,7 +517,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  playerGameState: 0
+  playerGameState: 1
+  is_dummy: 0
+  player_number: 1
 --- !u!114 &1706406939900078880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -534,6 +536,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _inputSystem: {fileID: 0}
+  _mapSize: {fileID: 0}
   VelocityTracker: {x: 0, y: 0, z: 0}
   _moveSpeed: 45
   drop_max_speed: 100

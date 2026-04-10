@@ -84,7 +84,7 @@ public class PlayerCore : NetworkBehaviour {
 		if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
 		switch (other.tag) {
 			case "ItemBox":
-				IUseable randomItem = new ShockwaveMagicItem();
+				IUseable randomItem = ItemManager.Instance.RandomItem();
 				_playerItemController.GetItem(randomItem);
 				_playerUIController.ActivateItemBtn();
 				break;

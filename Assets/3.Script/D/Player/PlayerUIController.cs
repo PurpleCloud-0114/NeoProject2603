@@ -11,6 +11,7 @@ public class PlayerUIController : NetworkBehaviour {
 
 	[SerializeField] private Button _wingButton;
 	[SerializeField] private Button _itemButton;
+	[SerializeField] private Text _itemName;
 	//[SerializeField] private Button _itemButton;
 
 	//----- ¸Þ¼­µå
@@ -30,6 +31,7 @@ public class PlayerUIController : NetworkBehaviour {
 	private void BindButton() {
 		_wingButton = UIManager.Instance.BindWingButton();
 		_itemButton = UIManager.Instance.BindItemButton();
+		_itemName = UIManager.Instance.BindItemText();
 	}
 
 	private void BindBtnAction() {
@@ -47,4 +49,5 @@ public class PlayerUIController : NetworkBehaviour {
 	public void DeActivateWingBtn() => _wingButton.interactable = false;
 	public void ActivateItemBtn() => _itemButton.interactable = true;
 	public void DeActivateItemBtn() => _itemButton.interactable = false;
+	public void SetItemNameOnUI(string name) => _itemName.text = name;
 }

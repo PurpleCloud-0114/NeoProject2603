@@ -8,10 +8,24 @@ public class ItemManager : MonoBehaviour {
 
 	[SerializeField] private GameObject _spiderwebPrefab;
 
-
 	private void Awake() {
 		if (Instance == null) Instance = this;
 		else Destroy(gameObject);
+	}
+
+	public IUseable RandomItem() {
+		int randomIndex = Random.Range(0, 3);
+
+		switch(randomIndex) {
+			case 1:
+				return new WeightAccelerationItem();
+			case 2:
+				return new SpiderwebItem();
+			case 3:
+				return new ShockwaveMagicItem();
+			default:
+				return null;
+		}
 	}
 
 	public void SpanwSpiderweb(Vector3 postion) {
