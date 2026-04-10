@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Audio;
 
-[System.Serializable]
+[System.Serializable]//데이터 직렬화
 public class Sound
 {
     public string name;
@@ -14,7 +14,7 @@ public class AudioManager : MonoBehaviour
 
     [SerializeField] private AudioMixer _audio_mixer;
 
-    [Space(10f)]
+    [Space(10f)]//인스펙터 창에서 공간 띄우기
     [Header("Audio Clip")]
     [Space(10f)]
     [SerializeField] private Sound[] _bgm;
@@ -80,7 +80,7 @@ public class AudioManager : MonoBehaviour
         _bgm_player.Stop();
     }
 
-    public void PlaySFX(string name) //RPC로 해야돼는 경우도 있음, Client개인 UI는 그냥 쓰면 됌
+    public void PlaySFX(string name) //RPC로 해야돼는 경우도 있음
     {
         foreach (Sound s in _sfx)
         {

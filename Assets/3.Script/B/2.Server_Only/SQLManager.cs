@@ -1,3 +1,7 @@
+// ※ 이 스크립트는 서버 빌드에만 포함되어야 합니다.
+// 클라이언트(안드로이드) 빌드에는 포함하지 마세요.
+// 서버 GameObject에만 부착하고, 클라이언트 씬에는 배치하지 않습니다.
+
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -46,8 +50,6 @@ public class SQLManager : MonoBehaviour
     public UserInfo user_info { get; private set; }
     public static SQLManager Instance = null;
 
-    [SerializeField] private bool _is_it_Client = false;
-
     private void Awake()
     {
         if (Instance == null) { Instance = this; }
@@ -83,8 +85,8 @@ public class SQLManager : MonoBehaviour
     private string ServerSet(string path)
     {
         CreateFile(path);
-        string jsonstring = File.ReadAllText(path + "/config.json");
-        JsonData itemData = JsonMapper.ToObject(jsonstring);
+        string jsonString = File.ReadAllText(path + "/config.json");
+        JsonData itemData = JsonMapper.ToObject(jsonString);
         try
         {
             return $"Server={itemData[0]["ip_json"]};" +
@@ -100,20 +102,13 @@ public class SQLManager : MonoBehaviour
     private void CreateFile(string path)
     {
         if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-        string filepath = path + "/config.json";
-        if (!File.Exists(filepath))
+        string filePath = path + "/config.json";
+        if (!File.Exists(filePath))
         {
             List<ServerJsonItem> item = new List<ServerJsonItem>();
-            if (_is_it_Client)
-            {
-                item.Add(new ServerJsonItem("192.168.1.45", "neoproject", "game_client", "1234", "3306"));
-            }
-            else
-            {
-                item.Add(new ServerJsonItem("192.168.1.45", "neoproject", "game_server", "1234", "3306"));
-            }
+            item.Add(new ServerJsonItem("192.168.1.45", "neoproject", "root", "1234", "3306"));
             JsonData data = JsonMapper.ToJson(item);
-            File.WriteAllText(filepath, data.ToString());
+            File.WriteAllText(filePath, data.ToString());
         }
     }
 
@@ -132,8 +127,6 @@ public class SQLManager : MonoBehaviour
         catch (Exception e) { Debug.LogError($"Connection Error: {e.Message}"); return false; }
     }
 
-    // ── 로그인 (오프라인씬, 클라이언트 직접 호출) ──
-    // 반환: 0=성공, 1=아이디/비번 불일치, 2=DB오류
     public int Login(string name, string password, out string nickname, out int score)
     {
         nickname = ""; score = 0;
@@ -153,19 +146,17 @@ public class SQLManager : MonoBehaviour
                         nickname = reader["user_nickname"].ToString();
                         score = reader.IsDBNull(reader.GetOrdinal("user_score")) ? 0 : Convert.ToInt32(reader["user_score"]);
                         user_info = new UserInfo(name, nickname, score);
-                        return 0;
+                        return 0; // 성공
                     }
                 }
             }
-            return 1;
+            return 1; // 아이디/비번 불일치
         }
         catch (Exception e) { Debug.LogError($"Login Error: {e.Message}"); return 2; }
     }
 
     public void Logout() { user_info = null; }
 
-    // ── 회원가입 (오프라인씬, 클라이언트 직접 호출) ──
-    // 반환: 0=성공, 1=아이디중복, 2=닉네임중복, 3=DB오류
     public int Signup(string name, string password, string nickname)
     {
         try
@@ -218,10 +209,9 @@ public class SQLManager : MonoBehaviour
         catch (Exception e) { Debug.LogError($"Nickname Check Error: {e.Message}"); return false; }
     }
 
-    // ── 점수 (서버에서만 호출, AuthPlayer 경유) ──
-    public bool GetScore(string name, out int outscore)
+    public bool GetScore(string name, out int out_score)
     {
-        outscore = 0;
+        out_score = 0;
         try
         {
             if (!ConnectionCheck(_connection)) return false;
@@ -230,7 +220,7 @@ public class SQLManager : MonoBehaviour
             {
                 cmd.Parameters.AddWithValue("@name", name);
                 object result = cmd.ExecuteScalar();
-                if (result != null) { outscore = Convert.ToInt32(result); return true; }
+                if (result != null) { out_score = Convert.ToInt32(result); return true; }
             }
             return false;
         }
@@ -239,13 +229,6 @@ public class SQLManager : MonoBehaviour
 
     public bool SetScore(string name, int score)
     {
-        // 클라이언트에서 호출 시 차단
-        if (_is_it_Client)
-        {
-            Debug.LogWarning("[SQLManager] 클라이언트에서 SetScore 호출 차단");
-            return false;
-        }
-
         try
         {
             if (!ConnectionCheck(_connection)) return false;

@@ -49,12 +49,13 @@ public class PlayerSlotUI : MonoBehaviour
             _playernum_text.text = $"P{_auth.player_num + 1}";
     }
 
-    // 숫자 애니메이션
+    // --- 추가된 애니메이션 로직 ---
     public void PlayBounce(bool isRoundScore)
     {
         if (!gameObject.activeInHierarchy) return;
         StopAllCoroutines();
-        float targetScale = isRoundScore ? 1.1f : 1.1f;
+        // 라운드 점수와 총점의 애니메이션 강도를 다르게 줄 수 있습니다.
+        float targetScale = isRoundScore ? 1.1f : 1.2f;
         StartCoroutine(BounceRoutine(targetScale));
     }
 

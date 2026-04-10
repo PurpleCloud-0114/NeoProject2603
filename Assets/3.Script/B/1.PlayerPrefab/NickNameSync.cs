@@ -12,7 +12,7 @@ public class NickNameSync : NetworkBehaviour
     [SerializeField] private TMP_Text _nicknamecard_tmp;
     [SerializeField] private GameObject _nicknamecard_ob;
 
-    private Camera _main_camera;
+    private Camera _maincamera;
 
     public override void OnStartClient()
     {
@@ -23,15 +23,15 @@ public class NickNameSync : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
-        _main_camera = Camera.main;
+        _maincamera = Camera.main;
     }
 
     void LateUpdate()
     {
-        if (_main_camera == null) _main_camera = Camera.main;
-        if (_main_camera == null || _nicknamecard_ob == null) return;
+        if (_maincamera == null) _maincamera = Camera.main;
+        if (_maincamera == null || _nicknamecard_ob == null) return;
 
-        _nicknamecard_ob.transform.rotation = _main_camera.transform.rotation;
+        _nicknamecard_ob.transform.rotation = _maincamera.transform.rotation;
     }
 
     public void SetNickName(string name)
