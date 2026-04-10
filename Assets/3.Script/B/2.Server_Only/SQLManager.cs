@@ -46,6 +46,8 @@ public class SQLManager : MonoBehaviour
     public UserInfo user_info { get; private set; }
     public static SQLManager Instance = null;
 
+    [SerializeField] private bool _is_it_Client = false;
+
     private void Awake()
     {
         if (Instance == null) { Instance = this; }
@@ -102,7 +104,14 @@ public class SQLManager : MonoBehaviour
         if (!File.Exists(filepath))
         {
             List<ServerJsonItem> item = new List<ServerJsonItem>();
-            item.Add(new ServerJsonItem("192.168.1.45", "neoproject", "root", "1234", "3306"));
+            if (_is_it_Client)
+            {
+                item.Add(new ServerJsonItem("192.168.1.45", "neoproject", "game_client", "1234", "3306"));
+            }
+            else
+            {
+                item.Add(new ServerJsonItem("192.168.1.45", "neoproject", "game_server", "1234", "3306"));
+            }
             JsonData data = JsonMapper.ToJson(item);
             File.WriteAllText(filepath, data.ToString());
         }
@@ -230,6 +239,13 @@ public class SQLManager : MonoBehaviour
 
     public bool SetScore(string name, int score)
     {
+        // 클라이언트에서 호출 시 차단
+        if (_is_it_Client)
+        {
+            Debug.LogWarning("[SQLManager] 클라이언트에서 SetScore 호출 차단");
+            return false;
+        }
+
         try
         {
             if (!ConnectionCheck(_connection)) return false;
