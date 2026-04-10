@@ -15,6 +15,7 @@ public class ItemManager : MonoBehaviour {
 	}
 
 	public void SpanwSpiderweb(Vector3 postion) {
-		Instantiate(_spiderwebPrefab, postion, Quaternion.identity);
+		if(_spiderwebPrefab.TryGetComponent(out SpiderwebObstacle _spiderweb))
+		Instantiate(_spiderwebPrefab, postion + Vector3.up * _spiderweb.distance, Quaternion.identity);
 	}
 }

@@ -6,6 +6,8 @@ using Mirror;
 public class StageManager : NetworkBehaviour {
 	public static StageManager Instance = null;
 
+	public MapSize map_size;
+
 	[SyncVar(hook = nameof(OnStageDataChanged))] public StageData stage_data_sync;
 	[SerializeField] private Transform _redzoneTrigger;
 

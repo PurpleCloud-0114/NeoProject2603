@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Mirror;
 
 public class PlayerUIController : NetworkBehaviour {
+	private PlayerCore _playerCore;
 	private PlayerMovement _playerMovement;
 	private PlayerItemController _playerItemController;
 
@@ -14,14 +15,16 @@ public class PlayerUIController : NetworkBehaviour {
 
 	//----- ¸Þ¼­µå
 	private void Awake() {
+		TryGetComponent(out _playerCore);
 		TryGetComponent(out _playerMovement);
 		TryGetComponent(out _playerItemController);
 	}
 
 	private void Start() {
-		if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
-		if (isLocalPlayer) BindButton();
+		if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay && !_playerCore.is_dummy) return;
+		if(isLocalPlayer)BindButton();
 		BindBtnAction();
+		BindUI();
 	}
 
 	private void BindButton() {
@@ -34,6 +37,10 @@ public class PlayerUIController : NetworkBehaviour {
 		_wingButton.onClick.AddListener(DeActivateWingBtn);
 		_itemButton.onClick.AddListener(_playerItemController.UseItem);
 		_itemButton.onClick.AddListener(DeActivateItemBtn);
+	}
+
+	private void BindUI() {
+		UIManager.Instance.BindStageProgressUI(transform);
 	}
 
 	public void ActivateWingBtn() => _wingButton.interactable = true;

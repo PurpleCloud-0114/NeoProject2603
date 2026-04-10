@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class StageProgressUi : MonoBehaviour {
+public class StageProgressUi : NetworkBehaviour {
 	[SerializeField] private Transform _player;
 
 	[SerializeField] private RectTransform _curPointBar;
@@ -27,7 +28,10 @@ public class StageProgressUi : MonoBehaviour {
 		_redZone.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, calibrateRedZoneHeight);
 	}
 
+	public void BindPlayer(Transform player) => player = _player;
+
 	private void Update() {
+		if (_player == null) return;
 		if (_player.position.y > _mapHeight) _progressPercent = 100;
 		else _progressPercent = (_player.position.y / _mapHeight) * 100;
 		UpdateProgress();

@@ -22,7 +22,7 @@ public class RaceManager : NetworkBehaviour {
 	[SyncVar] public double race_start_time_sync;
 
 	[SyncVar] private int _playersReadyCount = 0;
-	private int TotalPlayers => NetworkServer.connections.Count;
+	public int total_players => NetworkServer.connections.Count;
 
 	[Header("도착 속도 판정 (Death)")]
 	[SyncVar, SerializeField, Range(5f, 50f)] private float _deathOverSpeedSync = 30f;
@@ -80,7 +80,7 @@ public class RaceManager : NetworkBehaviour {
 
 		if(!finishers.Contains(sender.identity)) {
 			finishers.Add(sender.identity);
-			if (finishers.Count >= TotalPlayers) {
+			if (finishers.Count >= total_players) {
 				EndRace();
 			}
 			//들어온 시간 보고 순위 정렬?
@@ -119,9 +119,9 @@ public class RaceManager : NetworkBehaviour {
 	[Command(requiresAuthority = false)]
 	public void CmdReportReady() {
 		_playersReadyCount++;
-		Debug.Log($"플레이어 준비 완료: {_playersReadyCount} / {TotalPlayers}");
+		Debug.Log($"플레이어 준비 완료: {_playersReadyCount} / {total_players}");
 
-		//if(_playersReadyCount >= TotalPlayers && current_state_sync == RaceState.Waiting) {
+		//if(_playersReadyCount >= total_players && current_state_sync == RaceState.Waiting) {
 		if(_playersReadyCount >= START_MAX_PLAYER) { 
 			StartCountdown();
 		}

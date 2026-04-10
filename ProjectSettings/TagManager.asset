@@ -8,6 +8,7 @@ TagManager:
   - Obstacle
   - Redzone
   - ItemBox
+  - Spiderweb
   layers:
   - Default
   - TransparentFX

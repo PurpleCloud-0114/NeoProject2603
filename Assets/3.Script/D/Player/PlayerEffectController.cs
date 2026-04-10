@@ -10,6 +10,7 @@ using DG.Tweening;
 /// </summary>
 public class PlayerEffectController : MonoBehaviour {
 	private PlayerMovement _playerMovement;
+	private PlayerCore _playerCore;
 	private Rigidbody _rigidbody;
 	private Tween _itemBuffTween;
 
@@ -34,20 +35,26 @@ public class PlayerEffectController : MonoBehaviour {
 	 */
 	private void Awake() {
 		TryGetComponent(out _playerMovement);
+		TryGetComponent(out _playerCore);
 		TryGetComponent(out _rigidbody);
 	}
 
 	public void UseWeightAccelerationItem(float force, float expansionValue, float duration) {
 		_itemBuffTween?.Kill();
 		_playerMovement.drop_max_speed += expansionValue;
-		_rigidbody.AddForce(0, -force, 0);
+		_rigidbody.AddForce(0, -force, 0, ForceMode.VelocityChange);
+		//Vector3 currentVelocity = _rigidbody.linearVelocity;
+		//currentVelocity.y -= force;
+		//_rigidbody.linearVelocity = currentVelocity;
+
+
+
 		_itemBuffTween = DOTween.To(() => _playerMovement.drop_max_speed, x => _playerMovement.drop_max_speed = x, _playerMovement.base_drop_max_speed, 0.5f)
 			.SetDelay(duration) // 지속시간만큼 대기
 			.SetEase(Ease.InOutQuad); // 부드럽게 감속
 	}
 	public void UseSpiderwebBulletItem() {
-		Vector3 spawnPosition = transform.position + Vector3.up * 5f;
-		ItemManager.Instance.SpanwSpiderweb(spawnPosition);
+		ItemManager.Instance.SpanwSpiderweb(transform.position);
 	}
 	public void UseShockwaveMagicItem() {
 		//주변 사람들한테 범위 지정 및 거리 계산하여 일정 파워 날리기.
@@ -67,15 +74,19 @@ public class PlayerEffectController : MonoBehaviour {
 	}
 
 	//이제 맞는 판정
-	public void HitSpiderweb(float duration) {
+	public void HitSpiderweb(Collider spiderweb) {
 		if (_isInvinsible) return;
-		_playerMovement.drop_max_speed = 0;
-		_itemBuffTween = DOTween.To(() => _playerMovement.drop_max_speed, x => _playerMovement.drop_max_speed = x, _playerMovement.base_drop_max_speed, 0f)
-			.SetDelay(duration); // 지속시간만큼 대기
+		if(spiderweb.TryGetComponent(out SpiderwebObstacle _spiderweb)) {
+			StopCoroutine("CantMove_co");
+			_playerMovement.drop_max_speed = _spiderweb.SetPlayerVelocity;
+			StartCoroutine("CantMove_co", _spiderweb.duration);
+		}
 	}
 	public void HitShockwave(Vector3 force) {
 		if (_isInvinsible) return;
-		_rigidbody.AddForce(force);
+		StopCoroutine("CantMove_co");
+		_rigidbody.AddForce(force, ForceMode.VelocityChange);
+		StartCoroutine("CantMove_co", 1f);
 	}
 	public void HitMagnetic() {
 		if (_isInvinsible) return;
@@ -84,8 +95,9 @@ public class PlayerEffectController : MonoBehaviour {
 	}
 
 	private IEnumerator CantMove_co(float duration) {
-		_playerMovement._inputSystem.DisableInputSystem();
+		_playerCore.playerGameState = PlayerGameState.Stun;
 		yield return new WaitForSeconds(duration);
-		_playerMovement._inputSystem.EnableInputSystem();
+		_playerMovement.drop_max_speed = _playerMovement.base_drop_max_speed;
+		_playerCore.playerGameState = PlayerGameState.Falling;
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SinglePlayerActive : MonoBehaviour {
-	public GameObject player;
+	public GameObject[] players;
 
 	private void Start() {
 		StartCoroutine(test_co());
@@ -11,6 +11,8 @@ public class SinglePlayerActive : MonoBehaviour {
 
 	private IEnumerator test_co() {
 		yield return new WaitForSeconds(1f);
-		player.SetActive(true);
+		foreach(GameObject player in players) {
+			player.SetActive(true);
+		}
 	}
 }

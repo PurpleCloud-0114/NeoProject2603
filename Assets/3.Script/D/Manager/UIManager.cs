@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour {
 
 	[SerializeField] private Button _wingButton;
 	[SerializeField] private Button _itemButton;
+	[SerializeField] private StageProgressUi _stageProgressUI;
 
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -40,4 +41,5 @@ public class UIManager : MonoBehaviour {
 
 	[Client] public Button BindWingButton() => _wingButton;
 	[Client] public Button BindItemButton() => _itemButton;
+	public void BindStageProgressUI(Transform player) => _stageProgressUI.BindPlayer(player);
 }

@@ -10,6 +10,8 @@ public class PlayerMovement : NetworkBehaviour {
 	private PlayerCore _playerCore;
 	private Rigidbody _rigidBody;
 
+	[SerializeField] private MapSize _mapSize;
+
 	public Vector3 VelocityTracker;
 
 	[Header("조작 이동속도 조절")]
@@ -40,7 +42,8 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 
 	private void Start() {
-		if(isLocalPlayer || RaceManager.Instance.isSinglePlay) _inputSystem = FindAnyObjectByType<InputSystem>();
+		if((isLocalPlayer || RaceManager.Instance.isSinglePlay) && !_playerCore.is_dummy) _inputSystem = FindAnyObjectByType<InputSystem>();
+		_mapSize = StageManager.Instance.map_size;
 	}
 
 	private void FixedUpdate() {
@@ -56,6 +59,21 @@ public class PlayerMovement : NetworkBehaviour {
 		_moveDir = new Vector3(Mathf.Clamp(_moveVector.x, -1, 1), 0, Mathf.Clamp(_moveVector.y, -1, 1));
 	}
 
+	private void LateUpdate() {
+		Vector3 currentPos = transform.position;
+		Vector3 mapCetner = _mapSize.map_center;
+		currentPos.y = mapCetner.y;
+
+		float distanceFromCenter = Vector3.Distance(currentPos, mapCetner);
+
+		if(distanceFromCenter > _mapSize.boundaryRadius) {
+			Vector3 direction = (currentPos - mapCetner).normalized;
+			Vector3 clampedPosition = mapCetner + (direction * _mapSize.boundaryRadius);
+			clampedPosition.y = transform.position.y;
+			transform.position = clampedPosition;
+		}
+	}
+
 	private void Drop() {
 		_dropSpeed = _rigidBody.linearVelocity.y;
 		_dropSpeed = Mathf.Clamp(_dropSpeed, -1 * drop_max_speed, 0);
@@ -66,10 +84,6 @@ public class PlayerMovement : NetworkBehaviour {
 		Quaternion targetRotation = Quaternion.Euler(targetX, 0f, targetZ);
 		//transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 20f);
 		_rigidBody.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 20f));
-	}
-
-	public void hitObstacle() {
-
 	}
 
 	public void SetDecreaseDropSpeedTimeOnWing() {
