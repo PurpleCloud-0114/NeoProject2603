@@ -6834,6 +6834,10 @@ PrefabInstance:
       value: Assets/1.Scene/Main/ClientMain.unity
       objectReference: {fileID: 0}
     - target: {fileID: 8849018464848831088, guid: cf88ee5a333bb724186a558656475da2, type: 3}
+      propertyPath: playerPrefab
+      value: 
+      objectReference: {fileID: 6497241950661712083, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+    - target: {fileID: 8849018464848831088, guid: cf88ee5a333bb724186a558656475da2, type: 3}
       propertyPath: GameplayScene
       value: Assets/1.Scene/Main/ClientIngame.unity
       objectReference: {fileID: 0}
