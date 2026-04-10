@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/1.Scene/E/E_GameRoom.unity.meta
+guid: c0ac56d469acb114b8373dd222704891
+========
 guid: 9bec99b2cc227cf408b4c9e13bc9876f
+>>>>>>>> main:Assets/1.Scene/B/99.B_Server_test.unity.meta
 DefaultImporter:
   externalObjects: {}
   userData: 
