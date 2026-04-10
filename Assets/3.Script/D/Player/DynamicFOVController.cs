@@ -4,7 +4,7 @@ using UnityEngine;
 using Unity.Cinemachine;
 
 public class DynamicFOVController : MonoBehaviour {
-	[SerializeField] private GameObject _player;
+	private GameObject _player;
 
 	private CinemachineCamera _mainCamera;
 	private Rigidbody _rigidBody;
@@ -23,17 +23,20 @@ public class DynamicFOVController : MonoBehaviour {
 	private void Awake() {
 		if (TryGetComponent(out _mainCamera)) {
 			_defaultFOVvalue = _mainCamera.Lens.FieldOfView;
-		}
+		}		
+	}
+
+	public void BindPlayer(GameObject player) { 
+		_player = player;
 		_player.TryGetComponent(out _rigidBody);
+		_mainCamera.Follow = _player.transform;
+		_mainCamera.LookAt = _player.transform;
 	}
 
 	private void Update() {
-		TrackingPlayer();
-		ChangeFOV(); 
-	}
-
-	private void TrackingPlayer() {
-		transform.position = _player.transform.position + Vector3.up * 15f + Vector3.back;
+		if(_player != null) {
+			ChangeFOV(); 
+		}
 	}
 
 	private void ChangeFOV() {
