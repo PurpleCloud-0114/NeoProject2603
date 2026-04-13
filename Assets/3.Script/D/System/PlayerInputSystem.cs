@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Users;
 
-public class InputSystem : MonoBehaviour {
+public class PlayerInputSystem : MonoBehaviour {
 	public Vector2 BasePoint;
 	public Vector2 MovePoint;
 

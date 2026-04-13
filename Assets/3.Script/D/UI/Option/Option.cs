@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Option : MonoBehaviour {
 	[SerializeField] private PlayerMovement _playerMovement;
-	[SerializeField] private InputSystem _inputSystem;
+	[SerializeField] private PlayerInputSystem _playerInputSystem;
 
 	[Header("Sensitive")]
 	[SerializeField] private Slider _sensitiveSlider;
@@ -19,6 +19,6 @@ public class Option : MonoBehaviour {
 
 	public void OnJoyStickModChange() {
 		_joyStick.SetActive(!_joyStick.activeSelf);
-		_inputSystem.OnGravitySensorToggle();
+		_playerInputSystem.OnGravitySensorToggle();
 	}
 }

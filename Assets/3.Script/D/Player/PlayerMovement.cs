@@ -5,7 +5,7 @@ using Mirror;
 using DG.Tweening;
 
 public class PlayerMovement : NetworkBehaviour {
-	public InputSystem _inputSystem;
+	public PlayerInputSystem _playerInputSystem;
 
 	private PlayerCore _playerCore;
 	private Rigidbody _rigidBody;
@@ -42,20 +42,20 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 
 	private void Start() {
-		if((isLocalPlayer || RaceManager.Instance.isSinglePlay) && !_playerCore.is_dummy) _inputSystem = FindAnyObjectByType<InputSystem>();
+		if((isLocalPlayer || RaceManager.Instance.isSinglePlay) && !_playerCore.is_dummy) _playerInputSystem = FindAnyObjectByType<PlayerInputSystem>();
 		_mapSize = StageManager.Instance.map_size;
 	}
 
 	private void FixedUpdate() {
 		VelocityTracker = _rigidBody.linearVelocity;
-		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _inputSystem == null) return;
+		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _playerInputSystem == null) return;
 		if(_playerCore.playerGameState == PlayerGameState.Falling) Drop();
 	}
 
 	private void Update() {
-		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _inputSystem == null) return;
+		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _playerInputSystem == null) return;
 
-		_moveVector = _inputSystem.MovePoint * MoveMobileSensitive;
+		_moveVector = _playerInputSystem.MovePoint * MoveMobileSensitive;
 		_moveDir = new Vector3(Mathf.Clamp(_moveVector.x, -1, 1), 0, Mathf.Clamp(_moveVector.y, -1, 1));
 	}
 
