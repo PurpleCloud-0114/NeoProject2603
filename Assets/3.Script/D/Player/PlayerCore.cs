@@ -54,8 +54,8 @@ public class PlayerCore : NetworkBehaviour {
 		Vector3 spawnPosition = spawnCenter + new Vector3(x, 0f, z);
 		transform.position = spawnPosition;
 
-		Vector3 directionToCenter = (spawnCenter - spawnPosition).normalized;
-		transform.rotation = Quaternion.LookRotation(directionToCenter);
+		//Vector3 directionToCenter = (spawnCenter - spawnPosition).normalized;
+		//transform.rotation = Quaternion.LookRotation(directionToCenter);
 		Debug.Log("¹èÄ¡µÊ!");
 
 		if ((isLocalPlayer || RaceManager.Instance.isSinglePlay) && !is_dummy) {
@@ -118,18 +118,18 @@ public class PlayerCore : NetworkBehaviour {
 		switch (raceState) {
 			case RaceState.Waiting:
 				playerGameState = PlayerGameState.Wait;
-				_playerMovement._inputSystem.DisableInputSystem();
+				_playerMovement._playerInputSystem.DisableInputSystem();
 				break;
 			case RaceState.Countdown:
 				_playerMovement.SetDecreaseDropSpeedTimeOnWing();
 				break;
 			case RaceState.Racing:
 				playerGameState = PlayerGameState.Falling;
-				_playerMovement._inputSystem.EnableInputSystem();
+				_playerMovement._playerInputSystem.EnableInputSystem();
 				break;
 			case RaceState.Finished:
 				playerGameState = PlayerGameState.Finish;
-				_playerMovement._inputSystem.DisableInputSystem();
+				_playerMovement._playerInputSystem.DisableInputSystem();
 				break;
 		}
 	}
