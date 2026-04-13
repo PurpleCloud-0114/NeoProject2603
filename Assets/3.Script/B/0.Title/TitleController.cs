@@ -37,6 +37,7 @@ public class TitleController : MonoBehaviour
     public void StartGameEvent()
     {
         Debug.Log("스타트 게임 추후 작업예정");
+        //룸변경
     }
 
     public void OpenOptionPage()
