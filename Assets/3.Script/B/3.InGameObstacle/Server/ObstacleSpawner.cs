@@ -6,52 +6,53 @@ using System.Collections.Generic;
 public struct FloatingObstacleData
 {
     public GameObject prefab;
-    [Header("겹침 체크 반경 (이 수치만큼 다른 물체와 떨어짐)")]
-    public float safeRadius;
+    [Header("물리 체크 반경 (장애물 크기 + 여유분)")]
+    public float checkRadius;
 }
 
 public class ObstacleSpawner : NetworkBehaviour
 {
     [Header("Spawn Settings")]
     [SerializeField] private Vector3 _towerCenter = Vector3.zero;
-    [SerializeField] private float _maxRadius = 5.0f; // 중심에서 생성될 최대 반경 (0 ~ 5 완전 랜덤)
-    public float _startY = 0f;
-    public float _endY = -500f;
+    [SerializeField] private float _maxRadius = 5.0f; // 중심에서 생성될 최대 반경
+    [SerializeField] private float _startY = 0f;
+    [SerializeField] private float _endY = -500f;
 
-    [Header("생성 개수 (전체 맵 기준)")]
+    [Header("생성 개수")]
     [SerializeField] private int _totalFloatingObstacles = 50;
 
     [Header("Templates")]
     [SerializeField] private List<FloatingObstacleData> _obstacleList;
 
+    [Header("Collision Settings")]
+    [SerializeField] private LayerMask _obstacleLayer; // 장애물 레이어(예: Obstacle) 설정 필수
+
     private List<GameObject> _obstaclePool = new List<GameObject>();
 
-    // 맵 생성이 끝난 직후에 호출하세요.
+    /// <summary>
+    /// 서버에서 공중 장애물을 생성합니다.
+    /// 맵 타일과 벽 장애물이 생성된 이후에 호출되어야 합니다.
+    /// </summary>
     [Server]
-    public void GenerateFloatingObstacles(List<MapFloor> mapFloors)
+    public void GenerateFloatingObstacles()
     {
+        // 1. 기존 장애물 모두 풀로 반환
         ReturnAllToPool();
 
-        // 1. 맵에 이미 '켜진' 부착형 장애물들의 위치를 모두 수집
-        List<Vector3> avoidPositions = new List<Vector3>();
-        foreach (var floor in mapFloors)
-        {
-            avoidPositions.AddRange(floor.GetActiveObstaclePositions());
-        }
-
-        Debug.Log($"[Server] 공중부양 장애물 생성 시작... (피해야 할 맵 장애물 수: {avoidPositions.Count})");
-
         int spawnedCount = 0;
-        int maxAttempts = 1000; // 무한 루프 방지
+        int maxAttempts = 2000; // 빈 공간을 찾기 위한 최대 시도 횟수
         int attempts = 0;
+
+        Debug.Log("[Server] 공중 장애물 생성 시작...");
 
         while (spawnedCount < _totalFloatingObstacles && attempts < maxAttempts)
         {
             attempts++;
 
+            // 랜덤 프리팹 데이터 선택
             FloatingObstacleData data = _obstacleList[Random.Range(0, _obstacleList.Count)];
 
-            // 완전 랜덤 3D 좌표 생성 (원기둥 형태)
+            // 2. 원기둥 형태의 완전 랜덤 3D 좌표 생성
             float randomAngle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
             float randomDist = Random.Range(0f, _maxRadius);
             float randomY = Random.Range(_endY, _startY);
@@ -62,42 +63,41 @@ public class ObstacleSpawner : NetworkBehaviour
                 _towerCenter.z + Mathf.Sin(randomAngle) * randomDist
             );
 
-            // 겹침 체크 (거리 계산)
-            bool isPositionSafe = true;
-            foreach (Vector3 posToAvoid in avoidPositions)
+            // 3. 물리 체크 (Physics.CheckSphere)
+            // 해당 위치에 이미 다른 장애물이 있는지 부피 단위로 체크
+            if (!Physics.CheckSphere(spawnPos, data.checkRadius, _obstacleLayer))
             {
-                if (Vector3.Distance(spawnPos, posToAvoid) < data.safeRadius)
-                {
-                    isPositionSafe = false;
-                    break;
-                }
-            }
+                // 랜덤 회전값 결정
+                Quaternion randomRot = Quaternion.Euler(
+                    Random.Range(0f, 360f),
+                    Random.Range(0f, 360f),
+                    Random.Range(0f, 360f)
+                );
 
-            // 자리가 안전하면 스폰
-            if (isPositionSafe)
-            {
-                Quaternion randomRot = Quaternion.Euler(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
+                // 풀에서 가져오거나 생성
                 GameObject obstacle = GetFromPool(data.prefab, spawnPos, randomRot);
 
                 if (!obstacle.activeSelf) obstacle.SetActive(true);
-                NetworkServer.Spawn(obstacle);
 
-                // 방금 스폰한 장애물 위치도 '피해야 할 위치' 리스트에 추가 (공중 장애물끼리 겹침 방지)
-                avoidPositions.Add(spawnPos);
+                // 4. 서버 스폰 및 동기화
+                NetworkServer.Spawn(obstacle);
                 spawnedCount++;
+
+                // [중요] 방금 생성된 장애물의 위치 정보를 물리 엔진에 즉시 동기화
+                // 이 코드가 있어야 다음 루프의 CheckSphere가 이 장애물을 감지하여 겹치지 않게 합니다.
+                Physics.SyncTransforms();
             }
         }
 
-        if (attempts >= maxAttempts)
-        {
-            Debug.LogWarning("[Server] 너무 좁아서 설정한 개수만큼 스폰하지 못했습니다. (공간 부족)");
-        }
+        Debug.Log($"[Server] 공중 장애물 생성 완료: {spawnedCount}개 배치됨 (시도 횟수: {attempts})");
     }
 
     [Server]
     private GameObject GetFromPool(GameObject prefab, Vector3 pos, Quaternion rot)
     {
+        // 이름 뒤에 (Clone)이 붙는 것을 고려하여 탐색
         GameObject obj = _obstaclePool.Find(x => !x.activeSelf && x.name.Equals(prefab.name + "(Clone)"));
+
         if (obj == null)
         {
             obj = Instantiate(prefab, pos, rot);
