@@ -83,7 +83,7 @@ public class ObstacleSpawner : NetworkBehaviour
                 NetworkServer.Spawn(obstacle);
                 spawnedCount++;
 
-                // [중요] 방금 생성된 장애물의 위치 정보를 물리 엔진에 즉시 동기화
+                // 방금 생성된 장애물의 위치 정보를 물리 엔진에 즉시 동기화
                 // 이 코드가 있어야 다음 루프의 CheckSphere가 이 장애물을 감지하여 겹치지 않게 합니다.
                 Physics.SyncTransforms();
             }
