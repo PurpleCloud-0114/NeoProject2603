@@ -1364,6 +1364,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Wall_02_Window
       objectReference: {fileID: 0}
+    - target: {fileID: 1311382419031291770, guid: 8671a2861100d95479ce8f5b9ce6feb5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4010085638856028736, guid: 8671a2861100d95479ce8f5b9ce6feb5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1461,6 +1465,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Wall_01_Nomal
       objectReference: {fileID: 0}
+    - target: {fileID: 4656741095035066466, guid: 538e6adf0ad489540ab7538ad1df0a8d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1474,6 +1482,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3636780924977281387, guid: 619df07a6c2a9f2458c2fe49b31162af, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3636780924977281387, guid: 619df07a6c2a9f2458c2fe49b31162af, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3636780924977281387, guid: 619df07a6c2a9f2458c2fe49b31162af, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3636780924977281387, guid: 619df07a6c2a9f2458c2fe49b31162af, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1514,6 +1534,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3636780924977281387, guid: 619df07a6c2a9f2458c2fe49b31162af, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8693534039953576507, guid: 619df07a6c2a9f2458c2fe49b31162af, type: 3}
       propertyPath: m_Name
       value: Wall_06_Candle/Book
@@ -1531,6 +1555,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1043082283030045353, guid: 8dec10600b53b7a408a5ab322c1b2eb0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1043082283030045353, guid: 8dec10600b53b7a408a5ab322c1b2eb0, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1043082283030045353, guid: 8dec10600b53b7a408a5ab322c1b2eb0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1571,6 +1603,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1043082283030045353, guid: 8dec10600b53b7a408a5ab322c1b2eb0, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6224785930336252568, guid: 8dec10600b53b7a408a5ab322c1b2eb0, type: 3}
       propertyPath: m_Name
       value: Wall_08_WoodWindow
@@ -1588,6 +1624,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1585951328847515348, guid: 0536952ae449aea479443add8a56da0c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1585951328847515348, guid: 0536952ae449aea479443add8a56da0c, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1585951328847515348, guid: 0536952ae449aea479443add8a56da0c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1626,6 +1670,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1585951328847515348, guid: 0536952ae449aea479443add8a56da0c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1585951328847515348, guid: 0536952ae449aea479443add8a56da0c, type: 3}
+      propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4568036107791384648, guid: 0536952ae449aea479443add8a56da0c, type: 3}
@@ -1689,6 +1737,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Wall_05_Gate
       objectReference: {fileID: 0}
+    - target: {fileID: 6411370768708494045, guid: 99ae815042b86294fba9465e3c9b7cc1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1705,6 +1757,10 @@ PrefabInstance:
     - target: {fileID: 7806309783579552340, guid: 2e6a1915cb48ba94c85c1f4bfecdea2d, type: 3}
       propertyPath: m_Name
       value: Wall_04_Door/Window
+      objectReference: {fileID: 0}
+    - target: {fileID: 7806309783579552340, guid: 2e6a1915cb48ba94c85c1f4bfecdea2d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9018292006992092894, guid: 2e6a1915cb48ba94c85c1f4bfecdea2d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1760,6 +1816,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2850572855571694486, guid: c44d59c23e3357f47a61b46812f96fef, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2850572855571694486, guid: c44d59c23e3357f47a61b46812f96fef, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2850572855571694486, guid: c44d59c23e3357f47a61b46812f96fef, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2850572855571694486, guid: c44d59c23e3357f47a61b46812f96fef, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -1797,6 +1865,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2850572855571694486, guid: c44d59c23e3357f47a61b46812f96fef, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2850572855571694486, guid: c44d59c23e3357f47a61b46812f96fef, type: 3}
+      propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7089493655727706451, guid: c44d59c23e3357f47a61b46812f96fef, type: 3}
@@ -1876,6 +1948,10 @@ PrefabInstance:
     - target: {fileID: 7301932044659917098, guid: a5601ed608e66ff41ade1fd8010737e1, type: 3}
       propertyPath: m_Name
       value: Wall_03_Door
+      objectReference: {fileID: 0}
+    - target: {fileID: 7301932044659917098, guid: a5601ed608e66ff41ade1fd8010737e1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8437495248104010919, guid: a5601ed608e66ff41ade1fd8010737e1, type: 3}
       propertyPath: m_LocalPosition.x
