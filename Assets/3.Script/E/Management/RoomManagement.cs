@@ -42,7 +42,7 @@ public class RoomManagement : NetworkRoomManager
         RefreshLobbyUI(); 
     }
 
-    void RefreshLobbyUI()
+    public void RefreshLobbyUI()
     {
         if (LobbyTextUI.Instance == null)
         {
@@ -58,11 +58,12 @@ public class RoomManagement : NetworkRoomManager
             RoomPlayer rp = slot as RoomPlayer;
             if (rp == null) continue;
 
-            string name = $"WoWPlayer {slot_index + 1}";
+            string player_name = $"WoWPlayer {slot_index + 1}";
             bool _isReady = rp.readyToBegin;
-            Debug.Log($"[RoomManagement] UI 갱신 slot={slot_index}, name={name}, isReady={_isReady}");
+            Debug.Log($"[RoomManagement] UI 갱신 slot={slot_index}, name={player_name }, isReady={_isReady}");
 
-            LobbyTextUI.Instance.UpdateUI(slot_index, name, _isReady);
+            LobbyTextUI.Instance.UpdateUI(slot_index, player_name, _isReady);
+            rp.RpcUpdateUI(slot_index, player_name, _isReady);
             slot_index++;
         }
     }
