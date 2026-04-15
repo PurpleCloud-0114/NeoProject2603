@@ -1,8 +1,7 @@
 using UnityEngine;
-using Mirror;
 using System.Collections.Generic;
 
-public class MapFloor : NetworkBehaviour
+public class MapFloorlocal : MonoBehaviour
 {
     [Header("밸런싱 설정")]
     [Tooltip("장애물이 생성될 확률 (0: 없음, 1: 모두 생성)")]
@@ -12,16 +11,14 @@ public class MapFloor : NetworkBehaviour
     [Header("프리팹에 미리 배치된 장애물들")]
     [SerializeField] private List<GameObject> _attachedObstacles;
 
-    [SyncVar(hook = nameof(OnObstacleMaskChanged))]
     private uint _activeObstacleMask = 0;
 
-    [Server]
     public void RandomizeAttachedObstacles()
     {
         uint mask = 0;
         for (int i = 0; i < _attachedObstacles.Count; i++)
         {
-            // 서버에서 설정된 확률로 마스크 계산
+            // 고정값 0.5f 대신 설정한 확률 변수 사용
             if (Random.value < _spawnProbability)
             {
                 mask |= (1u << i);
@@ -29,11 +26,6 @@ public class MapFloor : NetworkBehaviour
         }
         _activeObstacleMask = mask;
         ApplyObstacleState(_activeObstacleMask);
-    }
-
-    private void OnObstacleMaskChanged(uint oldMask, uint newMask)
-    {
-        ApplyObstacleState(newMask);
     }
 
     private void ApplyObstacleState(uint mask)
