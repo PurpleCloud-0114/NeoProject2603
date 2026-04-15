@@ -5,52 +5,56 @@ using System.Collections.Generic;
 public struct FloatingObstacleDatalocal
 {
     public GameObject prefab;
-    [Header("물리 체크 반경 (장애물 크기 + 여유분)")]
+    [Header("물리 체크 반경 (여유분 포함)")]
     public float checkRadius;
 }
 
 public class ObstacleSpawnerlocal : MonoBehaviour
 {
-    [Header("Spawn Settings")]
+    [Header("Spawn Area Settings")]
     [SerializeField] private Vector3 _towerCenter = Vector3.zero;
-    [SerializeField] private float _maxRadius = 5.0f; // 중심에서 생성될 최대 반경
+    [SerializeField] private float _maxRadius = 5.0f;
     [SerializeField] private float _startY = 0f;
     [SerializeField] private float _endY = -500f;
 
-    [Header("생성 개수")]
+    [Header("--- Obstacle Settings ---")]
     [SerializeField] private int _totalFloatingObstacles = 50;
+    [SerializeField] private List<FloatingObstacleDatalocal> _obstacleList;
+    [SerializeField] private LayerMask _obstacleLayer; // 장애물 레이어
 
-    [Header("Templates")]
-    [SerializeField] private List<FloatingObstacleData> _obstacleList;
+    [Header("--- Item Settings ---")]
+    [SerializeField] private int _totalItems = 15;
+    [SerializeField] private List<FloatingObstacleDatalocal> _itemList; // 아이템 프리팹 리스트
+    [SerializeField] private LayerMask _itemLayer; // 아이템 전용 레이어
 
-    [Header("Collision Settings")]
-    [SerializeField] private LayerMask _obstacleLayer; // 장애물 레이어(예: Obstacle) 설정 필수
+    private List<GameObject> _pool = new List<GameObject>(); // 장애물/아이템 통합 풀
 
-    private List<GameObject> _obstaclePool = new List<GameObject>();
-
-    /// <summary>
-    /// 공중 장애물을 생성합니다.
-    /// 맵 타일과 벽 장애물이 생성된 이후에 호출되어야 합니다.
-    /// </summary>
     public void GenerateFloatingObstacles()
     {
-        // 1. 기존 장애물 모두 풀로 반환
         ReturnAllToPool();
 
+        // 1. 장애물 먼저 생성 (장애물 레이어만 체크)
+        SpawnObjects(_obstacleList, _totalFloatingObstacles, _obstacleLayer, "Obstacle");
+
+        // 2. 아이템 생성 (장애물 레이어 + 아이템 레이어 둘 다 체크하여 빈 공간 탐색)
+        // 아이템은 장애물 위나 다른 아이템 위에 겹치면 안 되기 때문
+        LayerMask combinedLayer = _obstacleLayer | _itemLayer;
+        SpawnObjects(_itemList, _totalItems, combinedLayer, "Item");
+    }
+
+    private void SpawnObjects(List<FloatingObstacleDatalocal> dataList, int totalCount, LayerMask checkLayer, string typeTag)
+    {
+        if (dataList == null || dataList.Count == 0) return;
+
         int spawnedCount = 0;
-        int maxAttempts = 2000; // 빈 공간을 찾기 위한 최대 시도 횟수
+        int maxAttempts = 2000;
         int attempts = 0;
 
-        Debug.Log("[Local] 공중 장애물 생성 시작...");
-
-        while (spawnedCount < _totalFloatingObstacles && attempts < maxAttempts)
+        while (spawnedCount < totalCount && attempts < maxAttempts)
         {
             attempts++;
+            FloatingObstacleDatalocal data = dataList[Random.Range(0, dataList.Count)];
 
-            // 랜덤 프리팹 데이터 선택
-            FloatingObstacleData data = _obstacleList[Random.Range(0, _obstacleList.Count)];
-
-            // 2. 원기둥 형태의 완전 랜덤 3D 좌표 생성
             float randomAngle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
             float randomDist = Random.Range(0f, _maxRadius);
             float randomY = Random.Range(_endY, _startY);
@@ -61,41 +65,29 @@ public class ObstacleSpawnerlocal : MonoBehaviour
                 _towerCenter.z + Mathf.Sin(randomAngle) * randomDist
             );
 
-            // 3. 물리 체크 (Physics.CheckSphere)
-            // 해당 위치에 이미 다른 장애물이 있는지 부피 단위로 체크
-            if (!Physics.CheckSphere(spawnPos, data.checkRadius, _obstacleLayer))
+            // 물리 체크: 설정된 레이어들과 겹치는지 확인
+            if (!Physics.CheckSphere(spawnPos, data.checkRadius, checkLayer))
             {
-                // 랜덤 회전값 결정
-                Quaternion randomRot = Quaternion.Euler(
-                    Random.Range(0f, 360f),
-                    Random.Range(0f, 360f),
-                    Random.Range(0f, 360f)
-                );
+                Quaternion randomRot = (typeTag == "Item") ? Quaternion.identity :
+                    Quaternion.Euler(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
 
-                // 풀에서 가져오거나 생성
-                GameObject obstacle = GetFromPool(data.prefab, spawnPos, randomRot);
-
-                if (!obstacle.activeSelf) obstacle.SetActive(true);
+                GameObject obj = GetFromPool(data.prefab, spawnPos, randomRot);
+                if (!obj.activeSelf) obj.SetActive(true);
 
                 spawnedCount++;
-
-                // 방금 생성된 장애물의 위치 정보를 물리 엔진에 즉시 반영
-                Physics.SyncTransforms();
+                Physics.SyncTransforms(); // 생성 직후 위치 반영하여 다음 체크에 사용
             }
         }
-
-        Debug.Log($"[Local] 공중 장애물 생성 완료: {spawnedCount}개 배치됨 (시도 횟수: {attempts})");
+        Debug.Log($"[Local] {typeTag} 생성 완료: {spawnedCount}개");
     }
 
     private GameObject GetFromPool(GameObject prefab, Vector3 pos, Quaternion rot)
     {
-        // 이름 뒤에 (Clone)이 붙는 것을 고려하여 탐색
-        GameObject obj = _obstaclePool.Find(x => !x.activeSelf && x.name.Equals(prefab.name + "(Clone)"));
-
+        GameObject obj = _pool.Find(x => !x.activeSelf && x.name.Equals(prefab.name + "(Clone)"));
         if (obj == null)
         {
             obj = Instantiate(prefab, pos, rot);
-            _obstaclePool.Add(obj);
+            _pool.Add(obj);
         }
         else
         {
@@ -107,12 +99,9 @@ public class ObstacleSpawnerlocal : MonoBehaviour
 
     public void ReturnAllToPool()
     {
-        foreach (GameObject obj in _obstaclePool)
+        foreach (GameObject obj in _pool)
         {
-            if (obj != null && obj.activeSelf)
-            {
-                obj.SetActive(false);
-            }
+            if (obj != null && obj.activeSelf) obj.SetActive(false);
         }
     }
 }
