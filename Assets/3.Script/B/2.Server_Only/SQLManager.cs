@@ -274,13 +274,42 @@ public class SQLManager : MonoBehaviour
         }
         catch (Exception e) { Debug.LogError($"SetScore Error: {e.Message}"); return false; }
     }
+    public bool GetNickname(string name, out string outNickname)
+    {
+        outNickname = "";
+        try
+        {
+            if (!ConnectionCheck(_connection)) return false;
+            string sql = "SELECT user_nickname FROM user_info WHERE user_name=@name";
+            using (MySqlCommand cmd = new MySqlCommand(sql, _connection))
+            {
+                cmd.Parameters.AddWithValue("@name", name);
+                object result = cmd.ExecuteScalar();
+                if (result != null)
+                {
+                    outNickname = result.ToString();
+                    return true;
+                }
+            }
+            return false;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SQLManager] GetNickname Error: {e.Message}");
+            return false;
+        }
+    }
 
     private void OnApplicationQuit()
     {
-        if (_connection != null && _connection.State == System.Data.ConnectionState.Open)
+        try
         {
-            _connection.Close();
-            Debug.Log("SQL Connection Closed.");
+            if (_connection != null && _connection.State == System.Data.ConnectionState.Open)
+            {
+                _connection.Close();
+                _connection.Dispose(); // 메모리 해제 추가
+            }
         }
+        catch { /* 종료 시 에러 무시 */ }
     }
 }

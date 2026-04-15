@@ -4,50 +4,31 @@ using Mirror;
 
 public class NickNameSync : NetworkBehaviour
 {
-    [Header("Sync Variable")]
     [SyncVar(hook = nameof(OnNameChange))]
     public string player_nickname = "";
 
-    [Header("UI Reference")]
-    [SerializeField] private TMP_Text _nicknamecard_tmp;
-    [SerializeField] private GameObject _nicknamecard_ob;
+    [SerializeField] private TMP_Text _nicknamecard_tmp; // 캐릭터 머리 위 UI
 
-    private Camera _main_camera;
-
-    public override void OnStartClient()
+    public void OnNameChange(string oldName, string newName)
     {
-        base.OnStartClient();
-        SetNickName(player_nickname);
-    }
+        // 1. 캐릭터 머리 위 닉네임 갱신
+        if (_nicknamecard_tmp != null) _nicknamecard_tmp.text = newName;
 
-    public override void OnStartLocalPlayer()
-    {
-        base.OnStartLocalPlayer();
-        _main_camera = Camera.main;
-    }
+        // 2. 로비 UI 갱신 (서버 개발자가 만든 LobbyTextUI 활용)
+        if (LobbyTextUI.Instance != null)
+        {
+            AuthPlayer auth = GetComponent<AuthPlayer>();
+            NetworkRoomPlayer roomPlayer = GetComponent<NetworkRoomPlayer>();
 
-    void LateUpdate()
-    {
-        if (_main_camera == null) _main_camera = Camera.main;
-        if (_main_camera == null || _nicknamecard_ob == null) return;
+            if (auth != null && roomPlayer != null)
+            {
+                // 점수도 함께 표시하려면 ScoreSync를 가져옴
+                int currentScore = TryGetComponent<ScoreSync>(out var s) ? s.player_score : 0;
 
-        _nicknamecard_ob.transform.rotation = _main_camera.transform.rotation;
-    }
-
-    public void SetNickName(string name)
-    {
-        if (_nicknamecard_tmp != null)
-            _nicknamecard_tmp.text = name;
-    }
-
-    [Command]
-    public void CmdSendNameToServer(string name)
-    {
-        player_nickname = name;
-    }
-
-    public void OnNameChange(string oldname, string newname)
-    {
-        SetNickName(newname);
+                // roomPlayer.index 또는 auth.player_num을 사용하여 슬롯 위치 결정
+                LobbyTextUI.Instance.UpdateUI(roomPlayer.index, newName, roomPlayer.readyToBegin);
+                Debug.Log($"[Client] 로비 UI 갱신됨: {newName} (Score: {currentScore})");
+            }
+        }
     }
 }
