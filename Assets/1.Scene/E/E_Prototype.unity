@@ -210,8 +210,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e01354ac485306448209b44d7fecf51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Option
-  _playerController: {fileID: 0}
-  _inputController: {fileID: 1574221436}
+  _playerMovement: {fileID: 0}
+  _playerInputSystem: {fileID: 0}
   _sensitiveSlider: {fileID: 1154103865}
   _joyStick: {fileID: 2038681801}
 --- !u!1 &21256798
@@ -2013,7 +2013,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -5171,7 +5172,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -6248,7 +6250,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 079df03725fa77b478de1eaae1174b20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DynamicFOVController
-  _player: {fileID: 0}
   _extendCoefficient: 0.5
   _limitFOVValue: 60
   _smoothSpeed: 5
@@ -6752,7 +6753,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -8122,7 +8124,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -8371,7 +8374,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43454008a277fa84a8699096f637646d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RestartBtn
-  _player: {fileID: 0}
 --- !u!1 &2021667266
 GameObject:
   m_ObjectHideFlags: 0
