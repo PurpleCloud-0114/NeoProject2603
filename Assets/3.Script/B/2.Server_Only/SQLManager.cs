@@ -46,7 +46,16 @@ public class SQLManager : MonoBehaviour
     public UserInfo user_info { get; private set; }
     public static SQLManager Instance = null;
 
+    [Header("Network Settings")]
     [SerializeField] private bool _is_it_Client = false;
+    [Tooltip("와이파이 연결후 ipconfig, 해당 IPv4 주소 입력")]
+    [SerializeField] private string _serverIP = "192.168.1.45";
+    private string _dbName = "neoproject";
+    private string _dbPort = "3306";
+
+    [Header("Debug Option")]
+    [Tooltip("체크하면 기존 config.json을 무시하고 위 인스펙터 설정값으로 덮어씁니다.")]
+    [SerializeField] private bool _overwriteConfig = true;
 
     private void Awake()
     {
@@ -61,12 +70,16 @@ public class SQLManager : MonoBehaviour
         string serverinfo = ServerSet(_db_path);
         try
         {
-            if (serverinfo.Equals(string.Empty)) { Debug.LogError("SQL Server json error"); return; }
+            if (string.IsNullOrEmpty(serverinfo)) { Debug.LogError("SQL Server info string is empty"); return; }
             _connection = new MySqlConnection(serverinfo);
             _connection.Open();
-            Debug.Log("SQL Server connect!");
+            Debug.Log($"<color=green>SQL Server connect success! (IP: {_serverIP})</color>");
         }
-        catch (Exception e) { Debug.LogError($"DB Connect Error: {e.Message}"); }
+        catch (Exception e)
+        {
+            Debug.LogError($"DB Connect Error: {e.Message}");
+            Debug.LogError("Tip: PC 방화벽 3306 포트가 열려있는지, IP가 맞는지 확인하세요.");
+        }
     }
 
     private string HashPassword(string password)
@@ -83,10 +96,13 @@ public class SQLManager : MonoBehaviour
     private string ServerSet(string path)
     {
         CreateFile(path);
-        string jsonstring = File.ReadAllText(path + "/config.json");
+        string filepath = Path.Combine(path, "config.json");
+        string jsonstring = File.ReadAllText(filepath);
         JsonData itemData = JsonMapper.ToObject(jsonstring);
+
         try
         {
+            // JSON 데이터를 기반으로 연결 문자열 생성
             return $"Server={itemData[0]["ip_json"]};" +
                    $"Database={itemData[0]["tablename_json"]};" +
                    $"Uid={itemData[0]["id_json"]};" +
@@ -100,20 +116,20 @@ public class SQLManager : MonoBehaviour
     private void CreateFile(string path)
     {
         if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-        string filepath = path + "/config.json";
-        if (!File.Exists(filepath))
+        string filepath = Path.Combine(path, "config.json");
+
+        // 파일이 없거나, 덮어쓰기 옵션이 켜져 있을 때 새로 생성
+        if (!File.Exists(filepath) || _overwriteConfig)
         {
             List<ServerJsonItem> item = new List<ServerJsonItem>();
-            if (_is_it_Client)
-            {
-                item.Add(new ServerJsonItem("192.168.1.45", "neoproject", "game_client", "1234", "3306"));
-            }
-            else
-            {
-                item.Add(new ServerJsonItem("192.168.1.45", "neoproject", "game_server", "1234", "3306"));
-            }
+
+            // 인스펙터 설정값 사용
+            string userId = _is_it_Client ? "game_client" : "game_server";
+            item.Add(new ServerJsonItem(_serverIP, _dbName, userId, "1234", _dbPort));
+
             JsonData data = JsonMapper.ToJson(item);
             File.WriteAllText(filepath, data.ToString());
+            Debug.Log($"[SQLManager] Config file updated. Target IP: {_serverIP}");
         }
     }
 
@@ -132,8 +148,7 @@ public class SQLManager : MonoBehaviour
         catch (Exception e) { Debug.LogError($"Connection Error: {e.Message}"); return false; }
     }
 
-    // ── 로그인 (오프라인씬, 클라이언트 직접 호출) ──
-    // 반환: 0=성공, 1=아이디/비번 불일치, 2=DB오류
+    // ── 로그인 ──
     public int Login(string name, string password, out string nickname, out int score)
     {
         nickname = ""; score = 0;
@@ -164,8 +179,7 @@ public class SQLManager : MonoBehaviour
 
     public void Logout() { user_info = null; }
 
-    // ── 회원가입 (오프라인씬, 클라이언트 직접 호출) ──
-    // 반환: 0=성공, 1=아이디중복, 2=닉네임중복, 3=DB오류
+    // ── 회원가입 ──
     public int Signup(string name, string password, string nickname)
     {
         try
@@ -218,7 +232,7 @@ public class SQLManager : MonoBehaviour
         catch (Exception e) { Debug.LogError($"Nickname Check Error: {e.Message}"); return false; }
     }
 
-    // ── 점수 (서버에서만 호출, AuthPlayer 경유) ──
+    // ── 점수 관리 ──
     public bool GetScore(string name, out int outscore)
     {
         outscore = 0;
@@ -239,7 +253,6 @@ public class SQLManager : MonoBehaviour
 
     public bool SetScore(string name, int score)
     {
-        // 클라이언트에서 호출 시 차단
         if (_is_it_Client)
         {
             Debug.LogWarning("[SQLManager] 클라이언트에서 SetScore 호출 차단");
@@ -261,13 +274,42 @@ public class SQLManager : MonoBehaviour
         }
         catch (Exception e) { Debug.LogError($"SetScore Error: {e.Message}"); return false; }
     }
+    public bool GetNickname(string name, out string outNickname)
+    {
+        outNickname = "";
+        try
+        {
+            if (!ConnectionCheck(_connection)) return false;
+            string sql = "SELECT user_nickname FROM user_info WHERE user_name=@name";
+            using (MySqlCommand cmd = new MySqlCommand(sql, _connection))
+            {
+                cmd.Parameters.AddWithValue("@name", name);
+                object result = cmd.ExecuteScalar();
+                if (result != null)
+                {
+                    outNickname = result.ToString();
+                    return true;
+                }
+            }
+            return false;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SQLManager] GetNickname Error: {e.Message}");
+            return false;
+        }
+    }
 
     private void OnApplicationQuit()
     {
-        if (_connection != null && _connection.State == System.Data.ConnectionState.Open)
+        try
         {
-            _connection.Close();
-            Debug.Log("SQL Connection Closed.");
+            if (_connection != null && _connection.State == System.Data.ConnectionState.Open)
+            {
+                _connection.Close();
+                _connection.Dispose(); // 메모리 해제 추가
+            }
         }
+        catch { /* 종료 시 에러 무시 */ }
     }
 }

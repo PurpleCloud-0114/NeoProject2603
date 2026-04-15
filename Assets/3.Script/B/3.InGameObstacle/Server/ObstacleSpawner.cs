@@ -6,52 +6,58 @@ using System.Collections.Generic;
 public struct FloatingObstacleData
 {
     public GameObject prefab;
-    [Header("겹침 체크 반경 (이 수치만큼 다른 물체와 떨어짐)")]
-    public float safeRadius;
+    [Header("물리 체크 반경 (장애물 크기 + 여유분)")]
+    public float checkRadius;
 }
 
 public class ObstacleSpawner : NetworkBehaviour
 {
     [Header("Spawn Settings")]
     [SerializeField] private Vector3 _towerCenter = Vector3.zero;
-    [SerializeField] private float _maxRadius = 5.0f; // 중심에서 생성될 최대 반경 (0 ~ 5 완전 랜덤)
-    public float _startY = 0f;
-    public float _endY = -500f;
+    [SerializeField] private float _maxRadius = 5.0f;
+    [SerializeField] private float _startY = 0f;
+    [SerializeField] private float _endY = -500f;
 
-    [Header("생성 개수 (전체 맵 기준)")]
+    [Header("--- Obstacle Settings ---")]
     [SerializeField] private int _totalFloatingObstacles = 50;
-
-    [Header("Templates")]
     [SerializeField] private List<FloatingObstacleData> _obstacleList;
+    [SerializeField] private LayerMask _obstacleLayer; // 장애물 레이어
 
-    private List<GameObject> _obstaclePool = new List<GameObject>();
+    [Header("--- Item Settings ---")]
+    [SerializeField] private int _totalItems = 15;
+    [SerializeField] private List<FloatingObstacleData> _itemList; // 아이템 프리팹 리스트
+    [SerializeField] private LayerMask _itemLayer; // 아이템 레이어
 
-    // 맵 생성이 끝난 직후에 호출하세요.
+    private List<GameObject> _pool = new List<GameObject>();
+
     [Server]
-    public void GenerateFloatingObstacles(List<MapFloor> mapFloors)
+    public void GenerateFloatingObstacles()
     {
+        // 1. 기존 모든 오브젝트 언스폰 및 풀 회수
         ReturnAllToPool();
 
-        // 1. 맵에 이미 '켜진' 부착형 장애물들의 위치를 모두 수집
-        List<Vector3> avoidPositions = new List<Vector3>();
-        foreach (var floor in mapFloors)
-        {
-            avoidPositions.AddRange(floor.GetActiveObstaclePositions());
-        }
+        // 2. 장애물 먼저 생성 (장애물끼리만 겹치지 않게)
+        SpawnObjects(_obstacleList, _totalFloatingObstacles, _obstacleLayer, "Obstacle");
 
-        Debug.Log($"[Server] 공중부양 장애물 생성 시작... (피해야 할 맵 장애물 수: {avoidPositions.Count})");
+        // 3. 아이템 생성 (장애물 + 아이템 레이어 모두 체크하여 빈 공간에 생성)
+        LayerMask combinedLayer = _obstacleLayer | _itemLayer;
+        SpawnObjects(_itemList, _totalItems, combinedLayer, "Item");
+    }
+
+    [Server]
+    private void SpawnObjects(List<FloatingObstacleData> dataList, int totalCount, LayerMask checkLayer, string typeTag)
+    {
+        if (dataList == null || dataList.Count == 0) return;
 
         int spawnedCount = 0;
-        int maxAttempts = 1000; // 무한 루프 방지
+        int maxAttempts = 2000;
         int attempts = 0;
 
-        while (spawnedCount < _totalFloatingObstacles && attempts < maxAttempts)
+        while (spawnedCount < totalCount && attempts < maxAttempts)
         {
             attempts++;
+            FloatingObstacleData data = dataList[Random.Range(0, dataList.Count)];
 
-            FloatingObstacleData data = _obstacleList[Random.Range(0, _obstacleList.Count)];
-
-            // 완전 랜덤 3D 좌표 생성 (원기둥 형태)
             float randomAngle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
             float randomDist = Random.Range(0f, _maxRadius);
             float randomY = Random.Range(_endY, _startY);
@@ -62,46 +68,36 @@ public class ObstacleSpawner : NetworkBehaviour
                 _towerCenter.z + Mathf.Sin(randomAngle) * randomDist
             );
 
-            // 겹침 체크 (거리 계산)
-            bool isPositionSafe = true;
-            foreach (Vector3 posToAvoid in avoidPositions)
+            // 물리 체크 (서버의 물리 연산 사용)
+            if (!Physics.CheckSphere(spawnPos, data.checkRadius, checkLayer))
             {
-                if (Vector3.Distance(spawnPos, posToAvoid) < data.safeRadius)
-                {
-                    isPositionSafe = false;
-                    break;
-                }
-            }
+                // 아이템은 보통 회전을 고정(identity)하거나 특정 방향만 랜덤으로 줌
+                Quaternion randomRot = (typeTag == "Item") ? Quaternion.identity :
+                    Quaternion.Euler(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
 
-            // 자리가 안전하면 스폰
-            if (isPositionSafe)
-            {
-                Quaternion randomRot = Quaternion.Euler(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
-                GameObject obstacle = GetFromPool(data.prefab, spawnPos, randomRot);
+                GameObject obj = GetFromPool(data.prefab, spawnPos, randomRot);
 
-                if (!obstacle.activeSelf) obstacle.SetActive(true);
-                NetworkServer.Spawn(obstacle);
+                if (!obj.activeSelf) obj.SetActive(true);
 
-                // 방금 스폰한 장애물 위치도 '피해야 할 위치' 리스트에 추가 (공중 장애물끼리 겹침 방지)
-                avoidPositions.Add(spawnPos);
+                // [중요] 미러 네트워크 스폰
+                NetworkServer.Spawn(obj);
+
                 spawnedCount++;
+                Physics.SyncTransforms();
             }
         }
-
-        if (attempts >= maxAttempts)
-        {
-            Debug.LogWarning("[Server] 너무 좁아서 설정한 개수만큼 스폰하지 못했습니다. (공간 부족)");
-        }
+        Debug.Log($"[Server] {typeTag} 생성 완료: {spawnedCount}개");
     }
 
     [Server]
     private GameObject GetFromPool(GameObject prefab, Vector3 pos, Quaternion rot)
     {
-        GameObject obj = _obstaclePool.Find(x => !x.activeSelf && x.name.Equals(prefab.name + "(Clone)"));
+        GameObject obj = _pool.Find(x => !x.activeSelf && x.name.Equals(prefab.name + "(Clone)"));
+
         if (obj == null)
         {
             obj = Instantiate(prefab, pos, rot);
-            _obstaclePool.Add(obj);
+            _pool.Add(obj);
         }
         else
         {
@@ -114,10 +110,11 @@ public class ObstacleSpawner : NetworkBehaviour
     [Server]
     public void ReturnAllToPool()
     {
-        foreach (GameObject obj in _obstaclePool)
+        foreach (GameObject obj in _pool)
         {
             if (obj != null && obj.activeSelf)
             {
+                // [중요] 클라이언트들에서 제거하도록 언스폰 호출
                 NetworkServer.UnSpawn(obj);
                 obj.SetActive(false);
             }
