@@ -43,7 +43,7 @@ public class PlayerTrigger : NetworkBehaviour {
 			case TAG_REDZONE:
 				Debug.Log($"레드존 진입합 Y좌표 : {other.transform.position.y}");
 				Debug.Log($"플레이어 현재 Y좌표 : {transform.position.y}");
-				//_playerUIController.ActivateWingBtn();
+				_playerCore.on_redzone_entered?.Invoke();
 				break;
 			case TAG_SPIDERWEB:
 				if (_playerCore.status_effect == StatusEffect.Invinsible) return;

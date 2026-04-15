@@ -3249,6 +3249,22 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8171989218035641456, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+      propertyPath: syncInterval
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171989218035641456, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+      propertyPath: useFixedUpdate
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171989218035641456, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+      propertyPath: interpolatePosition
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171989218035641456, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+      propertyPath: bufferResetMultiplier
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 8886728869848558828, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
       propertyPath: sceneId
       value: 282594145

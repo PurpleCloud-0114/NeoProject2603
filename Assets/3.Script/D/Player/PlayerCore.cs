@@ -48,19 +48,6 @@ public class PlayerCore : NetworkBehaviour {
 		}
 	}
 
-	private void Start() {
-		int totalPlayer = RaceManager.Instance.START_MAX_PLAYER;
-		float angle = player_number * Mathf.PI * 2f / totalPlayer;
-		float x = Mathf.Cos(angle) * 5f;
-		float z = Mathf.Sin(angle) * 5f;
-		Vector3 spawnCenter = StageManager.Instance.map_size.map_center + Vector3.up * 3000f;
-		Vector3 spawnPosition = spawnCenter + new Vector3(x, 0f, z);
-		transform.position = spawnPosition;
-		if ((isLocalPlayer || RaceManager.Instance.isSinglePlay) && !is_dummy) {
-			_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-			if (_mainCamera.TryGetComponent(out DynamicFOVController FOVController)) FOVController.BindPlayer(gameObject);
-		}
-	}
 	private void OnEnable() { 
 		on_player_state_change_requested += ChangePlayerState;
 		on_state_effect_change_requested += ChangeStatusEffect;
@@ -75,7 +62,26 @@ public class PlayerCore : NetworkBehaviour {
 
 	//----- 네트워킹
 
-	public override void OnStartLocalPlayer() {	RaceManager.Instance.CmdReportReady();}
+	public override void OnStartLocalPlayer() {
+		//int totalPlayer = RaceManager.Instance.START_MAX_PLAYER;
+		int totalPlayer = 100;
+		player_number = UnityEngine.Random.Range(0, totalPlayer);
+		float angle = player_number * Mathf.PI * 2f / totalPlayer;
+		float x = Mathf.Cos(angle) * 5f;
+		float z = Mathf.Sin(angle) * 5f;
+		Vector3 spawnCenter = StageManager.Instance.map_size.map_center + Vector3.up * 20000f;
+		//Vector3 spawnCenter = StageManager.Instance.map_size.map_center + Vector3.up * StageManager.Instance.stage_data_sync.map_height;
+		Vector3 spawnPosition = spawnCenter + new Vector3(x, 0f, z);
+		transform.position = spawnPosition;
+		if ((isLocalPlayer || RaceManager.Instance.isSinglePlay) && !is_dummy) {
+			_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+			if (_mainCamera.TryGetComponent(out DynamicFOVController FOVController)) FOVController.BindPlayer(gameObject);
+		}
+		if (TryGetComponent(out Rigidbody rigid)) {
+			rigid.interpolation = RigidbodyInterpolation.Interpolate;
+		}
+		RaceManager.Instance.CmdReportReady();
+	}
 
 	[Command]
 	//서버에게 보내는 도착 신호. (도착 속도 / 시간,

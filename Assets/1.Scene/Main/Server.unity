@@ -621,6 +621,10 @@ PrefabInstance:
       propertyPath: GameplayScene
       value: Assets/1.Scene/Main/ClientIngame.unity
       objectReference: {fileID: 0}
+    - target: {fileID: 8849018464848831088, guid: cf88ee5a333bb724186a558656475da2, type: 3}
+      propertyPath: networkAddress
+      value: 192.168.45.148
+      objectReference: {fileID: 0}
     - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 104

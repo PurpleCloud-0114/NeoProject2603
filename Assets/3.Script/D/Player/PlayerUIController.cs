@@ -26,11 +26,13 @@ public class PlayerUIController : NetworkBehaviour {
 	}
 
 	private void OnEnable() {
+		_playerCore.on_redzone_entered += ActivateWingBtn;
 		_playerCore.on_item_acquired += ActivateItemBtn;
 		_playerCore.on_item_acquired += SetItemNameOnUI;
 	}
 	private void OnDisable() {
-		_playerCore.on_item_acquired += ActivateItemBtn;
+		_playerCore.on_redzone_entered -= ActivateWingBtn;
+		_playerCore.on_item_acquired -= ActivateItemBtn;
 		_playerCore.on_item_acquired -= SetItemNameOnUI;
 	}
 
@@ -49,6 +51,7 @@ public class PlayerUIController : NetworkBehaviour {
 
 	private void BindUI() {
 		UIManager.Instance.BindStageProgressUI(transform);
+		UIManager.Instance.BindJoystick(transform);
 	}
 
 	public void ActivateWingBtn() => _wingButton.interactable = true;

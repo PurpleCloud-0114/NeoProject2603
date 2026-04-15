@@ -36,6 +36,8 @@ public class PlayerMovement : NetworkBehaviour {
 		base_drop_max_speed = drop_max_speed;
 	}
 	private void Start() {
+		_rigidBody.isKinematic = true;
+
 		if (!RaceManager.Instance.isSinglePlay && !isLocalPlayer) {
 			this.enabled = false;
 			return;
@@ -48,11 +50,13 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 
 	private void OnEnable() {
+		_playerCore.on_player_state_change_requested += StartFalling;
 		_playerCore.on_wing_button_clicked += OpenWing;
 		_playerCore.on_max_drop_speed_change_requested += ApplySpeedChange;
 		_playerCore.on_impulse_requested += ApplyImpulse;
 	}
 	private void OnDisable() {
+		_playerCore.on_player_state_change_requested -= StartFalling;
 		_playerCore.on_wing_button_clicked -= OpenWing;
 		_playerCore.on_max_drop_speed_change_requested -= ApplySpeedChange;
 		_playerCore.on_impulse_requested -= ApplyImpulse;
@@ -76,6 +80,16 @@ public class PlayerMovement : NetworkBehaviour {
 
 		_moveVector = _playerInputSystem.MovePoint * MoveMobileSensitive;
 		_moveDir = new Vector3(Mathf.Clamp(_moveVector.x, -1, 1), 0, Mathf.Clamp(_moveVector.y, -1, 1));
+	}
+
+	private void StartFalling(PlayerState playerState) {
+		if (isLocalPlayer) {
+			if (playerState == PlayerState.Falling) {
+				_rigidBody.isKinematic = false;
+			} else {
+				_rigidBody.isKinematic = true;
+			}
+		}
 	}
 
 	private void Move() {
