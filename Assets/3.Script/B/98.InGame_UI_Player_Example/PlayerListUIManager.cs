@@ -1,6 +1,5 @@
 using UnityEngine;
 using Mirror;
-using System.Collections.Generic;
 
 public class PlayerListUIManager : MonoBehaviour
 {
@@ -10,7 +9,7 @@ public class PlayerListUIManager : MonoBehaviour
     [SerializeField] private PlayerSlotUI[] _slots;
 
     [Header("Settings")]
-    [SerializeField] private float _updateInterval = 1f; // 갱신 주기 (1초)
+    [SerializeField] private float _updateInterval = 1f;
 
     private void Awake()
     {
@@ -23,46 +22,45 @@ public class PlayerListUIManager : MonoBehaviour
         InvokeRepeating(nameof(UpdateAllSlots), 0.5f, _updateInterval);
     }
 
-    /// <summary>
-    /// 모든 플레이어 정보를 찾아서 해당되는 슬롯(player_num 기반)에 배치합니다.
-    /// </summary>
     public void UpdateAllSlots()
     {
+        // 1. 모든 슬롯 초기화
         foreach (PlayerSlotUI slot in _slots) if (slot != null) slot.ClearSlot();
 
-        foreach (var pair in AuthPlayer.AllPlayers)
-        {
-            int index = pair.Key; // player_num
-            AuthPlayer auth = pair.Value;
+        // 2. RoomManager에 등록된 모든 roomSlots를 순회
+        // RoomManager가 싱글톤이므로 singleton으로 접근 가능합니다.
+        var roomManager = NetworkManager.singleton as NetworkRoomManager;
+        if (roomManager == null) return;
 
-            if (index >= 0 && index < _slots.Length && _slots[index] != null)
+        foreach (var roomPlayer in roomManager.roomSlots)
+        {
+            if (roomPlayer == null) continue;
+
+            // 3. roomPlayer의 index를 슬롯 번호로 사용
+            int realIndex = roomPlayer.index;
+
+            if (realIndex >= 0 && realIndex < _slots.Length && _slots[realIndex] != null)
             {
-                ScoreSync score = auth.GetComponent<ScoreSync>();
-                NickNameSync nick = auth.GetComponent<NickNameSync>();
-                if (score != null && nick != null)
+                // 4. 같은 오브젝트에 붙어있는 컴포넌트들 가져오기
+                AuthPlayer auth = roomPlayer.GetComponent<AuthPlayer>();
+                ScoreSync score = roomPlayer.GetComponent<ScoreSync>();
+                NickNameSync nick = roomPlayer.GetComponent<NickNameSync>();
+
+                if (auth != null && score != null && nick != null)
                 {
-                    _slots[index].SetPlayer(auth, score, nick);
+                    _slots[realIndex].SetPlayer(auth, score, nick);
                 }
             }
         }
     }
 
-    /// <summary>
-    /// 특정 인덱스의 슬롯을 즉시 갱신하고 애니메이션을 실행합니다.
-    /// </summary>
-    /// <param name="index">플레이어 번호 기반 인덱스 (player_num - 1)</param>
-    /// <param name="isRoundScore">라운드 점수 변화인지 여부</param>
     public void PlaySlotAnimation(int index, bool isRoundScore)
     {
-        // 인덱스 범위 체크 (10개 슬롯 기준)
         if (index >= 0 && index < _slots.Length)
         {
-            if (_slots[index] != null)
+            if (_slots[index] != null && _slots[index].gameObject.activeSelf)
             {
-                // 1. 해당 슬롯의 텍스트들을 최신 데이터로 갱신
                 _slots[index].RefreshUI();
-
-                // 2. 해당 슬롯 오브젝트에 통통 튀는 애니메이션 실행
                 _slots[index].PlayBounce(isRoundScore);
             }
         }

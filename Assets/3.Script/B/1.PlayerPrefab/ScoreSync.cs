@@ -3,17 +3,30 @@ using Mirror;
 
 public class ScoreSync : NetworkBehaviour
 {
-    [SyncVar(hook = nameof(OnScoreChange))]
-    public int player_score = 0;
+    [SyncVar] public string player_ID;
+    [SyncVar(hook = nameof(OnScoreChange))] public int player_score = 0;
+    [SyncVar(hook = nameof(OnRoundScoreChange))] public int round_total_score = 0;
 
-    public void OnScoreChange(int oldVal, int newVal)
+    [Server] public void ServerAddRoundScore(int amount) { round_total_score += amount; }
+    [Server] public void ServerResetRoundScore() { round_total_score = 0; }
+
+    public void OnScoreChange(int old, int newVal) { if (newVal != old) TriggerSlotRefresh(false); }
+    public void OnRoundScoreChange(int old, int newVal) { if (newVal != old) TriggerSlotRefresh(true); }
+
+    private void TriggerSlotRefresh(bool isroundScore)
     {
-        // 점수가 바뀌었을 때 실행할 로직 (예: UI 텍스트 업데이트 또는 애니메이션)
-        if (newVal != oldVal)
+        NetworkRoomPlayer roomPlayer = GetComponent<NetworkRoomPlayer>();
+
+        // 인덱스를 기반으로 슬롯 애니메이션 실행
+        if (roomPlayer != null && PlayerListUIManager.Instance != null)
         {
-            AuthPlayer auth = GetComponent<AuthPlayer>();
-            // 필요한 경우 PlayerListUIManager 등의 인스턴스를 통해 애니메이션 실행
-            Debug.Log($"[Score] 점수 동기화: {oldVal} -> {newVal}");
+            PlayerListUIManager.Instance.PlaySlotAnimation(roomPlayer.index, isroundScore);
+        }
+
+        // 내 화면의 인게임 점수 팝업 갱신
+        if (isLocalPlayer && InGameUIManager.Instance != null)
+        {
+            InGameUIManager.Instance.PlayScorePop(isroundScore ? round_total_score : player_score, isroundScore);
         }
     }
 }

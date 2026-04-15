@@ -25,7 +25,7 @@ public class NickNameSync : NetworkBehaviour
                 // 점수도 함께 표시하려면 ScoreSync를 가져옴
                 int currentScore = TryGetComponent<ScoreSync>(out var s) ? s.player_score : 0;
 
-                // roomPlayer.index 또는 auth.player_num을 사용하여 슬롯 위치 결정
+                // roomPlayer.index 사용하여 슬롯 위치 결정
                 LobbyTextUI.Instance.UpdateUI(roomPlayer.index, newName, roomPlayer.readyToBegin);
                 Debug.Log($"[Client] 로비 UI 갱신됨: {newName} (Score: {currentScore})");
             }
