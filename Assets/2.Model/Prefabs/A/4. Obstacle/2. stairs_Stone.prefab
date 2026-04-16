@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6485103620228313256}
   - component: {fileID: 968503485149623593}
   - component: {fileID: 16328187697656081}
-  - component: {fileID: 6127420953335393980}
+  - component: {fileID: 1785999067009811897}
   m_Layer: 0
   m_Name: 2. stairs_Stone
   m_TagString: Obstacle
@@ -114,7 +114,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -8283968969392904872, guid: ad76addba19c4504e94f00baeca8645d, type: 3}
---- !u!114 &6127420953335393980
+--- !u!114 &1785999067009811897
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -123,9 +123,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 3239867733461785438}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b029a166fad48c4e833e0156657bb89, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!1001 &2256925646306091701
 PrefabInstance:
   m_ObjectHideFlags: 0

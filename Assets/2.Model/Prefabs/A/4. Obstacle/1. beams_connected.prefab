@@ -74,31 +74,16 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 983aaf7c2abd1de4bb8f7409f26f1e6a, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 160075144330803851}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 983aaf7c2abd1de4bb8f7409f26f1e6a, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 5280887862392860139}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 983aaf7c2abd1de4bb8f7409f26f1e6a, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6340452297895155475}
+      addedObject: {fileID: 3717691314639048103}
   m_SourcePrefab: {fileID: 100100000, guid: 983aaf7c2abd1de4bb8f7409f26f1e6a, type: 3}
 --- !u!1 &8706310930940813724 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 983aaf7c2abd1de4bb8f7409f26f1e6a, type: 3}
   m_PrefabInstance: {fileID: 8363868919703723213}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &160075144330803851
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8706310930940813724}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b029a166fad48c4e833e0156657bb89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
 --- !u!64 &5280887862392860139
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -121,7 +106,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -1537099187924498445, guid: 983aaf7c2abd1de4bb8f7409f26f1e6a, type: 3}
---- !u!114 &6340452297895155475
+--- !u!114 &3717691314639048103
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -130,6 +115,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 8706310930940813724}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b029a166fad48c4e833e0156657bb89, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger

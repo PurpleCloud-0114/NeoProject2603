@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 2294790111339914330}
   - component: {fileID: 7183460990560159090}
   - component: {fileID: 5704237966747865591}
-  - component: {fileID: 5081975209306428326}
+  - component: {fileID: 7553441464023084667}
   m_Layer: 0
   m_Name: 11. bed_A_stacked
   m_TagString: Obstacle
@@ -203,7 +203,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 8463985132477582440, guid: 1300e3d10ae3a834c92e4ce960688165, type: 3}
---- !u!114 &5081975209306428326
+--- !u!114 &7553441464023084667
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -212,6 +212,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 7179604682595883482}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b029a166fad48c4e833e0156657bb89, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger

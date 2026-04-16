@@ -11,9 +11,8 @@ GameObject:
   - component: {fileID: 2286023318066123148}
   - component: {fileID: 596558278649314265}
   - component: {fileID: 3310070141584376897}
-  - component: {fileID: 6734087654905177165}
   - component: {fileID: 4588448948748209782}
-  - component: {fileID: 7198406867609396693}
+  - component: {fileID: 7751970093824688579}
   m_Layer: 0
   m_Name: 6. floor_tile_small_corner
   m_TagString: Obstacle
@@ -94,18 +93,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &6734087654905177165
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6362359059135490270}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b029a166fad48c4e833e0156657bb89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
 --- !u!64 &4588448948748209782
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -128,7 +115,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 1461080864389551725, guid: f22bda8d2863aa347a96fb5f95a89ed7, type: 3}
---- !u!114 &7198406867609396693
+--- !u!114 &7751970093824688579
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -137,9 +124,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6362359059135490270}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b029a166fad48c4e833e0156657bb89, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!1001 &1309714293212809616
 PrefabInstance:
   m_ObjectHideFlags: 0
