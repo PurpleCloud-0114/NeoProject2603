@@ -9,8 +9,8 @@ public class GameManagerExample : NetworkBehaviour
     [Server]
     public void StartNewGame()
     {
-        _map_spawner.GenerateMap();
-        _spawner.GenerateFloatingObstacles(_map_spawner.SpawnedFloors);
+        _map_spawner.FullGenerate();
+        _spawner.GenerateFloatingObstacles();
         RpcNotifyGameStart();
     }
 
