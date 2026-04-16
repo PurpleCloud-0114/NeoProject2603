@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
-using System.Collections; // 코루틴 사용을 위해 추가
+using System.Collections;
+using Mirror; // <--- 1. 이 줄이 없으면 NetworkRoomPlayer에서 빨간 줄이 뜹니다.
 
 public class PlayerSlotUI : MonoBehaviour
 {
@@ -36,17 +37,18 @@ public class PlayerSlotUI : MonoBehaviour
     {
         if (_auth == null || _scoreSync == null || _nickSync == null) return;
 
-        if (_nickname_text != null)
-            _nickname_text.text = _nickSync.player_nickname;
+        // 2. _auth가 할당된 후 해당 오브젝트에서 NetworkRoomPlayer를 가져옵니다.
+        NetworkRoomPlayer roomPlayer = _auth.GetComponent<NetworkRoomPlayer>();
 
-        if (_score_text != null)
-            _score_text.text = $"{_scoreSync.player_score}";
+        if (_nickname_text != null) _nickname_text.text = _nickSync.player_nickname;
+        if (_score_text != null) _score_text.text = $"{_scoreSync.player_score}";
+        if (_roundscore_text != null) _roundscore_text.text = $"{_scoreSync.round_total_score}";
 
-        if (_roundscore_text != null)
-            _roundscore_text.text = $"{_scoreSync.round_total_score}";
-
-        if (_playernum_text != null)
-            _playernum_text.text = $"P{_auth.player_num + 1}";
+        // index가 0이면 P1, 1이면 P2로 표시
+        if (_playernum_text != null && roomPlayer != null)
+        {
+            _playernum_text.text = $"P{roomPlayer.index + 1}";
+        }
     }
 
     // 숫자 애니메이션
@@ -54,7 +56,7 @@ public class PlayerSlotUI : MonoBehaviour
     {
         if (!gameObject.activeInHierarchy) return;
         StopAllCoroutines();
-        float targetScale = isRoundScore ? 1.1f : 1.1f;
+        float targetScale = 1.1f;
         StartCoroutine(BounceRoutine(targetScale));
     }
 

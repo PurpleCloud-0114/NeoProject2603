@@ -15,10 +15,18 @@ public class ScoreSync : NetworkBehaviour
 
     private void TriggerSlotRefresh(bool isroundScore)
     {
-        AuthPlayer auth = GetComponent<AuthPlayer>();
-        if (auth != null && PlayerListUIManager.Instance != null)
+        NetworkRoomPlayer roomPlayer = GetComponent<NetworkRoomPlayer>();
+
+        // 인덱스를 기반으로 슬롯 애니메이션 실행
+        if (roomPlayer != null && PlayerListUIManager.Instance != null)
         {
-            PlayerListUIManager.Instance.PlaySlotAnimation(auth.player_num, isroundScore);
+            PlayerListUIManager.Instance.PlaySlotAnimation(roomPlayer.index, isroundScore);
+        }
+
+        // 내 화면의 인게임 점수 팝업 갱신
+        if (isLocalPlayer && InGameUIManager.Instance != null)
+        {
+            InGameUIManager.Instance.PlayScorePop(isroundScore ? round_total_score : player_score, isroundScore);
         }
     }
 }

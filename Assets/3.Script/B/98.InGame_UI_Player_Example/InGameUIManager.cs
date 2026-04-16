@@ -29,12 +29,14 @@ public class InGameUIManager : MonoBehaviour
 
     private IEnumerator WaitForLocalPlayer()
     {
+        // 로컬 플레이어 오브젝트가 생성될 때까지 대기
         while (NetworkClient.localPlayer == null)
             yield return null;
 
-        AuthPlayer myAuth = NetworkClient.localPlayer.GetComponent<AuthPlayer>();
+        // [수정] NetworkRoomPlayer의 index가 -1이 아닐 때까지 대기 (Mirror가 인덱스를 할당할 시간 필요)
+        NetworkRoomPlayer myRoom = NetworkClient.localPlayer.GetComponent<NetworkRoomPlayer>();
         float timer = 0f;
-        while (myAuth != null && myAuth.player_num == -1 && timer < 2f)
+        while (myRoom != null && myRoom.index == -1 && timer < 2f)
         {
             timer += Time.deltaTime;
             yield return null;
@@ -43,36 +45,30 @@ public class InGameUIManager : MonoBehaviour
         _myScoreSync = NetworkClient.localPlayer.GetComponent<ScoreSync>();
         _myNickSync = NetworkClient.localPlayer.GetComponent<NickNameSync>();
 
-        // 초기 UI 설정 (한 번만 실행)
         InitialSetup();
     }
 
     private void InitialSetup()
     {
-        if (NetworkClient.localPlayer == null) { return; }
-        
+        if (NetworkClient.localPlayer == null) return;
+
         if (_myScoreSync == null || _myNickSync == null)
         {
-            Debug.LogError("[InGameUIManager] ScoreSync 또는 NickNameSync 컴포넌트를 찾을 수 없습니다.");
+            Debug.LogError("[InGameUIManager] ScoreSync 또는 NickNameSync를 찾을 수 없습니다.");
             return;
         }
 
-        if (_nickname_text != null)
-            _nickname_text.text = _myNickSync.player_nickname;
+        if (_nickname_text != null) _nickname_text.text = _myNickSync.player_nickname;
+        if (_score_text != null) _score_text.text = $"총점: {_myScoreSync.player_score}";
+        if (_roundscore_text != null) _roundscore_text.text = $"라운드: {_myScoreSync.round_total_score}";
 
-        if (_score_text != null)
-            _score_text.text = $"총점: {_myScoreSync.player_score}";
-
-        if (_roundscore_text != null)
-            _roundscore_text.text = $"라운드: {_myScoreSync.round_total_score}";
-
-        // AuthPlayer 및 player_num 체크
-        AuthPlayer myAuth = NetworkClient.localPlayer.GetComponent<AuthPlayer>();
+        // [수정] NetworkRoomPlayer.index를 사용하여 P1, P2 표시
+        NetworkRoomPlayer myRoom = NetworkClient.localPlayer.GetComponent<NetworkRoomPlayer>();
         if (_playernum_text != null)
         {
-            if (myAuth != null && myAuth.player_num != -1)
+            if (myRoom != null && myRoom.index != -1)
             {
-                _playernum_text.text = $"P{myAuth.player_num + 1}";
+                _playernum_text.text = $"P{myRoom.index + 1}";
             }
             else
             {
@@ -81,9 +77,6 @@ public class InGameUIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ScoreSync의 Hook에서 호출될 애니메이션 재생 함수
-    /// </summary>
     public void PlayScorePop(int newValue, bool isRoundScore)
     {
         if (isRoundScore)
