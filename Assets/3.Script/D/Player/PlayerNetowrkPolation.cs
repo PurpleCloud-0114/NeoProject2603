@@ -68,15 +68,10 @@ public class PlayerNetowrkPolation : NetworkBehaviour {
 	}
 
 	private void LateUpdate() {
-		//if (!isLocalPlayer) {
-		//	//타 플레이어는 받아온 정보를 적용
-		//	ApplyExtrapolationAndInterpolation();
-		//}
-
 		if (isLocalPlayer || _latestStateSync.time_stamp == 0) return;
 
-		// [핵심] 통신 지연(Ping)과 상관없이, 로컬 프레임(Time.deltaTime)에 맞춰 타겟을 직접 낙하시킴!
-		// 이렇게 하면 타겟 자체가 위아래로 떨리는 현상이 100% 차단됨.
+		//[핵심] 통신 지연(Ping)과 상관없이, 로컬 프레임(Time.deltaTime)에 맞춰 타겟을 직접 낙하시킴!
+		//이렇게 하면 타겟 자체가 위아래로 떨리는 현상이 100% 차단됨.
 		_ghostPosition.y += _latestStateSync.velocity.y * Time.deltaTime;
 
 		// Hard Snap 체크
@@ -86,14 +81,7 @@ public class PlayerNetowrkPolation : NetworkBehaviour {
 		}
 
 		// 부드럽게 추적 (제한 속도를 무한대(Mathf.Infinity)로 풀어주기)
-		transform.position = Vector3.SmoothDamp(
-			transform.position,
-			_ghostPosition,
-			ref _currentVelocity,
-			smooth_time,
-			Mathf.Infinity,
-			Time.deltaTime
-		);
+		transform.position = Vector3.SmoothDamp(transform.position, _ghostPosition, ref _currentVelocity, smooth_time, Mathf.Infinity, Time.deltaTime);
 
 		// 회전 동기화
 		transform.rotation = Quaternion.Slerp(transform.rotation, _latestStateSync.rotation, Time.deltaTime * smooth_speed);
@@ -118,7 +106,8 @@ public class PlayerNetowrkPolation : NetworkBehaviour {
 
 		// 패킷이 도착한 시점의 지연 시간 계산 (딱 한 번만)
 		double latency = Math.Max(0, NetworkTime.time - newState.time_stamp);
-		float extrapolatedTime = Mathf.Min((float)latency, max_extrapolation_time);
+		//float extrapolatedTime = Mathf.Min((float)latency, max_extrapolation_time);
+		float extrapolatedTime = Mathf.Min((float)latency, max_extrapolation_time) + smooth_time;
 
 		// X, Z는 최신 위치(보간) / Y는 지연된 시간만큼만 미래로 땡겨옴(외삽)
 		_ghostPosition = new Vector3(
@@ -129,45 +118,6 @@ public class PlayerNetowrkPolation : NetworkBehaviour {
 	}
 
 	private void ApplyExtrapolationAndInterpolation() {
-		////서버 최신 정보가 없으면 리턴
-		//if (_latestStateSync.time_stamp == 0) return;
-
-		////외삽 : 데이터가 생성된 시간과 현재 서버 시간의 차이 계산. 즉, pING을 의미한다.
-		//double latency = NetworkTime.time - _latestStateSync.time_stamp;
-		//float extrapolatedTime = Mathf.Min((float)latency, max_extrapolation_time);
-
-		////계산된 Extrapolation의 DELTA time으로 위치 보정.
-		//Vector3 targetPos = _latestStateSync.position + (_latestStateSync.velocity * extrapolatedTime);
-		//Quaternion targetRot = _latestStateSync.rotation;
-
-		////Hard Snap (순간이동) : 예측 위치와 현재 렌더링의 위치의 오차가 너무 클 경우, 강제 교정.
-		//float distanceError = Vector3.Distance(transform.position, targetPos);
-		//if (distanceError > hardsnap_threshold) {
-		//	transform.position = targetPos;
-		//	transform.rotation = targetRot;
-		//	return; //보간 없이 바로 종료.
-		//}
-
-		//// 기존 코드
-		//// transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * smooth_speed);
-		//// transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * smooth_speed);
-
-		//// 수정된 코드: 속도에 비례하는 보간 속도 (Adaptive Smoothing)
-		//float currentVelocityMagnitude = _latestStateSync.velocity.magnitude;
-
-		//// 속도가 빠를수록 보간도 빠르게 따라붙도록 조정 (최소값은 기존 smooth_speed 유지)
-		//// 0.2f 같은 배수는 게임 체감에 따라 조절해보세요 (100 속도일 때 20 추가 스피드)
-		//float dynamicSmoothSpeed = Mathf.Max(smooth_speed, currentVelocityMagnitude * 0.2f);
-
-		//transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * dynamicSmoothSpeed);
-		//transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * dynamicSmoothSpeed);
-
-		////회전 동기화도 동일한 방식으로 적용합니다.
-		////velocity대신 angularVelocity
-		////Lerp 대신 Slerp 사용
-
-
-
 		//서버 최신 정보가 없으면 리턴
 		if (_latestStateSync.time_stamp == 0) return;
 
@@ -203,7 +153,5 @@ public class PlayerNetowrkPolation : NetworkBehaviour {
 
 		// 회전은 플레이어 입력에 즉각 반응해야 하므로 기존의 Slerp 방식을 유지하거나 필요에 따라 조절
 		transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * smooth_speed);
-
-
 	}
 }
