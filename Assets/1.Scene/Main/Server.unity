@@ -602,6 +602,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomManagement
       objectReference: {fileID: 0}
+    - target: {fileID: 8849018464848831088, guid: cf88ee5a333bb724186a558656475da2, type: 3}
+      propertyPath: 'spawnPrefabs.Array.data[10]'
+      value: 
+      objectReference: {fileID: 6050089829315985338, guid: 7f8b0b4b626390a43903e79c4bd8e6ad, type: 3}
     - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 104

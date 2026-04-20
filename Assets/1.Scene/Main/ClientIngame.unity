@@ -6082,8 +6082,8 @@ MonoBehaviour:
   _endY: 350
   _count: 50
   _list:
-  - prefab: {fileID: 4857432051056301919, guid: da253e943ae1a524f8bd5a960523c2dc, type: 3}
-    checkRadius: 6
+  - prefab: {fileID: 6050089829315985338, guid: 7f8b0b4b626390a43903e79c4bd8e6ad, type: 3}
+    checkRadius: 8
   - prefab: {fileID: 8542186906585345430, guid: 7ec3337192cb0d44ea73cf067d2ba913, type: 3}
     checkRadius: 6
   _layer:
