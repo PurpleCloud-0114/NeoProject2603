@@ -63,7 +63,6 @@ public class PlayerCore : NetworkBehaviour {
 	//----- 네트워킹
 
 	public override void OnStartLocalPlayer() {
-		Debug.Log("1차" + transform.position.y);
 		//int totalPlayer = RaceManager.Instance.START_MAX_PLAYER;
 		int totalPlayer = 10;
 		player_number = UnityEngine.Random.Range(0, totalPlayer);
@@ -73,9 +72,7 @@ public class PlayerCore : NetworkBehaviour {
 		Vector3 spawnCenter = StageManager.Instance.map_size.map_center + Vector3.up * 3000f;
 		//Vector3 spawnCenter = StageManager.Instance.map_size.map_center + Vector3.up * StageManager.Instance.stage_data_sync.map_height;
 		Vector3 spawnPosition = spawnCenter + new Vector3(x, 0f, z);
-		Debug.Log("2차" + transform.position.y);
 		transform.position = spawnPosition;
-		Debug.Log("3차" + transform.position.y);
 		if ((isLocalPlayer || RaceManager.Instance.isSinglePlay) && !is_dummy) {
 			_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 			if (_mainCamera.TryGetComponent(out DynamicFOVController FOVController)) FOVController.BindPlayer(gameObject);
@@ -83,7 +80,6 @@ public class PlayerCore : NetworkBehaviour {
 		if (TryGetComponent(out Rigidbody rigid)) {
 			rigid.interpolation = RigidbodyInterpolation.Interpolate;
 		}
-		Debug.Log("4차" + transform.position.y);
 		RaceManager.Instance.CmdReportReady();
 	}
 

@@ -59,9 +59,7 @@ public class PlayerEffectController : MonoBehaviour {
 
 	//이제 맞는 판정
 	public void HitSpiderweb(Collider spiderweb) {
-		Debug.Log("거미줄 ㅁㄴㅇㄹ");
 		if (spiderweb.TryGetComponent(out SpiderwebObstacle _spiderweb)) {
-			Debug.Log("거미줄 ㄹㅇㅁㄴ");
 			_playerCore.on_max_drop_speed_change_requested(_spiderweb.SetPlayerVelocity, _spiderweb.duration, 0f, StatusEffect.Stun);
 		}
 	}

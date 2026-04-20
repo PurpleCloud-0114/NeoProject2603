@@ -9,6 +9,10 @@ public class PlayerTrigger : NetworkBehaviour {
 	private const string TAG_ITEMBOX = "ItemBox";
 	private const string TAG_REDZONE = "Redzone";
 	private const string TAG_SPIDERWEB = "Spiderweb";
+	private const string TAG_PLAYER = "Player";
+
+	//[Header("충돌 파워")]
+	private float _hitPlayerImpulsePower = 25f;
 
 	private void Awake() {
 		TryGetComponent(out _playerCore);
@@ -51,6 +55,16 @@ public class PlayerTrigger : NetworkBehaviour {
 				Debug.Log("거미줄 트리거 발동");
 				_playerCore.on_spiderweb_hit?.Invoke(other); //거미줄 충돌 이벤트 호출
 				break;
+			case TAG_PLAYER:
+				PushPlayer(other);
+				break;
+		}
+	}
+	private void PushPlayer(Collider other) {
+		Vector3 pushDir = transform.position - other.transform.position;
+		pushDir.y = 0;
+		if (pushDir.sqrMagnitude > 0.001f) {
+			_playerCore.on_impulse_requested?.Invoke(pushDir.normalized * _hitPlayerImpulsePower);
 		}
 	}
 }

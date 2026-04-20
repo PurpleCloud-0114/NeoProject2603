@@ -35,7 +35,7 @@ public class StageProgressUi : MonoBehaviour {
 		if (_player.position.y > _mapHeight) _progressPercent = 100;
 		else _progressPercent = (_player.position.y / _mapHeight) * 100;
 		UpdateProgress();
-		Debug.Log("UI Progress 연산중...");
+		//Debug.Log("UI Progress 연산중...");
 	}
 
 	private void UpdateProgress() {
