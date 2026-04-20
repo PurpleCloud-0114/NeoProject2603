@@ -21,7 +21,6 @@ public class MapFloor : NetworkBehaviour
         uint mask = 0;
         for (int i = 0; i < _attachedObstacles.Count; i++)
         {
-            // 서버에서 설정된 확률로 마스크 계산
             if (Random.value < _spawnProbability)
             {
                 mask |= (1u << i);
@@ -49,16 +48,62 @@ public class MapFloor : NetworkBehaviour
     }
 
     [Server]
-    public void Server_DisableObstacle(GameObject obstacle)
+    public void Server_DisableObstacleByName(string targetName)
     {
-        int index = _attachedObstacles.IndexOf(obstacle);
+        int index = _attachedObstacles.FindIndex(obj => obj != null &&
+            (obj.name == targetName || targetName.StartsWith(obj.name)));
+
         if (index != -1)
         {
-            // 해당 비트만 0으로 끔
-            _activeObstacleMask &= ~(1u << index);
+            // 이미 꺼진 경우 무시
+            if ((_activeObstacleMask & (1u << index)) == 0) return;
 
-            // 주의: 서버에서는 Hook이 자동으로 안 불릴 수 있으므로 직접 적용
+            _activeObstacleMask &= ~(1u << index);
             ApplyObstacleState(_activeObstacleMask);
+            Debug.Log($"[Server] {targetName} 비활성화 성공 (인덱스: {index})");
         }
+        else
+        {
+            Debug.LogWarning($"[Server] {targetName}을 리스트에서 찾을 수 없습니다.");
+        }
+    }
+
+    [Server]
+    public void Server_DisableObstacleByIndex(int index)
+    {
+        // index가 유효한지 먼저 체크
+        if (index < 0 || index >= _attachedObstacles.Count) return;
+
+        // 현재 마스크 상태 로그 (서버 콘솔에서 확인용)
+        // Debug.Log($"[Server] 현재 마스크: {_activeObstacleMask}, 끌 인덱스: {index}");
+
+        // 비트마스크에서 해당 인덱스를 끄는 가장 확실한 방법
+        uint bit = (1u << index);
+
+        // 이미 꺼져있더라도 다시 한번 확실히 끄고 상태를 동기화합니다.
+        _activeObstacleMask &= ~bit;
+
+        // [중요] SyncVar 후크가 작동하지만, 서버에서도 즉시 반영되도록 명시적 호출
+        ApplyObstacleState(_activeObstacleMask);
+    }
+
+    public int GetObstacleIndex(GameObject contactObj)
+    {
+        Transform contact = contactObj.transform;
+        for (int i = 0; i < _attachedObstacles.Count; i++)
+        {
+            if (_attachedObstacles[i] == null) continue;
+            Transform obstacle = _attachedObstacles[i].transform;
+
+            Transform check = contact;
+            while (check != null)
+            {
+                if (check == obstacle) return i;
+                check = check.parent;
+            }
+        }
+        // 로그 4: 탐색 실패 시 상세 경로 출력 (구조 파악용)
+        // Debug.Log($"[Index] 리스트에 없음: {contactObj.name}");
+        return -1;
     }
 }
