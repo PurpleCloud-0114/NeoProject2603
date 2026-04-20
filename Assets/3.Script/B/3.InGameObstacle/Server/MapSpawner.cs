@@ -38,6 +38,12 @@ public class MapSpawner : NetworkBehaviour
             if (identity.netId == 0)
                 NetworkServer.Spawn(obj);
 
+            MapFloor floorScript = obj.GetComponent<MapFloor>();
+            if (floorScript != null)
+            {
+                floorScript.RandomizeAttachedObstacles();
+            }
+
             y -= _step;
         }
 
