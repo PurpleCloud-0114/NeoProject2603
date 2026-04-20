@@ -1,17 +1,21 @@
 using UnityEngine;
 using Mirror;
 
-public class GameManagerExample : NetworkBehaviour
+public class Spawner : NetworkBehaviour
 {
+    public static Spawner Instance = null;
     [SerializeField] private ObstacleSpawner _spawner;
     [SerializeField] private MapSpawner _map_spawner;
 
-    // 기존의 OnStartServer() 자동 실행 로직 제거
+    private void Awake()
+    {
+        if (Instance = null) Instance = this;
+    }
 
     [Server]
     public void StartNewGame()
     {
-        Debug.Log("[GameManager] 게임 씬 진입 완료! 맵 생성을 시작합니다.");
+        Debug.Log("[Spawner] 맵 생성을 시작합니다.");
 
         _map_spawner.FullGenerate();
         _spawner.GenerateFloatingObstacles();

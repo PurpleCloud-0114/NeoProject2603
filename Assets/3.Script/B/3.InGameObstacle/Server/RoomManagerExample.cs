@@ -11,12 +11,11 @@ public class MyRoomManager : NetworkRoomManager
         // 현재 넘어온 씬이 GameplayScene인지 확인합니다.
         if (sceneName == GameplayScene)
         {
-            // 씬에 배치된 GameManagerExample을 찾습니다.
-            GameManagerExample gm = FindAnyObjectByType<GameManagerExample>();
+            Spawner spw = FindAnyObjectByType<Spawner>();
 
-            if (gm != null)
+            if (spw != null)
             {
-                gm.StartNewGame();
+                spw.StartNewGame();
             }
             else
             {
