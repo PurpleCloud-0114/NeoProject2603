@@ -13,6 +13,8 @@ public class Option : MonoBehaviour {
 	[Header("JoyStick")]
 	[SerializeField] private GameObject _joyStick;
 
+	public void BindPlayer(Transform player) => player.TryGetComponent(out _playerMovement);
+
 	public void OnSensitiveValueChange() {
 		_playerMovement.MoveMobileSensitive = _sensitiveSlider.value;
 	}

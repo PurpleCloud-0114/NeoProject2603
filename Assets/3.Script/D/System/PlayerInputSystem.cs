@@ -15,15 +15,6 @@ public class PlayerInputSystem : MonoBehaviour {
 	public bool is_joystick = false;
 
 	private PlayerInput _playerInput;
-	private InputAction _moveVector2;
-	private InputAction _moveVector3;
-
-	private void Awake() {
-		if(TryGetComponent(out _playerInput)) {
-			_moveVector2 = _playerInput.actions["Move(Vector2)"];
-			_moveVector3 = _playerInput.actions["Move(Vector3)"];
-		}
-	}
 
 	private void Start() {
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -33,12 +24,15 @@ public class PlayerInputSystem : MonoBehaviour {
 			Debug.LogError("GravitySensor not found on this device");
 		}
 		if (GravitySensor.current.enabled) Debug.Log("GravitySensor is enabled");
-		Application.targetFrameRate = 60;
 #endif
+		Application.targetFrameRate = 60;
 	}
-	public void OnMoveVector2(InputAction.CallbackContext context) => MovePoint = context.ReadValue<Vector2>();
+	public void OnMoveVector2(InputAction.CallbackContext context) {
+		if (!is_joystick) return;
+		MovePoint = context.ReadValue<Vector2>();
+	}
 	public void OnMoveVector3(InputAction.CallbackContext context) {
-		//if (is_joystick) return;
+		if (is_joystick) return;
 		Gravity = context.ReadValue<Vector3>();
 		_calibratedGravity = _calibrationRotation * Gravity;
 		MovePoint = new Vector2(_calibratedGravity.x, _calibratedGravity.y);
@@ -48,14 +42,10 @@ public class PlayerInputSystem : MonoBehaviour {
 		is_joystick = !is_joystick; //Toggle
 		if (is_joystick) {
 			//조이스틱 활성화
-			_moveVector2.Enable();
-			_moveVector3.Disable();
 			SetBasePoint(Vector2.zero);
 		} 
 		else {
 			//그래비티 활성화
-			_moveVector3.Enable();
-			_moveVector2.Disable();
 			Calibrate();
 		}
 	}

@@ -95,25 +95,23 @@ public class RaceManager : NetworkBehaviour {
 	// ==========================================
 	// [클라이언트 영역] - 연출 및 입력 제어
 	// ==========================================
-	private void OnStateChanged(RaceState raceState, RaceState newState) {
-		if (NetworkClient.localPlayer != null && NetworkClient.localPlayer.TryGetComponent(out PlayerCore playerCore)) {
-			playerCore.UpdatePlayerStateByRace(newState);
-		}
+	private void OnStateChanged(RaceState oldState, RaceState newState) {
+		PlayerState playerNewState = PlayerState.Wait;
 		switch (newState) {
 			case RaceState.Waiting:
-				//없음.
-				break;
-			case RaceState.Countdown:
-				//UI 매니저한테 카운트다운 연출 지시?
-				//New Input Ststem 액션 맵 비활성화 (Disable)
+				playerNewState = PlayerState.Wait;
 				break;
 			case RaceState.Racing:
-				//New Input Ststem 액션 맵 활성화 (Enable)
+				playerNewState = PlayerState.Falling;
 				break;
 			case RaceState.Finished:
-				//New Input Ststem 액션 맵 비활성화 (Disable)
+				playerNewState = PlayerState.Finish;
 				break;
 		}
+		if (NetworkClient.localPlayer != null && NetworkClient.localPlayer.TryGetComponent(out PlayerCore playerCore)) {
+			playerCore.on_player_state_change_requested?.Invoke(playerNewState);
+		}
+
 	}
 
 	[Command(requiresAuthority = false)]
