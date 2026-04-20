@@ -12,6 +12,11 @@ public class Spawner : NetworkBehaviour
         if (Instance = null) Instance = this;
     }
 
+    private void Start()
+    {
+        StartNewGame();
+    }
+
     [Server]
     public void StartNewGame()
     {
