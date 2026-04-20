@@ -47,6 +47,8 @@ public class PlayerMovement : NetworkBehaviour {
 		}
 
 		_mapSize = StageManager.Instance.map_size;
+
+		if(RaceManager.Instance.isSinglePlay) StartFalling(PlayerState.Falling);
 	}
 
 	private void OnEnable() {

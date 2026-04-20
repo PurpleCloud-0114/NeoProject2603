@@ -24,8 +24,8 @@ public class PlayerInputSystem : MonoBehaviour {
 			Debug.LogError("GravitySensor not found on this device");
 		}
 		if (GravitySensor.current.enabled) Debug.Log("GravitySensor is enabled");
-		Application.targetFrameRate = 60;
 #endif
+		Application.targetFrameRate = 60;
 	}
 	public void OnMoveVector2(InputAction.CallbackContext context) {
 		if (!is_joystick) return;
