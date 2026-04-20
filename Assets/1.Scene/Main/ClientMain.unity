@@ -6505,7 +6505,7 @@ PrefabInstance:
     - target: {fileID: 8849018464848831088, guid: cf88ee5a333bb724186a558656475da2, type: 3}
       propertyPath: 'spawnPrefabs.Array.data[0]'
       value: 
-      objectReference: {fileID: 4857432051056301919, guid: da253e943ae1a524f8bd5a960523c2dc, type: 3}
+      objectReference: {fileID: 6050089829315985338, guid: 7f8b0b4b626390a43903e79c4bd8e6ad, type: 3}
     - target: {fileID: 8849018464848831088, guid: cf88ee5a333bb724186a558656475da2, type: 3}
       propertyPath: 'spawnPrefabs.Array.data[1]'
       value: 

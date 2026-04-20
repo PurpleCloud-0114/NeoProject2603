@@ -221,7 +221,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Mirror::Mirror.NetworkIdentity
   sceneId: 0
   _assetId: 4060824427
-  serverOnly: 1
+  serverOnly: 0
   visibility: 0
   hasSpawned: 0
 --- !u!114 &2078989545505503166
