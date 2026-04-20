@@ -1,29 +1,47 @@
 using UnityEngine;
 using Mirror;
+using System.Collections;
 
 public class Spawner : NetworkBehaviour
 {
-    public static Spawner Instance = null;
-    [SerializeField] private ObstacleSpawner _spawner;
-    [SerializeField] private MapSpawner _map_spawner;
+    public static Spawner Instance;
+
+    [SerializeField] private MapSpawner _mapSpawner;
+    [SerializeField] private ObstacleSpawner _obstacleSpawner;
+
+    private Coroutine startRoutine;
 
     private void Awake()
     {
-        if (Instance = null) Instance = this;
+        if (Instance == null) Instance = this;
     }
 
-    private void Start()
+    public override void OnStartServer()
     {
+        startRoutine = StartCoroutine(StartRoutine());
+    }
+
+    private IEnumerator StartRoutine()
+    {
+        yield return new WaitForSeconds(0.5f);
         StartNewGame();
     }
 
     [Server]
     public void StartNewGame()
     {
-        Debug.Log("[Spawner] 맵 생성을 시작합니다.");
+        Debug.Log("[Spawner] 새 게임 시작");
 
-        _map_spawner.FullGenerate();
-        _spawner.GenerateFloatingObstacles();
+        if (startRoutine != null)
+        {
+            StopCoroutine(startRoutine);
+            startRoutine = null;
+        }
+
+        _mapSpawner.ReturnMapToPool();
+        _obstacleSpawner.ReturnAllToPool();
+
+        _mapSpawner.FullGenerate();
 
         RpcNotifyGameStart();
     }
@@ -31,12 +49,13 @@ public class Spawner : NetworkBehaviour
     [ClientRpc]
     private void RpcNotifyGameStart()
     {
-        Debug.Log("GameStart!");
+        Debug.Log("Game Start!");
     }
 
-    [ContextMenu("Force Generate Map Now")]
+    [ContextMenu("Force Generate")]
     public void ForceGenerate()
     {
-        if (NetworkServer.active) StartNewGame();
+        if (NetworkServer.active)
+            StartNewGame();
     }
 }
