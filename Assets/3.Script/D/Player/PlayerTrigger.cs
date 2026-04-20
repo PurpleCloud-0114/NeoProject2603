@@ -7,6 +7,7 @@ public class PlayerTrigger : NetworkBehaviour {
 	private PlayerCore _playerCore;
 
 	private const string TAG_ITEMBOX = "ItemBox";
+	private const string TAG_OBSTACLE = "Obstacle";
 	private const string TAG_REDZONE = "Redzone";
 	private const string TAG_SPIDERWEB = "Spiderweb";
 	private const string TAG_PLAYER = "Player";
@@ -41,8 +42,8 @@ public class PlayerTrigger : NetworkBehaviour {
 				_playerCore.on_item_acquired?.Invoke(randomItem);   //아이템 획득 이벤트 호출
 				Debug.Log("아이템 로직 끝");
 				break;
-			case "Obstacle":
-				//_playerMovement.hitObstacle();
+			case TAG_OBSTACLE:
+				_playerCore.on_obstacle_hit?.Invoke();
 				break;
 			case TAG_REDZONE:
 				Debug.Log($"레드존 진입합 Y좌표 : {other.transform.position.y}");

@@ -48,7 +48,7 @@ public class PlayerMovement : NetworkBehaviour {
 
 		_mapSize = StageManager.Instance.map_size;
 
-		if(RaceManager.Instance.isSinglePlay) StartFalling(PlayerState.Falling);
+		if (RaceManager.Instance.isSinglePlay) StartFalling(PlayerState.Falling);
 	}
 
 	private void OnEnable() {
@@ -56,12 +56,14 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_wing_button_clicked += OpenWing;
 		_playerCore.on_max_drop_speed_change_requested += ApplySpeedChange;
 		_playerCore.on_impulse_requested += ApplyImpulse;
+		_playerCore.on_obstacle_hit += HitObstacle;
 	}
 	private void OnDisable() {
 		_playerCore.on_player_state_change_requested -= StartFalling;
 		_playerCore.on_wing_button_clicked -= OpenWing;
 		_playerCore.on_max_drop_speed_change_requested -= ApplySpeedChange;
 		_playerCore.on_impulse_requested -= ApplyImpulse;
+		_playerCore.on_obstacle_hit -= HitObstacle;
 	}
 
 	private void FixedUpdate() {
@@ -178,6 +180,12 @@ public class PlayerMovement : NetworkBehaviour {
 		DOTween.To(() => drop_max_speed, x => drop_max_speed = x, _dropWingSpeed, _wingTime).SetEase(Ease.OutQuad);
 	}
 
+	private void HitObstacle() {
+		Vector3 currentVelocity = _rigidBody.linearVelocity;
+		float nextYVelocity = currentVelocity.y + 30f;
+		currentVelocity.y = Mathf.Min(nextYVelocity, 0f);
+		_rigidBody.linearVelocity = currentVelocity;
+	}
 	private void ApplySpeedChange(float targetSpeed, float duration, float recoveryTime, StatusEffect statusEffect) {
 		// 플레이어의 조작 제한 및 속도 조절 방식을 코루틴으로 하려고 했으나,
 		// 만약 중첩되어 효과가 적용될 경우, 두번째 효과는 무시될 가능성이 높다.

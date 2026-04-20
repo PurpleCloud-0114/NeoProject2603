@@ -15053,7 +15053,7 @@ GameObject:
   - component: {fileID: 2166349588925705287}
   m_Layer: 8
   m_Name: Crystal_obstacle
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15096,7 +15096,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Mirror::Mirror.NetworkIdentity
   sceneId: 0
-  _assetId: 2188743773
+  _assetId: 3727602266
   serverOnly: 0
   visibility: 0
   hasSpawned: 0
