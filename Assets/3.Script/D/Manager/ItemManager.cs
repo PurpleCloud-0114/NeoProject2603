@@ -14,14 +14,14 @@ public class ItemManager : MonoBehaviour {
 	}
 
 	public IUseable RandomItem() {
-		int randomIndex = Random.Range(0, 3);
+		int randomIndex = Random.Range(0, 0);
 
 		switch(randomIndex) {
-			case 1:
+			case 0:
 				return new WeightAccelerationItem();
-			case 2:
+			case 1:
 				return new SpiderwebItem();
-			case 3:
+			case 2:
 				return new ShockwaveMagicItem();
 			default:
 				return null;

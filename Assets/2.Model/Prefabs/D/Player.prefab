@@ -1124,13 +1124,14 @@ GameObject:
   - component: {fileID: 5156042526776253182}
   - component: {fileID: 977717858592824544}
   - component: {fileID: 8886728869848558828}
-  - component: {fileID: 4607743404685064500}
-  - component: {fileID: 8029687212666753975}
+  - component: {fileID: -481069449564899884}
   - component: {fileID: 2364354345721609652}
   - component: {fileID: 3852201451123842045}
   - component: {fileID: 546341614421835030}
   - component: {fileID: 2803637901400589826}
   - component: {fileID: 544714143869547402}
+  - component: {fileID: 271410411352786643}
+  - component: {fileID: -4233077273478090972}
   - component: {fileID: 6583540796084539334}
   m_Layer: 0
   m_Name: Player
@@ -1204,7 +1205,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &8886728869848558828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1222,21 +1223,21 @@ MonoBehaviour:
   serverOnly: 0
   visibility: 0
   hasSpawned: 0
---- !u!114 &4607743404685064500
+--- !u!114 &-481069449564899884
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6497241950661712083}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Mirror.Components::Mirror.NetworkTransformUnreliable
   syncDirection: 1
   syncMode: 0
-  syncInterval: 0
+  syncInterval: 0.1
   target: {fileID: 1586846061133210816}
   syncPosition: 1
   syncRotation: 1
@@ -1245,41 +1246,7 @@ MonoBehaviour:
   compressRotation: 1
   interpolatePosition: 1
   interpolateRotation: 1
-  interpolateScale: 1
-  coordinateSpace: 0
-  timelineOffset: 1
-  showGizmos: 0
-  showOverlay: 0
-  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
-  bufferResetMultiplier: 3
-  useFixedUpdate: 0
-  positionSensitivity: 0.01
-  rotationSensitivity: 0.01
-  scaleSensitivity: 0.01
---- !u!114 &8029687212666753975
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6497241950661712083}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b20dc110904e47f8a154cdcf6433eae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Mirror.Components::Mirror.NetworkRigidbodyUnreliable
-  syncDirection: 1
-  syncMode: 0
-  syncInterval: 0
-  target: {fileID: 1586846061133210816}
-  syncPosition: 1
-  syncRotation: 1
-  syncScale: 0
-  onlySyncOnChange: 1
-  compressRotation: 1
-  interpolatePosition: 1
-  interpolateRotation: 1
-  interpolateScale: 1
+  interpolateScale: 0
   coordinateSpace: 0
   timelineOffset: 1
   showGizmos: 0
@@ -1305,9 +1272,10 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  playerGameState: 0
-  is_dummy: 0
+  player_state: 0
+  status_effect: 0
   player_number: 0
+  is_dummy: 0
 --- !u!114 &3852201451123842045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1323,9 +1291,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  _inputSystem: {fileID: 0}
-  _mapSize: {fileID: 0}
-  VelocityTracker: {x: 0, y: 0, z: 0}
+  _velocityTracker: {x: 0, y: 0, z: 0}
   _moveSpeed: 45
   drop_max_speed: 100
   base_drop_max_speed: 0
@@ -1373,6 +1339,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d76b162a258f04846b4eeae24e9acf1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEffectController
+--- !u!114 &271410411352786643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6497241950661712083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32896bba0c29eb34b866120602d1a9c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerTrigger
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+--- !u!114 &-4233077273478090972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6497241950661712083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d54c8021454a2ea47bd2acfb707b30fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerNetowrkPolation
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  send_interval: 0.033
+  hardsnap_threshold: 50
+  smooth_speed: 20
+  max_extrapolation_time: 0.15
+  smooth_time: 0.06
 --- !u!114 &6583540796084539334
 MonoBehaviour:
   m_ObjectHideFlags: 0

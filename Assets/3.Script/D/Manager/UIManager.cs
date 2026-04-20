@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private Button _itemButton;
 	[SerializeField] private TextMeshProUGUI _itemText;
 	[SerializeField] private StageProgressUi _stageProgressUI;
+	[SerializeField] private Option _option;
 
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -45,4 +46,5 @@ public class UIManager : MonoBehaviour {
 	[Client] public Button BindItemButton() => _itemButton;
 	[Client] public TextMeshProUGUI BindItemText() => _itemText;
 	public void BindStageProgressUI(Transform player) => _stageProgressUI.BindPlayer(player);
+	public void BindJoystick(Transform player) => _option.BindPlayer(player);
 }

@@ -3,26 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerItemController : MonoBehaviour {
-	private PlayerUIController _playerUIController;
+	private PlayerCore _playerCore;
 
 	public IUseable currentItem = null;
 
 	private void Awake() {
-		TryGetComponent(out _playerUIController);
+		TryGetComponent(out _playerCore);
 	}
 
-	public void GetItem(IUseable newItem) {
+	private void OnEnable() {
+		_playerCore.on_item_acquired += GetItem;
+		_playerCore.on_item_button_clicked += UseItem;
+	}
+	private void OnDisable() {
+		_playerCore.on_item_acquired -= GetItem;
+		_playerCore.on_item_button_clicked -= UseItem;
+	}
+
+	private void GetItem(IUseable newItem) {
 		currentItem = newItem;
-		SetItemNameOnUI(currentItem.Name);
 	}
 
 	public void UseItem() {
 		if(currentItem != null) {
 			currentItem.Use(gameObject);
 			currentItem = null;
-			SetItemNameOnUI(string.Empty);
 		}
 	}
-
-	private void SetItemNameOnUI(string name) => _playerUIController.SetItemNameOnUI(name);
 }
