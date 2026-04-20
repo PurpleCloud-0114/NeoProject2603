@@ -408,7 +408,7 @@ MonoBehaviour:
     m_Bits: 64
   _totalItems: 30
   _itemList:
-  - prefab: {fileID: 8542186906585345430, guid: 8cf5fd7bc78868e438abc3b15cfdd6b1, type: 3}
+  - prefab: {fileID: 8542186906585345430, guid: 7ec3337192cb0d44ea73cf067d2ba913, type: 3}
     checkRadius: 6
   _itemLayer:
     serializedVersion: 2

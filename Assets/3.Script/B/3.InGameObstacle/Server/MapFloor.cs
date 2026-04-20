@@ -47,4 +47,18 @@ public class MapFloor : NetworkBehaviour
             }
         }
     }
+
+    [Server]
+    public void Server_DisableObstacle(GameObject obstacle)
+    {
+        int index = _attachedObstacles.IndexOf(obstacle);
+        if (index != -1)
+        {
+            // 해당 비트만 0으로 끔
+            _activeObstacleMask &= ~(1u << index);
+
+            // 주의: 서버에서는 Hook이 자동으로 안 불릴 수 있으므로 직접 적용
+            ApplyObstacleState(_activeObstacleMask);
+        }
+    }
 }

@@ -1487,7 +1487,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3661160637048443433}
-  - component: {fileID: 4676207578840456032}
+  - component: {fileID: 4214055175059104992}
+  - component: {fileID: 3185941994653949825}
   m_Layer: 0
   m_Name: Wall_02_Window_local
   m_TagString: Untagged
@@ -1517,7 +1518,7 @@ Transform:
   - {fileID: 5326696931015333202}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4676207578840456032
+--- !u!114 &4214055175059104992
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1526,10 +1527,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 8183796055650036226}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69e5f049a3e04144d8f72ae470a97bd8, type: 3}
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MapFloorlocal
-  _spawnProbability: 0.411
+  m_EditorClassIdentifier: Mirror::Mirror.NetworkIdentity
+  sceneId: 0
+  _assetId: 3003760165
+  serverOnly: 1
+  visibility: 0
+  hasSpawned: 0
+--- !u!114 &3185941994653949825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8183796055650036226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e214cc59e43a70c4f965d600f8fef54e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapFloor
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  _spawnProbability: 0.4
   _attachedObstacles:
   - {fileID: 4216667840833585975}
 --- !u!1 &8549343864754854649
