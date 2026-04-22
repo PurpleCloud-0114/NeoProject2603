@@ -50,13 +50,12 @@ public class LoginController : MonoBehaviour
             PlayerPrefs.SetString("PlayerNickname", nickname);
             PlayerPrefs.Save();
 
-            // Mirror 서버 접속 (Player Prefab 스폰 → AuthPlayer.CmdInitialize 자동 호출)
-            GameObject manager = NetworkManager.singleton.gameObject;
-            if (manager.TryGetComponent(out ServerChecker checker))
-                checker.Start_Client();
-
-            if (_title_ob != null) _title_ob.SetActive(true);
-            gameObject.SetActive(false);
+            NetworkManager networkManager = NetworkManager.singleton;
+            //lan
+            //networkManager.networkAddress = "192.168.45.93";
+            //wifi
+            networkManager.networkAddress = "192.168.45.172";
+            networkManager.StartClient();
         }
         else
         {
