@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 7887642564896025384}
   - component: {fileID: 2557351098021571062}
   - component: {fileID: 904524565683085956}
-  - component: {fileID: 2484210267271895980}
+  - component: {fileID: 4692853537381921444}
   m_Layer: 6
   m_Name: 7. bar_straight
   m_TagString: Obstacle
@@ -205,7 +205,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 5065339006483925968, guid: 5b7b30dab96ecf24094f0f454877bd29, type: 3}
---- !u!114 &2484210267271895980
+--- !u!114 &4692853537381921444
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -214,9 +214,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1312564388348856545}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 1
+  parentFloor: {fileID: 4191623681071325561}
 --- !u!1 &1697836187048699742
 GameObject:
   m_ObjectHideFlags: 0
@@ -416,8 +418,8 @@ GameObject:
   - component: {fileID: 8146303113889647072}
   - component: {fileID: 4666028666230922513}
   - component: {fileID: 4366377863065793197}
-  - component: {fileID: 8765150645762096574}
   - component: {fileID: 196008672959266767}
+  - component: {fileID: 7757523390631425335}
   m_Layer: 6
   m_Name: 8. barrel_small_stack
   m_TagString: Obstacle
@@ -496,18 +498,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &8765150645762096574
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5881344714558251358}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!64 &196008672959266767
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -530,6 +520,20 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 6612861825822380455, guid: c471d79dbb02c90489e09e67a442125b, type: 3}
+--- !u!114 &7757523390631425335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5881344714558251358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 0
+  parentFloor: {fileID: 4191623681071325561}
 --- !u!1 &5954872571489361648
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,7 +912,7 @@ GameObject:
   - component: {fileID: 2135171308578459567}
   - component: {fileID: 428720604207602973}
   - component: {fileID: 8999160697752651363}
-  - component: {fileID: 3199890769211730539}
+  - component: {fileID: 197633487090331901}
   m_Layer: 6
   m_Name: bookcase_single_decoratedA
   m_TagString: Obstacle
@@ -1010,7 +1014,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -4795600177947294301, guid: f404375c91a4f234880fae2f1b31570a, type: 3}
---- !u!114 &3199890769211730539
+--- !u!114 &197633487090331901
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1019,9 +1023,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8456176105645162141}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 3
+  parentFloor: {fileID: 4191623681071325561}
 --- !u!1 &8573763324027464005
 GameObject:
   m_ObjectHideFlags: 0
@@ -1034,7 +1040,7 @@ GameObject:
   - component: {fileID: 1696977486144063510}
   - component: {fileID: 5657523277543194042}
   - component: {fileID: 7465092672787486939}
-  - component: {fileID: 5987944852487477681}
+  - component: {fileID: 542470693610505458}
   m_Layer: 6
   m_Name: bookcase_single_decoratedB
   m_TagString: Obstacle
@@ -1136,7 +1142,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 5989482495593122601, guid: 247ee6aa8d9a6304788e5373d8d3904d, type: 3}
---- !u!114 &5987944852487477681
+--- !u!114 &542470693610505458
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1145,9 +1151,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8573763324027464005}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 2
+  parentFloor: {fileID: 4191623681071325561}
 --- !u!1 &8693534039953576507
 GameObject:
   m_ObjectHideFlags: 0

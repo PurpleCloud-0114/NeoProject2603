@@ -226,7 +226,7 @@ GameObject:
   - component: {fileID: 2983804163939661929}
   - component: {fileID: 1048333063444270243}
   - component: {fileID: 4633206981169588141}
-  - component: {fileID: 6935628287796854696}
+  - component: {fileID: 9163770589350613487}
   m_Layer: 6
   m_Name: 3. table
   m_TagString: Obstacle
@@ -329,7 +329,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 5767343452939779793, guid: b42954e6929aec44290c7c910125f5e3, type: 3}
---- !u!114 &6935628287796854696
+--- !u!114 &9163770589350613487
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -338,9 +338,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1552775597657894262}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 1
+  parentFloor: {fileID: 1543380604228119810}
 --- !u!1 &3039923744836959960
 GameObject:
   m_ObjectHideFlags: 0
@@ -665,7 +667,7 @@ GameObject:
   - component: {fileID: 8626983980995150124}
   - component: {fileID: 5790999585902261734}
   - component: {fileID: 7583642447494883276}
-  - component: {fileID: 5799846788103814688}
+  - component: {fileID: 7153160894274335041}
   m_Layer: 6
   m_Name: 4. floor
   m_TagString: Obstacle
@@ -768,7 +770,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2801968051306675209, guid: 1371e9aaa72007a4da2861c53a9eea8e, type: 3}
---- !u!114 &5799846788103814688
+--- !u!114 &7153160894274335041
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -777,9 +779,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5430565998309463091}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 3
+  parentFloor: {fileID: 1543380604228119810}
 --- !u!1 &5823416919945373740
 GameObject:
   m_ObjectHideFlags: 0
@@ -949,7 +953,7 @@ GameObject:
   - component: {fileID: 7320530629452556261}
   - component: {fileID: 4788250662568858415}
   - component: {fileID: 7640232498280029738}
-  - component: {fileID: 7637183925865999480}
+  - component: {fileID: 2803227426387277005}
   m_Layer: 6
   m_Name: 2. stairs_wood_decorated2
   m_TagString: Obstacle
@@ -1050,7 +1054,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -8355185453818535271, guid: 3109b3b4c853cda4e9fc0030fc29a848, type: 3}
---- !u!114 &7637183925865999480
+--- !u!114 &2803227426387277005
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1059,9 +1063,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6445694415445799674}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 2
+  parentFloor: {fileID: 1543380604228119810}
 --- !u!1 &7048409918847595415
 GameObject:
   m_ObjectHideFlags: 0
@@ -1245,7 +1251,7 @@ GameObject:
   - component: {fileID: 5218516757145601253}
   - component: {fileID: 8038663782454964271}
   - component: {fileID: 5186973038152056106}
-  - component: {fileID: 4900163595756916600}
+  - component: {fileID: 2221607619312051457}
   m_Layer: 6
   m_Name: 2. stairs_wood_decorated1
   m_TagString: Obstacle
@@ -1346,7 +1352,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -8355185453818535271, guid: 3109b3b4c853cda4e9fc0030fc29a848, type: 3}
---- !u!114 &4900163595756916600
+--- !u!114 &2221607619312051457
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1355,9 +1361,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8399193988978512378}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 0
+  parentFloor: {fileID: 1543380604228119810}
 --- !u!1 &8751227046231431269
 GameObject:
   m_ObjectHideFlags: 0

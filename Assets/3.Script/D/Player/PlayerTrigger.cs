@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
@@ -24,8 +22,6 @@ public class PlayerTrigger : NetworkBehaviour
     {
         if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
 
-        MapFloor floor = other.GetComponentInParent<MapFloor>();
-
         switch (other.tag)
         {
             case TAG_ITEMBOX:
@@ -35,13 +31,24 @@ public class PlayerTrigger : NetworkBehaviour
                 break;
 
             case TAG_OBSTACLE:
-                if (floor != null)
+                // 1. 맵 모듈의 자식 장애물인지 확인 (Identity 스크립트 기반)
+                if (other.TryGetComponent(out ObstacleIdentity obsID))
                 {
-                    CmdHitObstacle(floor.gameObject, other.gameObject);
+                    if (obsID.parentFloor != null)
+                    {
+                        CmdHitModuleObstacle(obsID.parentFloor.gameObject, obsID.obstacleIndex);
+                    }
                 }
+                // 2. 맵 모듈의 일부지만 스크립트가 없는 경우를 위한 안전장치
+                else if (other.GetComponentInParent<MapFloor>() != null)
+                {
+                    // 맵 전체 삭제를 방지하기 위해 root 삭제를 실행하지 않음
+                    Debug.Log("MapFloor 자식 장애물이지만 식별자가 없습니다.");
+                }
+                // 3. 순수 독립 장애물 (Spawner에 의해 개별 생성된 경우)
                 else
                 {
-                    CmdDisableRoot(other.gameObject);
+                    CmdDisableRoot(other.transform.root.gameObject);
                 }
 
                 _playerCore.on_obstacle_hit?.Invoke();
@@ -62,14 +69,12 @@ public class PlayerTrigger : NetworkBehaviour
         }
     }
 
-    private void PushPlayer(Collider other)
+    [Command]
+    private void CmdHitModuleObstacle(GameObject floorObj, int index)
     {
-        Vector3 pushDir = transform.position - other.transform.position;
-        pushDir.y = 0;
-
-        if (pushDir.sqrMagnitude > 0.001f)
+        if (floorObj != null && floorObj.TryGetComponent(out MapFloor floor))
         {
-            _playerCore.on_impulse_requested?.Invoke(pushDir.normalized * _hitPlayerImpulsePower);
+            floor.DisableByIndex(index);
         }
     }
 
@@ -77,19 +82,15 @@ public class PlayerTrigger : NetworkBehaviour
     private void CmdDisableRoot(GameObject obj)
     {
         if (obj == null) return;
-
         NetworkServer.UnSpawn(obj);
         obj.SetActive(false);
     }
 
-    [Command]
-    private void CmdHitObstacle(GameObject floorObj, GameObject hitObj)
+    private void PushPlayer(Collider other)
     {
-        if (floorObj == null || hitObj == null) return;
-
-        if (floorObj.TryGetComponent(out MapFloor floor))
-        {
-            floor.DisableByObject(hitObj);
-        }
+        Vector3 pushDir = transform.position - other.transform.position;
+        pushDir.y = 0;
+        if (pushDir.sqrMagnitude > 0.001f)
+            _playerCore.on_impulse_requested?.Invoke(pushDir.normalized * _hitPlayerImpulsePower);
     }
 }

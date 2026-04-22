@@ -22,7 +22,6 @@ public class MapSpawner : NetworkBehaviour
     [SerializeField] private List<GameObject> _floorPrefabs;
 
     private List<GameObject> _pool = new List<GameObject>();
-
     private readonly int[] _yRotations = { 0, 30, 60, 90, 120, 150 };
 
     [Server]
@@ -39,8 +38,6 @@ public class MapSpawner : NetworkBehaviour
 
             obj.SetActive(false);
             obj.transform.localScale = Vector3.one;
-
-            // 위치
             obj.transform.position = new Vector3(_center.x, y, _center.z);
 
             int angle = _yRotations[Random.Range(0, _yRotations.Length)];
@@ -54,7 +51,7 @@ public class MapSpawner : NetworkBehaviour
                 NetworkServer.Spawn(obj);
             }
 
-            // ===== 스케일 =====
+            // 스케일 계산 로직
             if (floor >= _noChangeFloorCount)
             {
                 float delta = (floor == _noChangeFloorCount)
@@ -64,17 +61,16 @@ public class MapSpawner : NetworkBehaviour
                 scale += delta;
                 scale = Mathf.Clamp(scale, _minScale, _maxScale);
             }
-
             obj.transform.localScale = new Vector3(scale, 1f, scale);
 
-            Debug.Log($"[Floor] {floor} | Scale: {scale} | RotY: {angle}");
-
-            // 장애물
+            // 맵 구성요소(장애물) 자동 설정
             MapFloor mf = obj.GetComponent<MapFloor>();
             if (mf != null)
             {
                 mf.ResetObstacles();
                 mf.RandomizeAttachedObstacles();
+                // 생성 직후 인덱스와 부모 참조를 장애물들에게 주입
+                mf.SetupIndices();
             }
 
             y -= _step;
@@ -89,13 +85,11 @@ public class MapSpawner : NetworkBehaviour
     private GameObject GetFromPool(GameObject prefab)
     {
         GameObject obj = _pool.Find(x => x != null && !x.activeSelf && x.name.Contains(prefab.name));
-
         if (obj == null)
         {
             obj = Instantiate(prefab);
             _pool.Add(obj);
         }
-
         return obj;
     }
 
