@@ -401,7 +401,7 @@ GameObject:
   - component: {fileID: 1156046794805334831}
   - component: {fileID: 4030700942172694501}
   - component: {fileID: 1646827118209607281}
-  - component: {fileID: 894845583401284757}
+  - component: {fileID: 6040811307023846959}
   m_Layer: 6
   m_Name: 2. stairs_wood2
   m_TagString: Obstacle
@@ -502,7 +502,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6246154298496031678, guid: b45057a4048d5bf44bb9e18a439e76ac, type: 3}
---- !u!114 &894845583401284757
+--- !u!114 &6040811307023846959
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -511,12 +511,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 3237825720460150320}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f3ae3e0dd7fba64b8bd9bbab7124028, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!1 &3344789931737324005
 GameObject:
   m_ObjectHideFlags: 0
@@ -771,6 +768,11 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _spawnProbability: 0.4
+  _attachedObstacles:
+  - {fileID: 5686211896164329164}
+  - {fileID: 3237825720460150320}
+  - {fileID: 5618733214756804980}
+  - {fileID: 9050794674225329823}
 --- !u!1 &4184015105092212078
 GameObject:
   m_ObjectHideFlags: 0
@@ -816,7 +818,7 @@ GameObject:
   - component: {fileID: 8150894304240061547}
   - component: {fileID: 6267106769003821217}
   - component: {fileID: 8632386502053017909}
-  - component: {fileID: 6801827158015167258}
+  - component: {fileID: 3657930740218450283}
   m_Layer: 6
   m_Name: 2. stairs_wood3
   m_TagString: Obstacle
@@ -919,7 +921,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6246154298496031678, guid: b45057a4048d5bf44bb9e18a439e76ac, type: 3}
---- !u!114 &6801827158015167258
+--- !u!114 &3657930740218450283
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -928,12 +930,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 5618733214756804980}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f3ae3e0dd7fba64b8bd9bbab7124028, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!1 &5686211896164329164
 GameObject:
   m_ObjectHideFlags: 0
@@ -946,7 +945,7 @@ GameObject:
   - component: {fileID: 8218348789271294931}
   - component: {fileID: 6190628591333934873}
   - component: {fileID: 8420849807844837005}
-  - component: {fileID: 7701825317534649134}
+  - component: {fileID: 3590265150928514771}
   m_Layer: 6
   m_Name: 2. stairs_wood1
   m_TagString: Obstacle
@@ -1049,7 +1048,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6246154298496031678, guid: b45057a4048d5bf44bb9e18a439e76ac, type: 3}
---- !u!114 &7701825317534649134
+--- !u!114 &3590265150928514771
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1058,12 +1057,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 5686211896164329164}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f3ae3e0dd7fba64b8bd9bbab7124028, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!1 &5690341893940640339
 GameObject:
   m_ObjectHideFlags: 0
@@ -1742,7 +1738,7 @@ GameObject:
   - component: {fileID: 4719467794441036672}
   - component: {fileID: 7393254438596319050}
   - component: {fileID: 5165422145874499294}
-  - component: {fileID: 7831061293224432797}
+  - component: {fileID: 189350727771356800}
   m_Layer: 6
   m_Name: 2. stairs_wood4
   m_TagString: Obstacle
@@ -1845,7 +1841,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6246154298496031678, guid: b45057a4048d5bf44bb9e18a439e76ac, type: 3}
---- !u!114 &7831061293224432797
+--- !u!114 &189350727771356800
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1854,12 +1850,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 9050794674225329823}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f3ae3e0dd7fba64b8bd9bbab7124028, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!1001 &1225734117990727489
 PrefabInstance:
   m_ObjectHideFlags: 0

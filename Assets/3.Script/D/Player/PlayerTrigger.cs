@@ -24,60 +24,41 @@ public class PlayerTrigger : NetworkBehaviour
     {
         if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
 
-        Debug.Log($"[Trigger] 충돌: {other.name}");
+        MapFloor floor = other.GetComponentInParent<MapFloor>();
 
-        // 맵 장애물 처리 (최우선)
-        var obstacle = other.GetComponentInParent<ObstacleIdentity>();
-
-        if (obstacle != null)
+        switch (other.tag)
         {
-            MapFloor floor = obstacle.GetComponentInParent<MapFloor>();
+            case TAG_ITEMBOX:
+                CmdDisableRoot(other.transform.root.gameObject);
+                IUseable randomItem = ItemManager.Instance.RandomItem();
+                _playerCore.on_item_acquired?.Invoke(randomItem);
+                break;
 
-            if (floor != null)
-            {
-                int index = floor.GetIndex(obstacle.gameObject);
-
-                if (index != -1)
+            case TAG_OBSTACLE:
+                if (floor != null)
                 {
-                    Debug.Log($"[Hit] index: {index}");
-
-                    CmdDisableObstacle(floor.netIdentity, index);
+                    CmdHitObstacle(floor.gameObject, other.gameObject);
                 }
                 else
                 {
-                    Debug.LogError("index 못찾음");
+                    CmdDisableRoot(other.gameObject);
                 }
-            }
 
-            _playerCore.on_obstacle_hit?.Invoke();
-            return;
-        }
+                _playerCore.on_obstacle_hit?.Invoke();
+                break;
 
-        // ===== 일반 처리 =====
+            case TAG_REDZONE:
+                _playerCore.on_redzone_entered?.Invoke();
+                break;
 
-        if (other.CompareTag(TAG_ITEMBOX))
-        {
-            CmdDisableRoot(other.transform.root.gameObject);
-            _playerCore.on_item_acquired?.Invoke(ItemManager.Instance.RandomItem());
-            return;
-        }
+            case TAG_SPIDERWEB:
+                if (_playerCore.status_effect == StatusEffect.Invinsible) return;
+                _playerCore.on_spiderweb_hit?.Invoke(other);
+                break;
 
-        if (other.CompareTag(TAG_REDZONE))
-        {
-            _playerCore.on_redzone_entered?.Invoke();
-            return;
-        }
-
-        if (other.CompareTag(TAG_SPIDERWEB))
-        {
-            if (_playerCore.status_effect == StatusEffect.Invinsible) return;
-            _playerCore.on_spiderweb_hit?.Invoke(other);
-            return;
-        }
-
-        if (other.CompareTag(TAG_PLAYER))
-        {
-            PushPlayer(other);
+            case TAG_PLAYER:
+                PushPlayer(other);
+                break;
         }
     }
 
@@ -92,39 +73,23 @@ public class PlayerTrigger : NetworkBehaviour
         }
     }
 
-    // =========================
-    // 공중 장애물 / 아이템
-    // =========================
     [Command]
     private void CmdDisableRoot(GameObject obj)
     {
         if (obj == null) return;
 
-        if (obj.GetComponent<MapFloor>() != null)
-        {
-            Debug.LogError("MapFloor 삭제 시도 차단");
-            return;
-        }
-
-        Debug.Log($"[Cmd] 공중 제거: {obj.name}");
-
         NetworkServer.UnSpawn(obj);
         obj.SetActive(false);
     }
 
-    // =========================
-    // 맵 장애물 제거 (index 기반)
-    // =========================
     [Command]
-    private void CmdDisableObstacle(NetworkIdentity floorId, int index)
+    private void CmdHitObstacle(GameObject floorObj, GameObject hitObj)
     {
-        if (floorId == null) return;
+        if (floorObj == null || hitObj == null) return;
 
-        var floor = floorId.GetComponent<MapFloor>();
-
-        if (floor != null)
+        if (floorObj.TryGetComponent(out MapFloor floor))
         {
-            floor.DisableByIndex(index);
+            floor.DisableByObject(hitObj);
         }
     }
 }

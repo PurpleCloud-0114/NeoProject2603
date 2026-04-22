@@ -24,13 +24,13 @@ public class Spawner : NetworkBehaviour
     private IEnumerator StartRoutine()
     {
         yield return new WaitForSeconds(0.5f);
-        ResetGame();
+        StartNewGame();
     }
 
     [Server]
-    public void ResetGame()
+    public void StartNewGame()
     {
-        Debug.Log("[Spawner] 게임 리셋");
+        Debug.Log("[Spawner] 새 게임 시작");
 
         if (startRoutine != null)
         {
@@ -39,9 +39,7 @@ public class Spawner : NetworkBehaviour
         }
 
         _mapSpawner.ReturnMapToPool();
-
-        if (_obstacleSpawner != null)
-            _obstacleSpawner.ReturnAllToPool();
+        _obstacleSpawner.ReturnAllToPool();
 
         _mapSpawner.FullGenerate();
 
@@ -54,10 +52,10 @@ public class Spawner : NetworkBehaviour
         Debug.Log("Game Start!");
     }
 
-    [ContextMenu("Force Reset")]
-    public void ForceReset()
+    [ContextMenu("Force Generate")]
+    public void ForceGenerate()
     {
         if (NetworkServer.active)
-            ResetGame();
+            StartNewGame();
     }
 }

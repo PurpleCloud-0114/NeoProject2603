@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8078479300785791872}
   - component: {fileID: 897618048232882856}
   - component: {fileID: 2372758568255215149}
-  - component: {fileID: 1254115320063938607}
+  - component: {fileID: 510889796539591073}
   m_Layer: 6
   m_Name: bed_A_stacked
   m_TagString: Obstacle
@@ -114,7 +114,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 8463985132477582440, guid: 1300e3d10ae3a834c92e4ce960688165, type: 3}
---- !u!114 &1254115320063938607
+--- !u!114 &510889796539591073
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -123,12 +123,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 893728159370550784}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f3ae3e0dd7fba64b8bd9bbab7124028, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!1 &1069955407719301141
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,7 +326,7 @@ GameObject:
   - component: {fileID: 1445959308085843848}
   - component: {fileID: 3163961115632645106}
   - component: {fileID: 8042826740271823673}
-  - component: {fileID: 8268762273536186990}
+  - component: {fileID: 1852272511354689214}
   m_Layer: 6
   m_Name: table_long_decorated_B
   m_TagString: Obstacle
@@ -430,7 +427,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -8249813824428445870, guid: 486c66f43fe70cb45b7d7d9507221053, type: 3}
---- !u!114 &8268762273536186990
+--- !u!114 &1852272511354689214
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -439,12 +436,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4361554878869312246}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f3ae3e0dd7fba64b8bd9bbab7124028, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!1 &4730127887781847841
 GameObject:
   m_ObjectHideFlags: 0
@@ -586,6 +580,10 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _spawnProbability: 0.4
+  _attachedObstacles:
+  - {fileID: 8233439247391358185}
+  - {fileID: 893728159370550784}
+  - {fileID: 4361554878869312246}
 --- !u!1 &8233439247391358185
 GameObject:
   m_ObjectHideFlags: 0
@@ -597,8 +595,8 @@ GameObject:
   - component: {fileID: 6480430930912696654}
   - component: {fileID: 6962947306430774816}
   - component: {fileID: 8273293986946377335}
+  - component: {fileID: 1449311159839516328}
   - component: {fileID: 3963157694904961704}
-  - component: {fileID: 6053183861607722345}
   m_Layer: 6
   m_Name: bed_B_double
   m_TagString: Obstacle
@@ -677,6 +675,18 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1449311159839516328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233439247391358185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!65 &3963157694904961704
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -698,21 +708,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.5000007, y: 1.5000037, z: 3.0000007}
   m_Center: {x: 7.1054274e-15, y: 0.74999547, z: -0.0000001192093}
---- !u!114 &6053183861607722345
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8233439247391358185}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f3ae3e0dd7fba64b8bd9bbab7124028, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
 --- !u!1 &9122444527657664698
 GameObject:
   m_ObjectHideFlags: 0
