@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7970926424704007298}
   - component: {fileID: 1641493552500741189}
   - component: {fileID: 8921056465117496404}
-  - component: {fileID: 2656650148841445059}
+  - component: {fileID: 5938601213212365110}
   m_Layer: 6
   m_Name: rocks_decorated
   m_TagString: Obstacle
@@ -113,7 +113,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6767028766887702578, guid: 691ceaacf64cde8439eba1ee4ab168ea, type: 3}
---- !u!114 &2656650148841445059
+--- !u!114 &5938601213212365110
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -122,9 +122,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1491104045477414224}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f3ae3e0dd7fba64b8bd9bbab7124028, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!1 &3105845346538629832
 GameObject:
   m_ObjectHideFlags: 0
@@ -171,8 +174,8 @@ GameObject:
   - component: {fileID: 1317769289962202689}
   - component: {fileID: 2559667412654584496}
   - component: {fileID: 6907587393209687308}
-  - component: {fileID: 1936760835846165023}
   - component: {fileID: 7060676043865149550}
+  - component: {fileID: 1838927291121448956}
   m_Layer: 6
   m_Name: 8. barrel_small_stack
   m_TagString: Obstacle
@@ -251,18 +254,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1936760835846165023
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3664356085131448063}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!64 &7060676043865149550
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -285,6 +276,21 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 6612861825822380455, guid: c471d79dbb02c90489e09e67a442125b, type: 3}
+--- !u!114 &1838927291121448956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3664356085131448063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f3ae3e0dd7fba64b8bd9bbab7124028, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!1 &4294844683517292840
 GameObject:
   m_ObjectHideFlags: 0
@@ -394,11 +400,6 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _spawnProbability: 0.4
-  _attachedObstacles:
-  - {fileID: 5174351350985241330}
-  - {fileID: 1491104045477414224}
-  - {fileID: 3664356085131448063}
-  - {fileID: 4885429138373260554}
 --- !u!1 &4736567586181737076
 GameObject:
   m_ObjectHideFlags: 0
@@ -446,7 +447,7 @@ GameObject:
   - component: {fileID: 2147734520071812188}
   - component: {fileID: 8649887415853061014}
   - component: {fileID: 6383805362307172843}
-  - component: {fileID: 6043725848780953295}
+  - component: {fileID: 5821856200299936720}
   m_Layer: 6
   m_Name: 3. rubble_half
   m_TagString: Obstacle
@@ -547,7 +548,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4476593937870996573, guid: 8ed4709d4747a874e9a95c42a0eb2b44, type: 3}
---- !u!114 &6043725848780953295
+--- !u!114 &5821856200299936720
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -556,9 +557,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4885429138373260554}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f3ae3e0dd7fba64b8bd9bbab7124028, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!1 &4927162020440164442
 GameObject:
   m_ObjectHideFlags: 0
@@ -604,7 +608,7 @@ GameObject:
   - component: {fileID: 6999670785251419707}
   - component: {fileID: 3747077095252841832}
   - component: {fileID: 3549596553865859077}
-  - component: {fileID: 729693725896902510}
+  - component: {fileID: 3992940197983718825}
   m_Layer: 6
   m_Name: rocks_gold
   m_TagString: Obstacle
@@ -705,7 +709,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 387770362854573042, guid: 726066d32dc231d46994e86eb17152a5, type: 3}
---- !u!114 &729693725896902510
+--- !u!114 &3992940197983718825
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -714,9 +718,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 5174351350985241330}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f3ae3e0dd7fba64b8bd9bbab7124028, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!1 &5207804596267755583
 GameObject:
   m_ObjectHideFlags: 0

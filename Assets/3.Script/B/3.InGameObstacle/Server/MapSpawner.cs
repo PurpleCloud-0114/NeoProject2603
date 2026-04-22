@@ -1,19 +1,18 @@
 using UnityEngine;
 using Mirror;
-using System.Collections;
 using System.Collections.Generic;
 
 public class MapSpawner : NetworkBehaviour
 {
     [SerializeField] private ObstacleSpawner _obstacleSpawner;
 
-    [Header("Tower Settings")]
+    [Header("Tower")]
     [SerializeField] private Vector3 _center = Vector3.zero;
     [SerializeField] private float _startY = 0f;
     [SerializeField] private float _endY = -500f;
     [SerializeField] private float _step = 40f;
 
-    [Header("Scale Settings")]
+    [Header("Scale")]
     [SerializeField] private int _noChangeFloorCount = 5;
     [SerializeField] private float _scaleStep = 0.1f;
     [SerializeField] private float _minScale = 0.6f;
@@ -22,8 +21,7 @@ public class MapSpawner : NetworkBehaviour
     [SerializeField] private List<GameObject> _floorPrefabs;
 
     private List<GameObject> _pool = new List<GameObject>();
-
-    private readonly int[] _yRotations = { 0, 30, 60, 90, 120, 150 };
+    private readonly int[] _rotY = { 0, 30, 60, 90, 120, 150 };
 
     [Server]
     public void FullGenerate()
@@ -40,21 +38,15 @@ public class MapSpawner : NetworkBehaviour
             obj.SetActive(false);
             obj.transform.localScale = Vector3.one;
 
-            // 위치
             obj.transform.position = new Vector3(_center.x, y, _center.z);
-
-            int angle = _yRotations[Random.Range(0, _yRotations.Length)];
-            obj.transform.rotation = Quaternion.Euler(0, angle, 0);
+            obj.transform.rotation = Quaternion.Euler(0, _rotY[Random.Range(0, _rotY.Length)], 0);
 
             obj.SetActive(true);
 
             var id = obj.GetComponent<NetworkIdentity>();
             if (id != null && id.netId == 0)
-            {
                 NetworkServer.Spawn(obj);
-            }
 
-            // ===== 스케일 =====
             if (floor >= _noChangeFloorCount)
             {
                 float delta = (floor == _noChangeFloorCount)
@@ -67,15 +59,9 @@ public class MapSpawner : NetworkBehaviour
 
             obj.transform.localScale = new Vector3(scale, 1f, scale);
 
-            Debug.Log($"[Floor] {floor} | Scale: {scale} | RotY: {angle}");
-
-            // 장애물
-            MapFloor mf = obj.GetComponent<MapFloor>();
+            var mf = obj.GetComponent<MapFloor>();
             if (mf != null)
-            {
-                mf.ResetObstacles();
-                mf.RandomizeAttachedObstacles();
-            }
+                mf.Initialize();
 
             y -= _step;
             floor++;
