@@ -68,7 +68,7 @@ public class PlayerNetowrkPolation : NetworkBehaviour {
 	}
 
 	private void LateUpdate() {
-		if (isLocalPlayer || _latestStateSync.time_stamp == 0) return;
+		if (isServerOnly || isLocalPlayer || _latestStateSync.time_stamp == 0) return;
 
 		//[핵심] 통신 지연(Ping)과 상관없이, 로컬 프레임(Time.deltaTime)에 맞춰 타겟을 직접 낙하시킴!
 		//이렇게 하면 타겟 자체가 위아래로 떨리는 현상이 100% 차단됨.
@@ -90,7 +90,8 @@ public class PlayerNetowrkPolation : NetworkBehaviour {
 	[Command(channel = Channels.Unreliable)]
 	private void CmdSendState(Vector3 pos, Quaternion rot, Vector3 vel, double timeStamp) {
 		//TODO : 서버 검증 로직 추가하기. (핵 방지)
-
+		transform.position = pos;
+		transform.rotation = rot;
 		_latestStateSync = new SyncState {
 			position = pos,
 			rotation = rot,

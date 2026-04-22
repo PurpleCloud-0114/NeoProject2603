@@ -21,7 +21,7 @@ public class PlayerMovement : NetworkBehaviour {
 	[HideInInspector] public float base_drop_max_speed;
 	[Header("날개")]
 	[SerializeField, Range(0, 500)] private float _dropWingSpeed = 30f;
-	private float _wingTime;
+	[SerializeField] private float _wingTime;
 	[Header("Mobile용 감도 조절")]
 	[Range(1f, 10f)] public float MoveMobileSensitive = 1f;
 
@@ -57,6 +57,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_max_drop_speed_change_requested += ApplySpeedChange;
 		_playerCore.on_impulse_requested += ApplyImpulse;
 		_playerCore.on_obstacle_hit += HitObstacle;
+		_playerCore.on_redzone_entered += SetDecreaseDropSpeedTimeOnWing;
 	}
 	private void OnDisable() {
 		_playerCore.on_player_state_change_requested -= StartFalling;
@@ -64,6 +65,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_max_drop_speed_change_requested -= ApplySpeedChange;
 		_playerCore.on_impulse_requested -= ApplyImpulse;
 		_playerCore.on_obstacle_hit -= HitObstacle;
+		_playerCore.on_redzone_entered -= SetDecreaseDropSpeedTimeOnWing;
 	}
 
 	private void FixedUpdate() {

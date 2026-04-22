@@ -84,6 +84,18 @@ public class PlayerCore : NetworkBehaviour {
 		RaceManager.Instance.CmdReportReady();
 	}
 
+	public override void OnStartClient() {
+		base.OnStartClient();
+		RaceManager.Instance.RegisterPlayer(this.transform);
+	}
+
+	public override void OnStopClient() {
+		base.OnStopClient();
+		if (RaceManager.Instance != null) {
+			RaceManager.Instance.UnregisterPlayer(this.transform);
+		}
+	}
+
 	[Command]
 	//서버에게 보내는 도착 신호. (도착 속도 / 시간,
 	private void SendArriveResult(float impactSpeed, double finishTime) {

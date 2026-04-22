@@ -8,6 +8,8 @@ public class StageManager : NetworkBehaviour {
 
 	public MapSize map_size;
 
+	public StageProgressUi stageProgressUi;
+
 	[SyncVar(hook = nameof(OnStageDataChanged))] public StageData stage_data_sync;
 	[SerializeField] private Transform _redzoneTrigger;
 
@@ -24,6 +26,7 @@ public class StageManager : NetworkBehaviour {
 	}
 
 	private void OnStageDataChanged(StageData oldData, StageData newData) {
+		stageProgressUi.Initialize();
 		if (_redzoneTrigger != null) {
 			_redzoneTrigger.position = new Vector3(0, newData.map_redzone_height_Y, 0);
 		}

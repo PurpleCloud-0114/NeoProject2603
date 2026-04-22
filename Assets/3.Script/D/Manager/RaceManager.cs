@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,8 +29,16 @@ public class RaceManager : NetworkBehaviour {
 	[SyncVar, SerializeField, Range(5f, 50f)] private float _deathOverSpeedSync = 30f;
 
 	private List<NetworkIdentity> finishers = new List<NetworkIdentity>();
-	
+
 	public int START_MAX_PLAYER = 10;
+
+
+	// 참가자 리스트 (순위)
+	public List<Transform> active_players = new List<Transform>();
+	// 이전 순위 기록용 딕셔너리
+	private Dictionary<Transform, int> _previousRanks = new Dictionary<Transform, int>();
+	public event Action on_any_rank_changed;
+
 
 	//----- 메서드
 	private void Awake() {
@@ -53,13 +62,14 @@ public class RaceManager : NetworkBehaviour {
 
 		//NetworkTime.time = 서버 시간
 		//5초 뒤 출발 하는거. (나중에 수정)
-		race_start_time_sync = NetworkTime.time + 5.0;
+		race_start_time_sync = NetworkTime.time + 4.0;
 
 		//TODO - ClientRPC로 카운트다운 UI 넣을건가?
 	}
 
 	[ServerCallback]
 	//TODO - 코루틴으로 바꿀지 고민.
+	//-> 코루틴으로 하면, 정말 미세하게 어긋나는 경우가 있을 수 있다고 함.
 	private void Update() {
 		if(current_state_sync == RaceState.Countdown) {
 			if(NetworkTime.time >= race_start_time_sync) {
@@ -68,6 +78,7 @@ public class RaceManager : NetworkBehaviour {
 			}
 		}
 	}
+
 
 	[Server]
 	//서버 수신 - 클라이언트 통과 정보 받기
@@ -103,6 +114,7 @@ public class RaceManager : NetworkBehaviour {
 				break;
 			case RaceState.Racing:
 				playerNewState = PlayerState.Falling;
+				StartRankTracking();
 				break;
 			case RaceState.Finished:
 				playerNewState = PlayerState.Finish;
@@ -122,6 +134,58 @@ public class RaceManager : NetworkBehaviour {
 		if(_playersReadyCount >= total_players && current_state_sync == RaceState.Waiting) {
 		//if(_playersReadyCount >= START_MAX_PLAYER) { 
 			StartCountdown();
+		}
+	}
+
+	//플레이어 생성시, PlayerCore에서 호출됨.
+	public void RegisterPlayer(Transform player) {
+		if (!active_players.Contains(player)) {
+			active_players.Add(player);
+		}
+	}
+	public void UnregisterPlayer(Transform player) {
+		if (active_players.Contains(player)) {
+			active_players.Remove(player);
+			_previousRanks.Remove(player);
+		}
+	}
+
+	private void StartRankTracking() {
+		StartCoroutine(Co_TrackRankingRoutine());
+	}
+
+	private IEnumerator Co_TrackRankingRoutine() {
+		WaitForSeconds wfs = new WaitForSeconds(0.2f);
+
+		while (current_state_sync == RaceState.Racing) {
+			if (active_players.Count > 1) {
+				CalculateRanks();
+			}
+			yield return wfs;
+		}
+	}
+
+	private void CalculateRanks() {
+		bool isRankChangedThisTick = false;
+
+		active_players.RemoveAll(p => p == null);   //null이 된 플레이어 리스트에서 제거 (튕긴 플레이어 예외처리)
+		active_players.Sort((a, b) => a.position.y.CompareTo(b.position.y));    //Y값 기준 오름차순 정렬
+		for (int i = 0; i < active_players.Count; i++) {
+			Transform player = active_players[i];
+			int currentRank = i + 1;
+
+			//사전에 등록되지 않았거나, 순위가 달라졌을 경우.
+			if (!_previousRanks.ContainsKey(player) || _previousRanks[player] != currentRank) {
+				_previousRanks[player] = currentRank;
+				isRankChangedThisTick = true;
+
+				//TODO : 개별 유저 순위 UI 업데이트 필요하다면 여기서 호출.
+				UIManager.Instance.UpdateRankUI();
+			}
+		}
+
+		if (isRankChangedThisTick) {
+			on_any_rank_changed?.Invoke();
 		}
 	}
 }

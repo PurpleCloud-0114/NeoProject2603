@@ -12,7 +12,6 @@ public class PlayerUIController : NetworkBehaviour {
 	[SerializeField] private Button _wingButton;
 	[SerializeField] private Button _itemButton;
 	[SerializeField] private TextMeshProUGUI _itemName;
-	//[SerializeField] private Button _itemButton;
 
 	//----- 메서드
 	private void Awake() {
@@ -20,9 +19,17 @@ public class PlayerUIController : NetworkBehaviour {
 	}
 	private void Start() {
 		if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay && !_playerCore.is_dummy) return;
+
 		if(isLocalPlayer)BindButton();
 		BindBtnAction();
 		BindUI();
+	}
+
+	public override void OnStartClient() {
+		base.OnStartClient();
+
+		// 내 캐릭터든 남의 캐릭터든, 화면에 스폰될 때 UI 매니저에게 마커 생성 요청
+		UIManager.Instance.CreatePlayerMarker(this.transform, isLocalPlayer);
 	}
 
 	private void OnEnable() {
@@ -50,7 +57,6 @@ public class PlayerUIController : NetworkBehaviour {
 	}
 
 	private void BindUI() {
-		UIManager.Instance.BindStageProgressUI(transform);
 		UIManager.Instance.BindJoystick(transform);
 	}
 
