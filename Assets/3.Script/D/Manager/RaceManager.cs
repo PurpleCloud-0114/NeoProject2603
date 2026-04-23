@@ -103,7 +103,7 @@ public class RaceManager : NetworkBehaviour {
 
 		ReceiveArriveResult(sender, isDead);
 
-		if(_roundResults.Count >= active_players.Count) {
+		if(_roundResults.Count >= total_players) {
 			EndRace();
 		}
 	}
@@ -112,6 +112,9 @@ public class RaceManager : NetworkBehaviour {
 	private void ReceiveArriveResult(NetworkConnectionToClient target, bool result) {
 		UIManager.Instance.UpdateResultTextLog(result);
 	}
+
+	//------------[ 레이스 종료 ] -----------------
+	//------------[ 레이스 종료 ] -----------------
 
 	[Server]
 	private void EndRace() {
