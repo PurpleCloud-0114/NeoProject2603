@@ -20,6 +20,8 @@ public enum StatusEffect {
 public class PlayerCore : NetworkBehaviour {
 	private ClientPlayer _clientPlayer;
 	private GameObject _mainCamera;
+	[SerializeField] private GameObject _playerModel;
+
 
 	public PlayerState player_state = PlayerState.Wait;
 	public StatusEffect status_effect = StatusEffect.None;
@@ -98,9 +100,11 @@ public class PlayerCore : NetworkBehaviour {
 
 	[Command]
 	//서버에게 보내는 도착 신호. (도착 속도 / 시간,
-	private void SendArriveResult(float impactSpeed, double finishTime) {
+	public void SendArriveResult(float impactSpeed, double finishTime) {
 		RaceManager.Instance.GetArriveResult(connectionToClient, impactSpeed, finishTime);
 	}
 
-
+	public void LandEndpoint() {
+		_playerModel.SetActive(false);
+	}
 }

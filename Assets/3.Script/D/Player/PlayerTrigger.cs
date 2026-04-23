@@ -23,11 +23,10 @@ public class PlayerTrigger : NetworkBehaviour {
 		if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
 
 		if (collision.transform.CompareTag("EndPoint")) {
-			//playerGameState = PlayerGameState.Finish;
-			double myFinishTime = NetworkTime.time - RaceManager.Instance.race_start_time_sync;
 			float impactSpeed = Mathf.Abs(collision.relativeVelocity.y);
-			// Checked - TODO : 추후 서버한테 도착을 알리는 이벤트 메시지 추가.
-			//SendArriveResult(impactSpeed, myFinishTime);
+			double myFinishTime = NetworkTime.time - RaceManager.Instance.race_start_time_sync;
+			_playerCore.SendArriveResult(impactSpeed, myFinishTime);
+			_playerCore.LandEndpoint();
 		}
 	}
 

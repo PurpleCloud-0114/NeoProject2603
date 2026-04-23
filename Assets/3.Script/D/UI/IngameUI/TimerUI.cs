@@ -8,9 +8,12 @@ using Mirror;
 public class TimerUI : MonoBehaviour {
 	[SerializeField] private TextMeshProUGUI _timerText;
 
+	public bool isStop = false;
+
 	private void Update() {
 		if (RaceManager.Instance.current_state_sync != RaceState.Racing) return;
 		//나중에 조건으로 플레이어가 EndPoint에 도달했을 경우 시간 정지.
+		if (isStop) return;
 
 		double elapsedTime = NetworkTime.time - RaceManager.Instance.race_start_time_sync;
 

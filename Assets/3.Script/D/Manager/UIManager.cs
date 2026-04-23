@@ -8,13 +8,17 @@ using TMPro;
 public class UIManager : MonoBehaviour {
 	public static UIManager Instance = null;
 
+
 	[SerializeField] private Button _wingButton;
 	[SerializeField] private Button _itemButton;
+	
 	[SerializeField] private TextMeshProUGUI _itemText;
+	[SerializeField] private TextMeshProUGUI _rankText;
+	[SerializeField] private TextMeshProUGUI _ResultTextLog;
+
 	[SerializeField] private StageProgressUi _stageProgressUI;
 	[SerializeField] private Option _option;
-
-	[SerializeField] private TextMeshProUGUI _rankText;
+	[SerializeField] private TimerUI _timerUI;
 
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -69,6 +73,15 @@ public class UIManager : MonoBehaviour {
 		if (_rankText != null) {
 			_rankText.text = $"{myRank} / {sortedList.Count}";
 		}
+	}
+
+	public void UpdateResultTextLog(bool result) {
+		if(result) _ResultTextLog.text = "성공";
+		else _ResultTextLog.text = "실패";
+	}
+
+	public void StopTimer() {
+		_timerUI.isStop = true;
 	}
 
 

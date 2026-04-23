@@ -11,6 +11,12 @@ public enum RaceState {
 	Finished
 }
 
+public struct PlayerResult {
+	public NetworkIdentity player;
+	public double finishTime;
+	public bool isDead;
+}
+
 public class RaceManager : NetworkBehaviour {
 	public static RaceManager Instance = null;
 
@@ -28,8 +34,6 @@ public class RaceManager : NetworkBehaviour {
 	[Header("도착 속도 판정 (Death)")]
 	[SyncVar, SerializeField, Range(5f, 50f)] private float _deathOverSpeedSync = 30f;
 
-	private List<NetworkIdentity> finishers = new List<NetworkIdentity>();
-
 	public int START_MAX_PLAYER = 10;
 
 
@@ -39,7 +43,9 @@ public class RaceManager : NetworkBehaviour {
 	private Dictionary<Transform, int> _previousRanks = new Dictionary<Transform, int>();
 	public event Action on_any_rank_changed;
 
-
+	// 도착 순위
+	//private List<PlayerResult> final_results = new List<PlayerResult>();
+	private Dictionary<NetworkIdentity, PlayerResult> _roundResults = new Dictionary<NetworkIdentity, PlayerResult>();
 	//----- 메서드
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -85,22 +91,35 @@ public class RaceManager : NetworkBehaviour {
 	public void GetArriveResult(NetworkConnectionToClient sender, float impactSpeed, double finishTime) {
 		//TODO - 순위 리스트 업데이트 및 결과 RPC 전송
 		if (current_state_sync != RaceState.Racing) return;
-		bool result = (impactSpeed > _deathOverSpeedSync) ? true : false;
-		//나중에 결과 알려주기.
+		bool isDead = impactSpeed > _deathOverSpeedSync;
 
-
-		if(!finishers.Contains(sender.identity)) {
-			finishers.Add(sender.identity);
-			if (finishers.Count >= total_players) {
-				EndRace();
+		_roundResults.Add(sender.identity,
+			new PlayerResult {
+				player = sender.identity,
+				finishTime = finishTime,
+				isDead = isDead
 			}
-			//들어온 시간 보고 순위 정렬?
+		);
+
+		ReceiveArriveResult(sender, isDead);
+
+		if(_roundResults.Count >= active_players.Count) {
+			EndRace();
 		}
+	}
+
+	[TargetRpc]
+	private void ReceiveArriveResult(NetworkConnectionToClient target, bool result) {
+		UIManager.Instance.UpdateResultTextLog(result);
 	}
 
 	[Server]
 	private void EndRace() {
 		current_state_sync = RaceState.Finished;
+
+		List<PlayerResult> sortedResults = new List<PlayerResult>(_roundResults.Values);
+		sortedResults.Sort((a, b) => a.finishTime.CompareTo(b.finishTime));
+
 	}
 
 	// ==========================================

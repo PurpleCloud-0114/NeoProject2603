@@ -34,11 +34,13 @@ public class PlayerUIController : NetworkBehaviour {
 
 	private void OnEnable() {
 		_playerCore.on_redzone_entered += ActivateWingBtn;
+		_playerCore.on_endpoint_landed += StopTimer;
 		_playerCore.on_item_acquired += ActivateItemBtn;
 		_playerCore.on_item_acquired += SetItemNameOnUI;
 	}
 	private void OnDisable() {
 		_playerCore.on_redzone_entered -= ActivateWingBtn;
+		_playerCore.on_endpoint_landed -= StopTimer;
 		_playerCore.on_item_acquired -= ActivateItemBtn;
 		_playerCore.on_item_acquired -= SetItemNameOnUI;
 	}
@@ -56,13 +58,12 @@ public class PlayerUIController : NetworkBehaviour {
 		_itemButton.onClick.AddListener(DeActivateItemBtn);
 	}
 
-	private void BindUI() {
-		UIManager.Instance.BindJoystick(transform);
-	}
+	private void BindUI() => UIManager.Instance.BindJoystick(transform);
 
 	public void ActivateWingBtn() => _wingButton.interactable = true;
 	public void DeActivateWingBtn() => _wingButton.interactable = false;
 	public void ActivateItemBtn(IUseable _item) => _itemButton.interactable = true;
 	public void DeActivateItemBtn() => _itemButton.interactable = false;
 	public void SetItemNameOnUI(IUseable _item) => _itemName.text = _item.Name;
+	public void StopTimer() => UIManager.Instance.StopTimer();
 }
