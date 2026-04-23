@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,11 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private StageProgressUi _stageProgressUI;
 	[SerializeField] private Option _option;
 	[SerializeField] private TimerUI _timerUI;
+
+	[Header("최종 결과 UI")]
+	[SerializeField] private GameObject _resultWindow;    // 결과창 부모 오브젝트
+	[SerializeField] private RectTransform _resultContainer; // RankPrefab이 생성될 부모 (Content)
+	[SerializeField] private GameObject _rankPrefab;
 
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -84,6 +90,52 @@ public class UIManager : MonoBehaviour {
 		_timerUI.isStop = true;
 	}
 
+	public void ShowFinalResult(PlayerResult[] results) {
+		// 1. 기존에 생성된 리스트가 있다면 제거 (초기화)
+		foreach (Transform child in _resultContainer) {
+			Destroy(child.gameObject);
+		}
+
+		_resultWindow.SetActive(true);
+
+		for (int i = 0; i < results.Length; i++) {
+			// 2. 프리팹 생성 및 부모 설정
+			GameObject go = Instantiate(_rankPrefab, _resultContainer);
+			RectTransform rect = go.GetComponent<RectTransform>();
+
+			// 3. 위치 배치 (위에서부터 150 간격으로 하단 배치)
+			// anchoredPosition의 Y값을 -150 * i 로 설정하여 아래로 나열
+			rect.anchoredPosition = new Vector2(0, -150 * i);
+
+			// 4. 텍스트 데이터 바인딩
+			var rankTexts = go.GetComponentsInChildren<TextMeshProUGUI>();
+
+			// 프리팹 구조에 따른 순서 (Rank, Name, Time)
+			// 인덱스는 하이어라키 순서에 따라 다를 수 있으니 확인 필요
+			foreach (var tmp in rankTexts) {
+				if (tmp.name == "Rank") {
+					if(results[i].isDead) {
+						tmp.color = Color.red;
+						tmp.text = "사망";
+					} else {
+						tmp.text = (i + 1).ToString();
+					}
+				} else if (tmp.name == "Name") {
+					// NetworkIdentity를 통해 해당 오브젝트의 이름을 가져옴
+					tmp.text = "플레이어";
+				} else if (tmp.name == "Time") {
+					// 사망자(Retire) 처리
+					if (results[i].isDead) {
+						tmp.text = "--:--.--";
+					} else {
+						// 시간을 "00:00.00" 형식으로 포맷팅
+						TimeSpan time = TimeSpan.FromSeconds(results[i].finishTime);
+						tmp.text = string.Format($"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds / 10:00}");
+					}
+				}
+			}
+		}
+	}
 
 	// ==========================================
 	// [ 클라이언트 UI 바인드 ]

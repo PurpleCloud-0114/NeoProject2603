@@ -119,7 +119,12 @@ public class RaceManager : NetworkBehaviour {
 
 		List<PlayerResult> sortedResults = new List<PlayerResult>(_roundResults.Values);
 		sortedResults.Sort((a, b) => a.finishTime.CompareTo(b.finishTime));
+		RpcShowFinalResult(sortedResults.ToArray());
+	}
 
+	[ClientRpc]
+	private void RpcShowFinalResult(PlayerResult[] results) {
+		UIManager.Instance.ShowFinalResult(results);
 	}
 
 	// ==========================================

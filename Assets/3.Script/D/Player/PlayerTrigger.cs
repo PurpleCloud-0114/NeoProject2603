@@ -18,6 +18,18 @@ public class PlayerTrigger : NetworkBehaviour
         TryGetComponent(out _playerCore);
     }
 
+    private void OnCollisionEnter(Collision collision) {
+        if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
+
+        if (collision.transform.CompareTag("EndPoint")) {
+            float impactSpeed = Mathf.Abs(collision.relativeVelocity.y);
+            double myFinishTime = NetworkTime.time - RaceManager.Instance.race_start_time_sync;
+            _playerCore.SendArriveResult(impactSpeed, myFinishTime);
+            _playerCore.LandEndpoint();
+        }
+    }
+
+
     private void OnTriggerEnter(Collider other)
     {
         if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay)

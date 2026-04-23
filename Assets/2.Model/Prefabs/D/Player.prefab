@@ -1328,6 +1328,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  _playerModel: {fileID: 7830986851564145393}
   player_state: 0
   status_effect: 0
   player_number: 0
@@ -1352,6 +1353,7 @@ MonoBehaviour:
   drop_max_speed: 100
   base_drop_max_speed: 0
   _dropWingSpeed: 30
+  _wingTime: 0
   MoveMobileSensitive: 1
 --- !u!114 &546341614421835030
 MonoBehaviour:
