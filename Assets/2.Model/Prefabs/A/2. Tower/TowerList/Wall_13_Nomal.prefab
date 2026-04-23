@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 858180267153939032}
   - component: {fileID: 4884350232678768770}
   - component: {fileID: 6034848265603233172}
-  - component: {fileID: 7367757722911632243}
   - component: {fileID: 5340600309521612932}
   m_Layer: 6
   m_Name: 6. floor_gaurd (1)
@@ -117,18 +116,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2801968051306675209, guid: 1371e9aaa72007a4da2861c53a9eea8e, type: 3}
---- !u!114 &7367757722911632243
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 10491699066461231}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!114 &5340600309521612932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4120,7 +4107,6 @@ GameObject:
   - component: {fileID: 8788790923998816806}
   - component: {fileID: 3591728492544233724}
   - component: {fileID: 2436665265832592874}
-  - component: {fileID: 1454478223002589965}
   - component: {fileID: 8558665710495951177}
   m_Layer: 6
   m_Name: 6. floor_gaurd
@@ -4225,18 +4211,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2801968051306675209, guid: 1371e9aaa72007a4da2861c53a9eea8e, type: 3}
---- !u!114 &1454478223002589965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8229649392956075089}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!114 &8558665710495951177
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4604,7 +4578,6 @@ GameObject:
   - component: {fileID: 8372042014759340138}
   - component: {fileID: 4327707546216280752}
   - component: {fileID: 3172714722868602790}
-  - component: {fileID: 1871282074814282049}
   - component: {fileID: 7517631722067485110}
   m_Layer: 6
   m_Name: 6. floor_gaurd (2)
@@ -4709,18 +4682,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2801968051306675209, guid: 1371e9aaa72007a4da2861c53a9eea8e, type: 3}
---- !u!114 &1871282074814282049
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9215191223892430365}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!114 &7517631722067485110
 MonoBehaviour:
   m_ObjectHideFlags: 0

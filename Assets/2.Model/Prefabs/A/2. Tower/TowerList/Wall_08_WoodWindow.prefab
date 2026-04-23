@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3940890019768579848}
   - component: {fileID: 1248673429085799362}
   - component: {fileID: 6887188761306556620}
-  - component: {fileID: 9194113679137468617}
+  - component: {fileID: 2955052883669995712}
   m_Layer: 0
   m_Name: 3. table
   m_TagString: Obstacle
@@ -115,7 +115,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 5767343452939779793, guid: b42954e6929aec44290c7c910125f5e3, type: 3}
---- !u!114 &9194113679137468617
+--- !u!114 &2955052883669995712
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -124,9 +124,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 744450383737217559}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 1
+  parentFloor: {fileID: 2812919872920854874}
 --- !u!1 &1598626109470018517
 GameObject:
   m_ObjectHideFlags: 0
@@ -650,8 +652,8 @@ GameObject:
   - component: {fileID: 7415182365727432488}
   - component: {fileID: 5856894508664590477}
   - component: {fileID: 8548722489565602887}
-  - component: {fileID: 2803269335765920169}
   - component: {fileID: 691667725766968301}
+  - component: {fileID: 4216044442108353172}
   m_Layer: 0
   m_Name: 1. beams_connected
   m_TagString: Obstacle
@@ -730,18 +732,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &2803269335765920169
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7900393190327109010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
 --- !u!65 &691667725766968301
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -761,8 +751,22 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 7.000001, y: 0.55, z: 0.64}
-  m_Center: {x: 0.00000035762787, y: 3.8249981, z: -0.00000053644175}
+  m_Size: {x: 7.000001, y: 0.25, z: 0.34}
+  m_Center: {x: 0.00000035762787, y: 3.82, z: -0.00000053644175}
+--- !u!114 &4216044442108353172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7900393190327109010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 0
+  parentFloor: {fileID: 2812919872920854874}
 --- !u!1 &8940412418147337422
 GameObject:
   m_ObjectHideFlags: 0
@@ -898,7 +902,7 @@ GameObject:
   - component: {fileID: 4692025927758965440}
   - component: {fileID: 7420133321112165898}
   - component: {fileID: 5660283182524420879}
-  - component: {fileID: 5581764493291872605}
+  - component: {fileID: 5061960150033377222}
   m_Layer: 0
   m_Name: 2. stairs_wood_decorated
   m_TagString: Obstacle
@@ -999,7 +1003,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -8355185453818535271, guid: 3109b3b4c853cda4e9fc0030fc29a848, type: 3}
---- !u!114 &5581764493291872605
+--- !u!114 &5061960150033377222
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1008,9 +1012,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 9077400327963131871}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4baec5313914a48b67e9ff1a8aa6c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleTrigger
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 2
+  parentFloor: {fileID: 2812919872920854874}
 --- !u!1001 &802409737306715103
 PrefabInstance:
   m_ObjectHideFlags: 0

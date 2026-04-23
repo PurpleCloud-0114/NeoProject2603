@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 5402466845971426315}
   - component: {fileID: 8078479300785791872}
   - component: {fileID: 897618048232882856}
-  - component: {fileID: 2372758568255215149}
   - component: {fileID: 8751624963128971961}
+  - component: {fileID: 7317784080181008113}
   m_Layer: 6
   m_Name: bed_A_stacked
   m_TagString: Obstacle
@@ -92,8 +92,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &2372758568255215149
-MeshCollider:
+--- !u!114 &8751624963128971961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 893728159370550784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 1
+  parentFloor: {fileID: 2078989545505503166}
+--- !u!65 &7317784080181008113
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -110,24 +124,9 @@ MeshCollider:
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 8463985132477582440, guid: 1300e3d10ae3a834c92e4ce960688165, type: 3}
---- !u!114 &8751624963128971961
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 893728159370550784}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
-  obstacleIndex: 1
-  parentFloor: {fileID: 2078989545505503166}
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2.65, z: 3.000001}
+  m_Center: {x: -0.0000030398369, y: 1.44, z: -0.0000015497208}
 --- !u!1 &1069955407719301141
 GameObject:
   m_ObjectHideFlags: 0
@@ -327,8 +326,8 @@ GameObject:
   - component: {fileID: 1970766428474950360}
   - component: {fileID: 1445959308085843848}
   - component: {fileID: 3163961115632645106}
-  - component: {fileID: 8042826740271823673}
   - component: {fileID: 7105077567777898465}
+  - component: {fileID: 6939235832028050845}
   m_Layer: 6
   m_Name: table_long_decorated_B
   m_TagString: Obstacle
@@ -407,8 +406,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &8042826740271823673
-MeshCollider:
+--- !u!114 &7105077567777898465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4361554878869312246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
+  obstacleIndex: 2
+  parentFloor: {fileID: 2078989545505503166}
+--- !u!65 &6939235832028050845
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -425,24 +438,9 @@ MeshCollider:
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8249813824428445870, guid: 486c66f43fe70cb45b7d7d9507221053, type: 3}
---- !u!114 &7105077567777898465
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4361554878869312246}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 629a403ce5bb4a74b908f5c026676730, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
-  obstacleIndex: 2
-  parentFloor: {fileID: 2078989545505503166}
+  serializedVersion: 3
+  m_Size: {x: 2.0000005, y: 0.91, z: 4.0000005}
+  m_Center: {x: 0.00000017881393, y: 0.5, z: 0}
 --- !u!1 &4730127887781847841
 GameObject:
   m_ObjectHideFlags: 0
@@ -698,8 +696,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3.5000007, y: 1.5000037, z: 3.0000007}
-  m_Center: {x: 7.1054274e-15, y: 0.74999547, z: -0.0000001192093}
+  m_Size: {x: 3.5000007, y: 0.78, z: 3.0000007}
+  m_Center: {x: 7.1054274e-15, y: 0.36, z: -0.0000001192093}
 --- !u!114 &5900755066389959359
 MonoBehaviour:
   m_ObjectHideFlags: 0

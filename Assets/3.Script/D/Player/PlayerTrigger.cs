@@ -5,8 +5,8 @@ public class PlayerTrigger : NetworkBehaviour
 {
     private PlayerCore _playerCore;
 
-    private const string TAG_ITEMBOX = "ItemBox";
     private const string TAG_OBSTACLE = "Obstacle";
+    private const string TAG_ITEMBOX = "ItemBox";
     private const string TAG_REDZONE = "Redzone";
     private const string TAG_SPIDERWEB = "Spiderweb";
     private const string TAG_PLAYER = "Player";
@@ -20,35 +20,33 @@ public class PlayerTrigger : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
+        if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay)
+            return;
 
         switch (other.tag)
         {
             case TAG_ITEMBOX:
-                CmdDisableRoot(other.transform.root.gameObject);
-                IUseable randomItem = ItemManager.Instance.RandomItem();
-                _playerCore.on_item_acquired?.Invoke(randomItem);
+                CmdDisableRoot(other.transform.root.GetComponent<NetworkIdentity>());
+                _playerCore.on_item_acquired?.Invoke(ItemManager.Instance.RandomItem());
                 break;
 
             case TAG_OBSTACLE:
-                // 1. 맵 모듈의 자식 장애물인지 확인 (Identity 스크립트 기반)
-                if (other.TryGetComponent(out ObstacleIdentity obsID))
+                ObstacleIdentity obs = other.GetComponentInParent<ObstacleIdentity>();
+
+                // 1. MapFloor에 속한 모듈형 장애물인 경우
+                if (obs != null && obs.parentFloor != null)
                 {
-                    if (obsID.parentFloor != null)
-                    {
-                        CmdHitModuleObstacle(obsID.parentFloor.gameObject, obsID.obstacleIndex);
-                    }
+                    CmdHitModuleObstacle(obs.parentFloor.netIdentity, obs.obstacleIndex);
                 }
-                // 2. 맵 모듈의 일부지만 스크립트가 없는 경우를 위한 안전장치
-                else if (other.GetComponentInParent<MapFloor>() != null)
-                {
-                    // 맵 전체 삭제를 방지하기 위해 root 삭제를 실행하지 않음
-                    Debug.Log("MapFloor 자식 장애물이지만 식별자가 없습니다.");
-                }
-                // 3. 순수 독립 장애물 (Spawner에 의해 개별 생성된 경우)
+                // 2. MapFloor가 없는 독립형(공중) 장애물인 경우 (아이템박스처럼 처리)
                 else
                 {
-                    CmdDisableRoot(other.transform.root.gameObject);
+                    // root에서 NetworkIdentity를 찾아 서버에서 UnSpawn 및 삭제 요청
+                    NetworkIdentity identity = other.transform.root.GetComponent<NetworkIdentity>();
+                    if (identity != null)
+                    {
+                        CmdDisableRoot(identity);
+                    }
                 }
 
                 _playerCore.on_obstacle_hit?.Invoke();
@@ -69,28 +67,34 @@ public class PlayerTrigger : NetworkBehaviour
         }
     }
 
+    // ---------------- COMMANDS ----------------
+
     [Command]
-    private void CmdHitModuleObstacle(GameObject floorObj, int index)
+    private void CmdHitModuleObstacle(NetworkIdentity floorId, int index)
     {
-        if (floorObj != null && floorObj.TryGetComponent(out MapFloor floor))
+        if (floorId != null && floorId.TryGetComponent(out MapFloor floor))
         {
             floor.DisableByIndex(index);
         }
     }
 
     [Command]
-    private void CmdDisableRoot(GameObject obj)
+    private void CmdDisableRoot(NetworkIdentity identity)
     {
-        if (obj == null) return;
-        NetworkServer.UnSpawn(obj);
-        obj.SetActive(false);
+        if (identity == null) return;
+
+        NetworkServer.UnSpawn(identity.gameObject);
+        identity.gameObject.SetActive(false);
     }
+
+    // ---------------- PUSH ----------------
 
     private void PushPlayer(Collider other)
     {
-        Vector3 pushDir = transform.position - other.transform.position;
-        pushDir.y = 0;
-        if (pushDir.sqrMagnitude > 0.001f)
-            _playerCore.on_impulse_requested?.Invoke(pushDir.normalized * _hitPlayerImpulsePower);
+        Vector3 dir = transform.position - other.transform.position;
+        dir.y = 0;
+
+        if (dir.sqrMagnitude > 0.001f)
+            _playerCore.on_impulse_requested?.Invoke(dir.normalized * _hitPlayerImpulsePower);
     }
 }
