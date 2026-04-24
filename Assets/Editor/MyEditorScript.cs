@@ -2,32 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEditor.Android;
 using UnityEngine;
 
 class MyEditorScript
 {
     static void PerformBuild()
     {
+        // Unity 6 공식 API로 JDK/SDK/NDK 경로 직접 설정
         string unityRoot = @"C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\PlaybackEngines\AndroidPlayer";
         string jdkPath = Path.Combine(unityRoot, "OpenJDK");
         string sdkPath = Path.Combine(unityRoot, "SDK");
         string ndkPath = Path.Combine(unityRoot, "NDK");
 
-        // 프로세스 환경변수에 직접 주입 (빌드 파이프라인이 이걸 봄)
-        Environment.SetEnvironmentVariable("JAVA_HOME", jdkPath, EnvironmentVariableTarget.Process);
-        Environment.SetEnvironmentVariable("ANDROID_HOME", sdkPath, EnvironmentVariableTarget.Process);
-        Environment.SetEnvironmentVariable("ANDROID_SDK_ROOT", sdkPath, EnvironmentVariableTarget.Process);
-        Environment.SetEnvironmentVariable("ANDROID_NDK_ROOT", ndkPath, EnvironmentVariableTarget.Process);
+        AndroidExternalToolsSettings.jdkRootPath = jdkPath;
+        AndroidExternalToolsSettings.sdkRootPath = sdkPath;
+        AndroidExternalToolsSettings.ndkRootPath = ndkPath;
 
-        // EditorPrefs도 같이 (보조)
-        EditorPrefs.SetString("JdkPath", jdkPath);
-        EditorPrefs.SetString("AndroidSdkRoot", sdkPath);
-        EditorPrefs.SetString("AndroidNdkRoot", ndkPath);
-        EditorPrefs.SetString("AndroidNdkRootR23b", ndkPath);
-
-        Debug.Log($"[Build] JAVA_HOME = {Environment.GetEnvironmentVariable("JAVA_HOME")}");
-        Debug.Log($"[Build] ANDROID_HOME = {Environment.GetEnvironmentVariable("ANDROID_HOME")}");
-        Debug.Log($"[Build] ANDROID_NDK_ROOT = {Environment.GetEnvironmentVariable("ANDROID_NDK_ROOT")}");
+        Debug.Log($"[Build] JDK = {AndroidExternalToolsSettings.jdkRootPath}");
+        Debug.Log($"[Build] SDK = {AndroidExternalToolsSettings.sdkRootPath}");
+        Debug.Log($"[Build] NDK = {AndroidExternalToolsSettings.ndkRootPath}");
 
         string buildDir = "Builds/Android";
         Directory.CreateDirectory(buildDir);
