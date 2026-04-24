@@ -9,15 +9,12 @@ class MyEditorScript
 {
     static void PerformBuild()
     {
-        // Unity 6 공식 API로 JDK/SDK/NDK 경로 직접 설정
         string unityRoot = @"C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\PlaybackEngines\AndroidPlayer";
-        string jdkPath = Path.Combine(unityRoot, "OpenJDK");
-        string sdkPath = Path.Combine(unityRoot, "SDK");
-        string ndkPath = Path.Combine(unityRoot, "NDK");
 
-        AndroidExternalToolsSettings.jdkRootPath = jdkPath;
-        AndroidExternalToolsSettings.sdkRootPath = sdkPath;
-        AndroidExternalToolsSettings.ndkRootPath = ndkPath;
+        // JDK는 별도 설치한 Java 17 사용 (Unity 내장 OpenJDK가 구버전이라서)
+        AndroidExternalToolsSettings.jdkRootPath = @"C:\Program Files\Eclipse Adoptium\jdk-17.0.18.8-hotspot";
+        AndroidExternalToolsSettings.sdkRootPath = Path.Combine(unityRoot, "SDK");
+        AndroidExternalToolsSettings.ndkRootPath = Path.Combine(unityRoot, "NDK");
 
         Debug.Log($"[Build] JDK = {AndroidExternalToolsSettings.jdkRootPath}");
         Debug.Log($"[Build] SDK = {AndroidExternalToolsSettings.sdkRootPath}");
