@@ -8,28 +8,26 @@ class MyEditorScript
 {
     static void PerformBuild()
     {
-        // Unity 설치 경로의 내장 JDK/SDK/NDK를 직접 지정
         string unityRoot = @"C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\PlaybackEngines\AndroidPlayer";
         string jdkPath = Path.Combine(unityRoot, "OpenJDK");
         string sdkPath = Path.Combine(unityRoot, "SDK");
         string ndkPath = Path.Combine(unityRoot, "NDK");
-        string gradlePath = Path.Combine(unityRoot, "Tools", "gradle");
 
+        // 프로세스 환경변수에 직접 주입 (빌드 파이프라인이 이걸 봄)
+        Environment.SetEnvironmentVariable("JAVA_HOME", jdkPath, EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("ANDROID_HOME", sdkPath, EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("ANDROID_SDK_ROOT", sdkPath, EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("ANDROID_NDK_ROOT", ndkPath, EnvironmentVariableTarget.Process);
+
+        // EditorPrefs도 같이 (보조)
         EditorPrefs.SetString("JdkPath", jdkPath);
         EditorPrefs.SetString("AndroidSdkRoot", sdkPath);
         EditorPrefs.SetString("AndroidNdkRoot", ndkPath);
         EditorPrefs.SetString("AndroidNdkRootR23b", ndkPath);
-        EditorPrefs.SetString("GradlePath", gradlePath);
 
-        // embedded 플래그도 같이
-        EditorPrefs.SetBool("JdkUseEmbedded", true);
-        EditorPrefs.SetBool("SdkUseEmbedded", true);
-        EditorPrefs.SetBool("NdkUseEmbedded", true);
-        EditorPrefs.SetBool("GradleUseEmbedded", true);
-
-        Debug.Log($"[Build] JDK: {jdkPath} (exists={Directory.Exists(jdkPath)})");
-        Debug.Log($"[Build] SDK: {sdkPath} (exists={Directory.Exists(sdkPath)})");
-        Debug.Log($"[Build] NDK: {ndkPath} (exists={Directory.Exists(ndkPath)})");
+        Debug.Log($"[Build] JAVA_HOME = {Environment.GetEnvironmentVariable("JAVA_HOME")}");
+        Debug.Log($"[Build] ANDROID_HOME = {Environment.GetEnvironmentVariable("ANDROID_HOME")}");
+        Debug.Log($"[Build] ANDROID_NDK_ROOT = {Environment.GetEnvironmentVariable("ANDROID_NDK_ROOT")}");
 
         string buildDir = "Builds/Android";
         Directory.CreateDirectory(buildDir);
