@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public enum ItemType { 
-	None,
-	WeightAcceleration,
-	Spiderweb,
-	Shockwave,
-	Magnetic,
-	AntiMagic
+public enum ItemType : byte
+{
+    None = 0,
+    WeightAcceleration = 1, // 중량 가속
+    Spiderweb = 2,          // 거미줄
+    Shockwave = 3,          // 충격파
+    Magnetic = 4,           // 자석 (예정)
+    AntiMagic = 5           // 안티 매직 (예정)
+
+	//아이템 이름 (이거 번호는 안적어도됨)
 }
 
 public class ItemManager : NetworkBehaviour {
@@ -23,50 +26,29 @@ public class ItemManager : NetworkBehaviour {
 		else Destroy(gameObject);
 	}
 
-	[Server]
-	public void ExecuteItemLogic(ItemType type, GameObject user) {
-		switch (type) {
-			case ItemType.WeightAcceleration:
-				ApplyWeightAcceleration(user);
-				break;
-			case ItemType.Spiderweb:
-
-				break;
-			case ItemType.Shockwave:
-
-				break;
-			case ItemType.Magnetic:
-
-				break;
-			case ItemType.AntiMagic:
-
-				break;
-		}
-	}
-
-	private void ApplyWeightAcceleration(GameObject user) {
-		if(user.TryGetComponent(out PlayerEffectController effect)) {
-			effect.UseWeightAccelerationItem(25f, 150f, 1.5f);
-		}
-	}
-
 	public IUseable RandomItem() {
-		int randomIndex = Random.Range(0, 0);
+		ItemType type = (ItemType)Random.Range(1, 4);
+		switch (type) {
+			case ItemType.WeightAcceleration: return new WeightAccelerationItem();
+			case ItemType.Spiderweb: return new SpiderwebItem();
+			case ItemType.Shockwave: return new ShockwaveMagicItem();
+			default: return null;
+		}
+	}
 
-		switch(randomIndex) {
-			case 0:
-				return new WeightAccelerationItem();
-			case 1:
-				return new SpiderwebItem();
-			case 2:
-				return new ShockwaveMagicItem();
-			default:
-				return null;
+	public IUseable GetItemUseable(ItemType type) {
+		switch (type) {
+			case ItemType.WeightAcceleration: return new WeightAccelerationItem();
+			case ItemType.Spiderweb: return new SpiderwebItem();
+			case ItemType.Shockwave: return new ShockwaveMagicItem();
+			default: return null;
 		}
 	}
 
 	public void SpanwSpiderweb(Vector3 postion) {
-		if(_spiderwebPrefab.TryGetComponent(out SpiderwebObstacle _spiderweb))
-		Instantiate(_spiderwebPrefab, postion + Vector3.up * _spiderweb.distance, Quaternion.identity);
+		if (_spiderwebPrefab.TryGetComponent(out SpiderwebObstacle _spiderweb)) {
+			GameObject webInst = Instantiate(_spiderwebPrefab, postion + Vector3.up * _spiderweb.distance, Quaternion.identity);
+			NetworkServer.Spawn(webInst);
+		}
 	}
 }

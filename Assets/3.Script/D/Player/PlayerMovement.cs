@@ -12,7 +12,7 @@ public class PlayerMovement : NetworkBehaviour {
 	private Vector2 _moveVector;
 	private Vector3 _moveDir;
 
-	[SerializeField] private Vector3 _velocityTracker;
+	//[SerializeField] private Vector3 _velocityTracker;
 
 	[Header("조작 이동속도 조절")]
 	[SerializeField, Range(0, 100)] public float _moveSpeed = 45f;              //임시 퍼블릭
@@ -26,6 +26,7 @@ public class PlayerMovement : NetworkBehaviour {
 	[Range(1f, 10f)] public float MoveMobileSensitive = 1f;
 
 	private Tween _speedControlSequence;
+	private Tween _stunSequence;
 
 	//----- 메서드
 
@@ -53,19 +54,23 @@ public class PlayerMovement : NetworkBehaviour {
 
 	private void OnEnable() {
 		_playerCore.on_player_state_change_requested += StartFalling;
+		_playerCore.on_wing_button_clicked += CancleSequence;
 		_playerCore.on_wing_button_clicked += OpenWing;
 		_playerCore.on_max_drop_speed_change_requested += ApplySpeedChange;
 		_playerCore.on_impulse_requested += ApplyImpulse;
 		_playerCore.on_obstacle_hit += HitObstacle;
 		_playerCore.on_redzone_entered += SetDecreaseDropSpeedTimeOnWing;
+		_playerCore.on_stun_requested += ApplyStun;
 	}
 	private void OnDisable() {
 		_playerCore.on_player_state_change_requested -= StartFalling;
+		_playerCore.on_wing_button_clicked -= CancleSequence;
 		_playerCore.on_wing_button_clicked -= OpenWing;
 		_playerCore.on_max_drop_speed_change_requested -= ApplySpeedChange;
 		_playerCore.on_impulse_requested -= ApplyImpulse;
 		_playerCore.on_obstacle_hit -= HitObstacle;
 		_playerCore.on_redzone_entered -= SetDecreaseDropSpeedTimeOnWing;
+		_playerCore.on_stun_requested -= ApplyStun;
 	}
 
 	private void FixedUpdate() {
@@ -79,7 +84,7 @@ public class PlayerMovement : NetworkBehaviour {
 		}
 
 		ClampPositionToMapBounds();
-		_velocityTracker = _rigidBody.linearVelocity;
+		//_velocityTracker = _rigidBody.linearVelocity;
 	}
 	private void Update() {
 		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _playerInputSystem == null) return;
@@ -188,5 +193,22 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 	private void ApplyImpulse(Vector3 force) {
 		_rigidBody.AddForce(force, ForceMode.VelocityChange);
+	}
+	private void ApplyStun(float duration) {
+		_stunSequence?.Kill();
+		_playerCore.on_state_effect_change_requested?.Invoke(StatusEffect.Stun);
+		if (_playerInputSystem != null) {
+			_playerInputSystem.DisableInputSystem();
+		}
+		_stunSequence = DOVirtual.DelayedCall(duration, () => {
+			_playerCore.on_state_effect_change_requested?.Invoke(StatusEffect.None);
+			if (_playerInputSystem != null) {
+				_playerInputSystem.EnableInputSystem();
+			}
+			_stunSequence = null;
+		});
+	}
+	private void CancleSequence() {
+		_speedControlSequence?.Kill();
 	}
 }

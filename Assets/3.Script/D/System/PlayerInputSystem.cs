@@ -16,6 +16,10 @@ public class PlayerInputSystem : MonoBehaviour {
 
 	private PlayerInput _playerInput;
 
+	private void Awake() {
+		TryGetComponent(out _playerInput);
+	}
+
 	private void Start() {
 #if UNITY_ANDROID && !UNITY_EDITOR
 		if (GravitySensor.current != null) {
