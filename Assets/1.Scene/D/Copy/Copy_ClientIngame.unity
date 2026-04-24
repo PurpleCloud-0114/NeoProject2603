@@ -481,7 +481,7 @@ MonoBehaviour:
   isSinglePlay: 0
   current_state_sync: 0
   race_start_time_sync: 0
-  _deathOverSpeedSync: 30
+  _deathOverSpeedSync: 31
   START_MAX_PLAYER: 1
   active_players: []
 --- !u!114 &145343252

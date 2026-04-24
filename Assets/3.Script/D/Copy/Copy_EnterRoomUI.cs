@@ -16,7 +16,7 @@ public class Copy_EnterRoomUI : MonoBehaviour
         //lan
         //networkManager.networkAddress = "192.168.45.93";
         //wifi
-        networkManager.networkAddress = "192.168.45.221";
+        networkManager.networkAddress = "192.168.45.81";
         _inputField.text = "Server Address: " + NetworkManager.singleton.networkAddress;
         networkManager.StartClient();
     }
