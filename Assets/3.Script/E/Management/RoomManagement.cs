@@ -125,7 +125,9 @@ public class RoomManagement : NetworkRoomManager
         {
             if (player == null) continue;
             if (player.connectionToClient == null) continue;
-            LobbyTextUI.Instance.ui?.SetTime(time);
+            RoomPlayer rp = player as RoomPlayer;
+            if (rp == null) continue;
+            rp.RpcSetCountdown(time);
         }
     }
 
@@ -135,7 +137,9 @@ public class RoomManagement : NetworkRoomManager
         {
             if (player == null) continue;
             if (player.connectionToClient == null) continue;
-            LobbyTextUI.Instance.ui?.Hide();
+            RoomPlayer rp = player as RoomPlayer;
+            if (rp == null) continue;
+            rp.RpcCancelCountdown();
         }
     }
 }

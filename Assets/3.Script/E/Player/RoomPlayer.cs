@@ -43,4 +43,13 @@ public class RoomPlayer : NetworkRoomPlayer
         Debug.Log($"[RoomPlayer] RpcUpdateUI ½ÇÇà: index={slot_index}, name={player_name}, isReady={_isReady}");
         LobbyTextUI.Instance.UpdateUI(slot_index, player_name, _isReady);
     }
+    [ClientRpc]
+    public void RpcSetCountdown(int time)
+    {
+        LobbyTextUI.Instance?.ui?.SetTime(time);
+    }
+    public void RpcCancelCountdown()
+    {
+        LobbyTextUI.Instance?.ui?.Hide();
+    }
 }

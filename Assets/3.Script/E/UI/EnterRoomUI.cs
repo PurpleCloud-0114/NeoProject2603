@@ -14,9 +14,9 @@ public class EnterRoomUI : MonoBehaviour
         _inputField.text = "EnterRoom";
         NetworkManager networkManager = NetworkManager.singleton;
         //lan
-        //networkManager.networkAddress = "192.168.50.1";
+        networkManager.networkAddress = "192.168.1.50";
         //wifi
-        networkManager.networkAddress = "192.168.45.93";
+        //networkManager.networkAddress = "192.168.45.93";
         _inputField.text = "Server Address: " + NetworkManager.singleton.networkAddress;
         networkManager.StartClient();
     }
