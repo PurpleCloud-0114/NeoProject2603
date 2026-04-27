@@ -46,6 +46,10 @@ public class RaceManager : NetworkBehaviour {
 	// 도착 순위
 	//private List<PlayerResult> final_results = new List<PlayerResult>();
 	private Dictionary<NetworkIdentity, PlayerResult> _roundResults = new Dictionary<NetworkIdentity, PlayerResult>();
+
+	[Header("레이스 종료")]
+	[SerializeField] private float returnDelay = 7.5f;
+
 	//----- 메서드
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -119,16 +123,49 @@ public class RaceManager : NetworkBehaviour {
 	[Server]
 	private void EndRace() {
 		current_state_sync = RaceState.Finished;
-
 		List<PlayerResult> sortedResults = new List<PlayerResult>(_roundResults.Values);
-		sortedResults.Sort((a, b) => a.finishTime.CompareTo(b.finishTime));
+		sortedResults.Sort((a, b) => {
+			// 생존자(false)는 0, 사망자(true)는 1로 취급됨
+			int deadCompare = a.isDead.CompareTo(b.isDead);
+			if (deadCompare != 0) return deadCompare;
+
+			// 생존 여부가 같다면(둘 다 성공 or 둘 다 실패) 시간이 빠른 순
+			return a.finishTime.CompareTo(b.finishTime);
+		});
+
 		RpcShowFinalResult(sortedResults.ToArray());
+
+		StartReturnToLobby();
 	}
 
 	[ClientRpc]
 	private void RpcShowFinalResult(PlayerResult[] results) {
 		UIManager.Instance.ShowFinalResult(results);
 	}
+
+	[Server]
+	private void StartReturnToLobby() {
+		StartCoroutine(Co_ReturnToLobby());
+	}
+
+	private IEnumerator Co_ReturnToLobby() {
+		Debug.Log("시상식중...(7.5초 걸림)");
+
+		yield return new WaitForSeconds(returnDelay);
+
+		var roomManager = NetworkManager.singleton as NetworkRoomManager;
+
+		if(roomManager != null) {
+			roomManager.ServerChangeScene(roomManager.RoomScene);
+		} else {
+			Debug.Log("RoomManager를 찾을 수 없습니다. 기본 Scene 전환 시도.");
+			NetworkManager.singleton.ServerChangeScene("Copy_ClientLobby");
+		}
+	}
+
+
+
+
 
 	// ==========================================
 	// [클라이언트 영역] - 연출 및 입력 제어
