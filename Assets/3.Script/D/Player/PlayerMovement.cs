@@ -12,7 +12,7 @@ public class PlayerMovement : NetworkBehaviour {
 	private Vector2 _moveVector;
 	private Vector3 _moveDir;
 
-	[SerializeField] private Vector3 _velocityTracker;
+	//[SerializeField] private Vector3 _velocityTracker;
 
 	[Header("조작 이동속도 조절")]
 	[SerializeField, Range(0, 100)] public float _moveSpeed = 45f;              //임시 퍼블릭
@@ -26,6 +26,7 @@ public class PlayerMovement : NetworkBehaviour {
 	[Range(1f, 10f)] public float MoveMobileSensitive = 1f;
 
 	private Tween _speedControlSequence;
+	private Tween _stunSequence;
 
 	//----- 메서드
 
@@ -53,19 +54,23 @@ public class PlayerMovement : NetworkBehaviour {
 
 	private void OnEnable() {
 		_playerCore.on_player_state_change_requested += StartFalling;
+		_playerCore.on_wing_button_clicked += CancleSequence;
 		_playerCore.on_wing_button_clicked += OpenWing;
 		_playerCore.on_max_drop_speed_change_requested += ApplySpeedChange;
 		_playerCore.on_impulse_requested += ApplyImpulse;
 		_playerCore.on_obstacle_hit += HitObstacle;
 		_playerCore.on_redzone_entered += SetDecreaseDropSpeedTimeOnWing;
+		_playerCore.on_stun_requested += ApplyStun;
 	}
 	private void OnDisable() {
 		_playerCore.on_player_state_change_requested -= StartFalling;
+		_playerCore.on_wing_button_clicked -= CancleSequence;
 		_playerCore.on_wing_button_clicked -= OpenWing;
 		_playerCore.on_max_drop_speed_change_requested -= ApplySpeedChange;
 		_playerCore.on_impulse_requested -= ApplyImpulse;
 		_playerCore.on_obstacle_hit -= HitObstacle;
 		_playerCore.on_redzone_entered -= SetDecreaseDropSpeedTimeOnWing;
+		_playerCore.on_stun_requested -= ApplyStun;
 	}
 
 	private void FixedUpdate() {
@@ -79,7 +84,7 @@ public class PlayerMovement : NetworkBehaviour {
 		}
 
 		ClampPositionToMapBounds();
-		_velocityTracker = _rigidBody.linearVelocity;
+		//_velocityTracker = _rigidBody.linearVelocity;
 	}
 	private void Update() {
 		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _playerInputSystem == null) return;
@@ -125,35 +130,6 @@ public class PlayerMovement : NetworkBehaviour {
 		_rigidBody.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 20f));
 	}
 	private void ClampPositionToMapBounds() {
-		//Vector3 currentPos = transform.position;
-		//Vector3 mapCenter = _mapSize.map_center;
-
-		//// Y축 제외한 평면 거리 계산
-		//Vector2 flatPos = new Vector2(currentPos.x, currentPos.z);
-		//Vector2 flatCenter = new Vector2(mapCenter.x, mapCenter.z);
-		//float distance = Vector2.Distance(flatPos, flatCenter);
-
-		//if (distance > _mapSize.boundaryRadius) {
-		//	// 1. 위치 보정 (떨림 방지를 위해 현재 위치를 경계선에 딱 붙임)
-		//	Vector2 dir = (flatPos - flatCenter).normalized;
-		//	Vector3 clampedPos = new Vector3(
-		//		flatCenter.x + dir.x * _mapSize.boundaryRadius,
-		//		currentPos.y,
-		//		flatCenter.y + dir.y * _mapSize.boundaryRadius
-		//	);
-		//	_rigidBody.position = clampedPos; // MovePosition 대신 직접 대입 시도
-
-		//	// 2. 속도 제어 (중요: 바깥으로 나가는 운동 에너지만 0으로 만듦)
-		//	Vector3 velocity = _rigidBody.linearVelocity;
-		//	Vector3 outDir = new Vector3(dir.x, 0, dir.y);
-
-		//	float dot = Vector3.Dot(velocity, outDir);
-		//	if (dot > 0) {
-		//		// 바깥 방향 속도 성분을 뺌
-		//		_rigidBody.linearVelocity -= outDir * dot;
-		//	}
-		//}
-
 		Vector3 currentPos = transform.position;
 		Vector3 mapCetner = _mapSize.map_center;
 		currentPos.y = mapCetner.y;
@@ -217,5 +193,22 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 	private void ApplyImpulse(Vector3 force) {
 		_rigidBody.AddForce(force, ForceMode.VelocityChange);
+	}
+	private void ApplyStun(float duration) {
+		_stunSequence?.Kill();
+		_playerCore.on_state_effect_change_requested?.Invoke(StatusEffect.Stun);
+		if (_playerInputSystem != null) {
+			_playerInputSystem.DisableInputSystem();
+		}
+		_stunSequence = DOVirtual.DelayedCall(duration, () => {
+			_playerCore.on_state_effect_change_requested?.Invoke(StatusEffect.None);
+			if (_playerInputSystem != null) {
+				_playerInputSystem.EnableInputSystem();
+			}
+			_stunSequence = null;
+		});
+	}
+	private void CancleSequence() {
+		_speedControlSequence?.Kill();
 	}
 }

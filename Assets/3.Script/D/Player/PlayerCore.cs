@@ -38,6 +38,7 @@ public class PlayerCore : NetworkBehaviour {
 
 	public Action<float, float, float, StatusEffect> on_max_drop_speed_change_requested;  //속도, 시간
 	public Action<Vector3> on_impulse_requested;
+	public Action<float> on_stun_requested;
 
 	public float player_number = 0;
 
