@@ -29,19 +29,35 @@ public class MapSpawner : NetworkBehaviour
     {
         float y = _startY;
         int floor = 0;
-        float scale = 1f;
+        float scale = _maxScale; // 시작은 1.0 (_maxScale)
+
+        float redzoneY = -9999f;
+        if (StageManager.Instance != null)
+        {
+            redzoneY = StageManager.Instance.stage_data_sync.map_redzone_height_Y;
+        }
 
         while (y > _endY)
         {
-            GameObject prefab = _floorPrefabs[Random.Range(0, _floorPrefabs.Count)];
-            GameObject obj = GetFromPool(prefab);
+            // 1. 프리팹 결정 로직
+            GameObject prefab = (floor < 3) ? _floorPrefabs[0] : _floorPrefabs[Random.Range(0, _floorPrefabs.Count)];
 
+            GameObject obj = GetFromPool(prefab);
             obj.SetActive(false);
-            obj.transform.localScale = Vector3.one;
             obj.transform.position = new Vector3(_center.x, y, _center.z);
 
             int angle = _yRotations[Random.Range(0, _yRotations.Length)];
             obj.transform.rotation = Quaternion.Euler(0, angle, 0);
+
+            // _noChangeFloorCount(7)층부터 _scaleStep(0.02)씩 감소
+            if (floor >= _noChangeFloorCount)
+            {
+                scale -= _scaleStep;
+                scale = Mathf.Max(scale, _minScale); // _minScale(0.6)까지만 감소
+            }
+
+            obj.transform.localScale = new Vector3(scale, 1f, scale);
+            // ---------------------------------------------
 
             obj.SetActive(true);
 
@@ -51,25 +67,15 @@ public class MapSpawner : NetworkBehaviour
                 NetworkServer.Spawn(obj);
             }
 
-            // 스케일 계산 로직
-            if (floor >= _noChangeFloorCount)
-            {
-                float delta = (floor == _noChangeFloorCount)
-                    ? -_scaleStep
-                    : (Random.value > 0.5f ? _scaleStep : -_scaleStep);
-
-                scale += delta;
-                scale = Mathf.Clamp(scale, _minScale, _maxScale);
-            }
-            obj.transform.localScale = new Vector3(scale, 1f, scale);
-
-            // 맵 구성요소(장애물) 자동 설정
+            // 2. 장애물 설정 로직
             MapFloor mf = obj.GetComponent<MapFloor>();
             if (mf != null)
             {
                 mf.ResetObstacles();
-                mf.RandomizeAttachedObstacles();
-                // 생성 직후 인덱스와 부모 참조를 장애물들에게 주입
+                if (floor >= 3 && y > redzoneY)
+                {
+                    mf.RandomizeAttachedObstacles();
+                }
                 mf.SetupIndices();
             }
 
