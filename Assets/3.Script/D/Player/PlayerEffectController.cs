@@ -3,19 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Mirror;
 
 /// <summary>
 /// 아이템으로 인한 상호작용 효과들을 다루는 컨트롤러입니다.
 /// 즉, 아이템으로 인한 시각적 효과가 아니라는 말입니다.
 /// </summary>
-public class PlayerEffectController : MonoBehaviour {
-	private PlayerMovement _playerMovement;
+public class PlayerEffectController : NetworkBehaviour {
 	private PlayerCore _playerCore;
-	private Rigidbody _rigidbody;
-	private Tween _itemBuffTween;
-
-	private bool _isInvinsible = false;
-
 	/*
 	 아이템 효과 발동할 내용들
 	[ 가속 아이템 ]
@@ -34,31 +29,70 @@ public class PlayerEffectController : MonoBehaviour {
 	 
 	 */
 	private void Awake() {
-		TryGetComponent(out _playerMovement);
 		TryGetComponent(out _playerCore);
-		TryGetComponent(out _rigidbody);
 	}
 
+	private void OnEnable() {
+		_playerCore.on_spiderweb_hit += HitSpiderweb;
+		//_playerCore.OnShockwaveHit += HitShockwave;
+	}
+	private void OnDisable() {
+		_playerCore.on_spiderweb_hit -= HitSpiderweb;
+	}
+
+
+	// ======================
+	// [ 중량 가속 ] - 자버프
+	// ======================
 	public void UseWeightAccelerationItem(float force, float expansionValue, float duration) {
-		_itemBuffTween?.Kill();
-		_playerMovement.drop_max_speed += expansionValue;
-		_rigidbody.AddForce(0, -force, 0, ForceMode.VelocityChange);
-		//Vector3 currentVelocity = _rigidbody.linearVelocity;
-		//currentVelocity.y -= force;
-		//_rigidbody.linearVelocity = currentVelocity;
-
-
-
-		_itemBuffTween = DOTween.To(() => _playerMovement.drop_max_speed, x => _playerMovement.drop_max_speed = x, _playerMovement.base_drop_max_speed, 0.5f)
-			.SetDelay(duration) // 지속시간만큼 대기
-			.SetEase(Ease.InOutQuad); // 부드럽게 감속
+		if (isServer) {
+			TargetApplyWeightAcceleration(netIdentity.connectionToClient, force, expansionValue, duration);
+		}
 	}
+	[TargetRpc]
+	private void TargetApplyWeightAcceleration(NetworkConnectionToClient target, float force, float expansionValue, float duration) {
+		// 실제 물리는 권한을 가진 클라이언트 로컬에서 실행!
+		_playerCore.on_max_drop_speed_change_requested(expansionValue, duration, 1.5f, StatusEffect.None);
+		_playerCore.on_impulse_requested(Vector3.down * force);
+	}
+
+
+	// ======================
+	// [ 거미줄 탄환 ] - 소환
+	// ======================
 	public void UseSpiderwebBulletItem() {
-		ItemManager.Instance.SpanwSpiderweb(transform.position);
+		if (isServer) {
+			ItemManager.Instance.SpanwSpiderweb(transform.position);
+		}
 	}
-	public void UseShockwaveMagicItem() {
-		//주변 사람들한테 범위 지정 및 거리 계산하여 일정 파워 날리기.
+	//맞는 판정
+	public void HitSpiderweb(Collider spiderweb) {
+		if (spiderweb.TryGetComponent(out SpiderwebObstacle _spiderweb)) {
+			_playerCore.on_max_drop_speed_change_requested(_spiderweb.SetPlayerVelocity, _spiderweb.duration, 0f, StatusEffect.Stun);
+		}
 	}
+
+
+	// =========================
+	// [ 충격파 마법 ] - 피격시.
+	// =========================
+	public void HitShockwave(Vector3 force, float stunDuration) {
+		// 이 함수는 서버에서 OverlapSphere로 찾아낸 '맞은 플레이어'의 컨트롤러에서 실행됨
+		if (isServer) {
+			// 맞은 플레이어의 클라이언트에게 날아가라고 명령 전달
+			TargetApplyShockwave(netIdentity.connectionToClient, force, stunDuration);
+		}
+	}
+	[TargetRpc]
+	private void TargetApplyShockwave(NetworkConnectionToClient target, Vector3 force, float stunDuration) {
+		// 맞은 클라이언트가 스스로 날아감
+		_playerCore.on_impulse_requested?.Invoke(force);
+		_playerCore.on_stun_requested?.Invoke(stunDuration);
+		Debug.Log($"충격파 피격! 밀려나는 힘: {force}");
+	}
+
+
+	// 하단 일단 미구현.
 	public void UseMagneticMagicItem() {
 		//일단 미구현
 	}
@@ -67,37 +101,8 @@ public class PlayerEffectController : MonoBehaviour {
 		StartCoroutine("Invinsibling_co",duration);
 	}
 
-	private IEnumerator Invinsibling_co(float duration) {
-		_isInvinsible = true;
-		yield return new WaitForSeconds(duration);
-		_isInvinsible = false;
-	}
-
-	//이제 맞는 판정
-	public void HitSpiderweb(Collider spiderweb) {
-		if (_isInvinsible) return;
-		if(spiderweb.TryGetComponent(out SpiderwebObstacle _spiderweb)) {
-			StopCoroutine("CantMove_co");
-			_playerMovement.drop_max_speed = _spiderweb.SetPlayerVelocity;
-			StartCoroutine("CantMove_co", _spiderweb.duration);
-		}
-	}
-	public void HitShockwave(Vector3 force) {
-		if (_isInvinsible) return;
-		StopCoroutine("CantMove_co");
-		_rigidbody.AddForce(force, ForceMode.VelocityChange);
-		StartCoroutine("CantMove_co", 1f);
-	}
 	public void HitMagnetic() {
-		if (_isInvinsible) return;
 		//조작 불가 및 그 사람한테 쭉 달려간다.
 		//일단 미구현
-	}
-
-	private IEnumerator CantMove_co(float duration) {
-		_playerCore.playerGameState = PlayerGameState.Stun;
-		yield return new WaitForSeconds(duration);
-		_playerMovement.drop_max_speed = _playerMovement.base_drop_max_speed;
-		_playerCore.playerGameState = PlayerGameState.Falling;
 	}
 }

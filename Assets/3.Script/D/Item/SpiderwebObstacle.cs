@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SpiderwebObstacle : MonoBehaviour {
 	public float SetPlayerVelocity = 0f;
-	public float distance = 2.5f;
+	public float distance = 5f;
 	public float duration = 0.5f;
 
 	private void OnTriggerEnter(Collider other) {

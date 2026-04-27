@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,12 @@ public enum RaceState {
 	Countdown,
 	Racing,
 	Finished
+}
+
+public struct PlayerResult {
+	public NetworkIdentity player;
+	public double finishTime;
+	public bool isDead;
 }
 
 public class RaceManager : NetworkBehaviour {
@@ -27,9 +34,21 @@ public class RaceManager : NetworkBehaviour {
 	[Header("도착 속도 판정 (Death)")]
 	[SyncVar, SerializeField, Range(5f, 50f)] private float _deathOverSpeedSync = 30f;
 
-	private List<NetworkIdentity> finishers = new List<NetworkIdentity>();
-	
 	public int START_MAX_PLAYER = 10;
+
+
+	// 참가자 리스트 (순위)
+	public List<Transform> active_players = new List<Transform>();
+	// 이전 순위 기록용 딕셔너리
+	private Dictionary<Transform, int> _previousRanks = new Dictionary<Transform, int>();
+	public event Action on_any_rank_changed;
+
+	// 도착 순위
+	//private List<PlayerResult> final_results = new List<PlayerResult>();
+	private Dictionary<NetworkIdentity, PlayerResult> _roundResults = new Dictionary<NetworkIdentity, PlayerResult>();
+
+	[Header("레이스 종료")]
+	[SerializeField] private float returnDelay = 7.5f;
 
 	//----- 메서드
 	private void Awake() {
@@ -53,13 +72,14 @@ public class RaceManager : NetworkBehaviour {
 
 		//NetworkTime.time = 서버 시간
 		//5초 뒤 출발 하는거. (나중에 수정)
-		race_start_time_sync = NetworkTime.time + 5.0;
+		race_start_time_sync = NetworkTime.time + 4.0;
 
 		//TODO - ClientRPC로 카운트다운 UI 넣을건가?
 	}
 
 	[ServerCallback]
 	//TODO - 코루틴으로 바꿀지 고민.
+	//-> 코루틴으로 하면, 정말 미세하게 어긋나는 경우가 있을 수 있다고 함.
 	private void Update() {
 		if(current_state_sync == RaceState.Countdown) {
 			if(NetworkTime.time >= race_start_time_sync) {
@@ -69,51 +89,105 @@ public class RaceManager : NetworkBehaviour {
 		}
 	}
 
+
 	[Server]
 	//서버 수신 - 클라이언트 통과 정보 받기
 	public void GetArriveResult(NetworkConnectionToClient sender, float impactSpeed, double finishTime) {
 		//TODO - 순위 리스트 업데이트 및 결과 RPC 전송
 		if (current_state_sync != RaceState.Racing) return;
-		bool result = (impactSpeed > _deathOverSpeedSync) ? true : false;
-		//나중에 결과 알려주기.
+		bool isDead = impactSpeed > _deathOverSpeedSync;
 
-
-		if(!finishers.Contains(sender.identity)) {
-			finishers.Add(sender.identity);
-			if (finishers.Count >= total_players) {
-				EndRace();
+		_roundResults.Add(sender.identity,
+			new PlayerResult {
+				player = sender.identity,
+				finishTime = finishTime,
+				isDead = isDead
 			}
-			//들어온 시간 보고 순위 정렬?
+		);
+
+		ReceiveArriveResult(sender, isDead);
+
+		if(_roundResults.Count >= total_players) {
+			EndRace();
 		}
 	}
+
+	[TargetRpc]
+	private void ReceiveArriveResult(NetworkConnectionToClient target, bool result) {
+		UIManager.Instance.UpdateResultTextLog(result);
+	}
+
+	//------------[ 레이스 종료 ] -----------------
+	//------------[ 레이스 종료 ] -----------------
 
 	[Server]
 	private void EndRace() {
 		current_state_sync = RaceState.Finished;
+		List<PlayerResult> sortedResults = new List<PlayerResult>(_roundResults.Values);
+		sortedResults.Sort((a, b) => {
+			// 생존자(false)는 0, 사망자(true)는 1로 취급됨
+			int deadCompare = a.isDead.CompareTo(b.isDead);
+			if (deadCompare != 0) return deadCompare;
+
+			// 생존 여부가 같다면(둘 다 성공 or 둘 다 실패) 시간이 빠른 순
+			return a.finishTime.CompareTo(b.finishTime);
+		});
+
+		RpcShowFinalResult(sortedResults.ToArray());
+
+		StartReturnToLobby();
 	}
+
+	[ClientRpc]
+	private void RpcShowFinalResult(PlayerResult[] results) {
+		UIManager.Instance.ShowFinalResult(results);
+	}
+
+	[Server]
+	private void StartReturnToLobby() {
+		StartCoroutine(Co_ReturnToLobby());
+	}
+
+	private IEnumerator Co_ReturnToLobby() {
+		Debug.Log("시상식중...(7.5초 걸림)");
+
+		yield return new WaitForSeconds(returnDelay);
+
+		var roomManager = NetworkManager.singleton as NetworkRoomManager;
+
+		if(roomManager != null) {
+			roomManager.ServerChangeScene(roomManager.RoomScene);
+		} else {
+			Debug.Log("RoomManager를 찾을 수 없습니다. 기본 Scene 전환 시도.");
+			NetworkManager.singleton.ServerChangeScene("Copy_ClientLobby");
+		}
+	}
+
+
+
+
 
 	// ==========================================
 	// [클라이언트 영역] - 연출 및 입력 제어
 	// ==========================================
-	private void OnStateChanged(RaceState raceState, RaceState newState) {
-		if (NetworkClient.localPlayer != null && NetworkClient.localPlayer.TryGetComponent(out PlayerCore playerCore)) {
-			playerCore.UpdatePlayerStateByRace(newState);
-		}
+	private void OnStateChanged(RaceState oldState, RaceState newState) {
+		PlayerState playerNewState = PlayerState.Wait;
 		switch (newState) {
 			case RaceState.Waiting:
-				//없음.
-				break;
-			case RaceState.Countdown:
-				//UI 매니저한테 카운트다운 연출 지시?
-				//New Input Ststem 액션 맵 비활성화 (Disable)
+				playerNewState = PlayerState.Wait;
 				break;
 			case RaceState.Racing:
-				//New Input Ststem 액션 맵 활성화 (Enable)
+				playerNewState = PlayerState.Falling;
+				StartRankTracking();
 				break;
 			case RaceState.Finished:
-				//New Input Ststem 액션 맵 비활성화 (Disable)
+				playerNewState = PlayerState.Finish;
 				break;
 		}
+		if (NetworkClient.localPlayer != null && NetworkClient.localPlayer.TryGetComponent(out PlayerCore playerCore)) {
+			playerCore.on_player_state_change_requested?.Invoke(playerNewState);
+		}
+
 	}
 
 	[Command(requiresAuthority = false)]
@@ -124,6 +198,58 @@ public class RaceManager : NetworkBehaviour {
 		if(_playersReadyCount >= total_players && current_state_sync == RaceState.Waiting) {
 		//if(_playersReadyCount >= START_MAX_PLAYER) { 
 			StartCountdown();
+		}
+	}
+
+	//플레이어 생성시, PlayerCore에서 호출됨.
+	public void RegisterPlayer(Transform player) {
+		if (!active_players.Contains(player)) {
+			active_players.Add(player);
+		}
+	}
+	public void UnregisterPlayer(Transform player) {
+		if (active_players.Contains(player)) {
+			active_players.Remove(player);
+			_previousRanks.Remove(player);
+		}
+	}
+
+	private void StartRankTracking() {
+		StartCoroutine(Co_TrackRankingRoutine());
+	}
+
+	private IEnumerator Co_TrackRankingRoutine() {
+		WaitForSeconds wfs = new WaitForSeconds(0.2f);
+
+		while (current_state_sync == RaceState.Racing) {
+			if (active_players.Count > 1) {
+				CalculateRanks();
+			}
+			yield return wfs;
+		}
+	}
+
+	private void CalculateRanks() {
+		bool isRankChangedThisTick = false;
+
+		active_players.RemoveAll(p => p == null);   //null이 된 플레이어 리스트에서 제거 (튕긴 플레이어 예외처리)
+		active_players.Sort((a, b) => a.position.y.CompareTo(b.position.y));    //Y값 기준 오름차순 정렬
+		for (int i = 0; i < active_players.Count; i++) {
+			Transform player = active_players[i];
+			int currentRank = i + 1;
+
+			//사전에 등록되지 않았거나, 순위가 달라졌을 경우.
+			if (!_previousRanks.ContainsKey(player) || _previousRanks[player] != currentRank) {
+				_previousRanks[player] = currentRank;
+				isRankChangedThisTick = true;
+
+				//TODO : 개별 유저 순위 UI 업데이트 필요하다면 여기서 호출.
+				UIManager.Instance.UpdateRankUI();
+			}
+		}
+
+		if (isRankChangedThisTick) {
+			on_any_rank_changed?.Invoke();
 		}
 	}
 }

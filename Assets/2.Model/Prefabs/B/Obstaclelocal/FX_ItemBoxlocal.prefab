@@ -4918,6 +4918,7 @@ GameObject:
   - component: {fileID: 1389952570801802914}
   - component: {fileID: 6592132797364522555}
   - component: {fileID: 20052641670057521}
+  - component: {fileID: 4573693583126913069}
   m_Layer: 7
   m_Name: Cube
   m_TagString: Untagged
@@ -5011,12 +5012,24 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4573693583126913069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1562468208570716886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc41a969d575b3c488254fe51cff3674, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemBox
 --- !u!1 &2482135825726970545
 GameObject:
   m_ObjectHideFlags: 0
@@ -14840,9 +14853,10 @@ GameObject:
   - component: {fileID: 3739609571027740795}
   - component: {fileID: 5110822593090793671}
   - component: {fileID: 7986897327550498012}
+  - component: {fileID: 1774427863714740449}
   m_Layer: 7
   m_Name: FX_ItemBoxlocal
-  m_TagString: Untagged
+  m_TagString: ItemBox
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -19676,3 +19690,20 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &1774427863714740449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8542186906585345430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mirror::Mirror.NetworkIdentity
+  sceneId: 0
+  _assetId: 3825495191
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0

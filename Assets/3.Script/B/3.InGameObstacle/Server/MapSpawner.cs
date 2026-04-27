@@ -1,122 +1,108 @@
 using UnityEngine;
 using Mirror;
+using System.Collections;
 using System.Collections.Generic;
 
 public class MapSpawner : NetworkBehaviour
 {
-    [Header("연동 스크립트")]
     [SerializeField] private ObstacleSpawner _obstacleSpawner;
 
     [Header("Tower Settings")]
-    [SerializeField] private Vector3 _towerCenter = Vector3.zero;
+    [SerializeField] private Vector3 _center = Vector3.zero;
     [SerializeField] private float _startY = 0f;
     [SerializeField] private float _endY = -500f;
-    [SerializeField] private float _heightStep = 40f;
+    [SerializeField] private float _step = 40f;
 
     [Header("Scale Settings")]
-    [Tooltip("이 Y값보다 낮아지면 스케일 변화가 시작됩니다.")]
-    [SerializeField] private float _scaleVariationThresholdY = -120f;
+    [SerializeField] private int _noChangeFloorCount = 5;
+    [SerializeField] private float _scaleStep = 0.1f;
     [SerializeField] private float _minScale = 0.6f;
     [SerializeField] private float _maxScale = 1.0f;
-    [SerializeField] private float _scaleStep = 0.1f;
 
-    [Header("Map Floor Templates")]
     [SerializeField] private List<GameObject> _floorPrefabs;
 
-    private List<GameObject> _mapPool = new List<GameObject>();
-    public List<MapFloor> SpawnedFloors { get; private set; } = new List<MapFloor>();
+    private List<GameObject> _pool = new List<GameObject>();
+    private readonly int[] _yRotations = { 0, 30, 60, 90, 120, 150 };
 
     [Server]
     public void FullGenerate()
     {
-        ReturnMapToPool();
-        SpawnedFloors.Clear();
+        float y = _startY;
+        int floor = 0;
+        float scale = 1f;
 
-        float currentY = _startY;
-        // 시작 스케일은 1.0으로 초기화
-        float currentFloorScale = 1.0f;
-
-        while (currentY > _endY)
+        while (y > _endY)
         {
-            if (_floorPrefabs == null || _floorPrefabs.Count == 0) break;
-
             GameObject prefab = _floorPrefabs[Random.Range(0, _floorPrefabs.Count)];
+            GameObject obj = GetFromPool(prefab);
 
-            // 1. 스케일 계산 로직
-            if (currentY <= _scaleVariationThresholdY)
+            obj.SetActive(false);
+            obj.transform.localScale = Vector3.one;
+            obj.transform.position = new Vector3(_center.x, y, _center.z);
+
+            int angle = _yRotations[Random.Range(0, _yRotations.Length)];
+            obj.transform.rotation = Quaternion.Euler(0, angle, 0);
+
+            obj.SetActive(true);
+
+            var id = obj.GetComponent<NetworkIdentity>();
+            if (id != null && id.netId == 0)
             {
-                // -0.1, 0, +0.1 중 하나를 랜덤하게 결정
-                int randomChoice = Random.Range(-1, 2); // -1, 0, 1 반환
-                float change = randomChoice * _scaleStep;
-
-                // 이전 층 스케일에 변화량을 더하고 최소/최대값으로 제한(Clamp)
-                currentFloorScale = Mathf.Clamp(currentFloorScale + change, _minScale, _maxScale);
-            }
-            else
-            {
-                // 임계값보다 높은 구간은 무조건 1.0
-                currentFloorScale = 1.0f;
-            }
-
-            float randomRotationY = Random.Range(0, 12) * 30f;
-            Vector3 spawnPos = new Vector3(_towerCenter.x, currentY, _towerCenter.z);
-            Quaternion spawnRot = Quaternion.Euler(0, randomRotationY, 0);
-
-            // 2. 풀에서 가져올 때 계산된 스케일 적용
-            Vector3 targetScale = new Vector3(currentFloorScale, 1f, currentFloorScale);
-            GameObject floorObj = GetFromPool(prefab, spawnPos, spawnRot, targetScale);
-
-            if (!floorObj.activeSelf) floorObj.SetActive(true);
-
-            MapFloor mapFloor = floorObj.GetComponent<MapFloor>();
-            if (mapFloor != null)
-            {
-                mapFloor.RandomizeAttachedObstacles();
-                SpawnedFloors.Add(mapFloor);
+                NetworkServer.Spawn(obj);
             }
 
-            NetworkServer.Spawn(floorObj);
-            currentY -= _heightStep;
+            // 스케일 계산 로직
+            if (floor >= _noChangeFloorCount)
+            {
+                float delta = (floor == _noChangeFloorCount)
+                    ? -_scaleStep
+                    : (Random.value > 0.5f ? _scaleStep : -_scaleStep);
+
+                scale += delta;
+                scale = Mathf.Clamp(scale, _minScale, _maxScale);
+            }
+            obj.transform.localScale = new Vector3(scale, 1f, scale);
+
+            // 맵 구성요소(장애물) 자동 설정
+            MapFloor mf = obj.GetComponent<MapFloor>();
+            if (mf != null)
+            {
+                mf.ResetObstacles();
+                mf.RandomizeAttachedObstacles();
+                // 생성 직후 인덱스와 부모 참조를 장애물들에게 주입
+                mf.SetupIndices();
+            }
+
+            y -= _step;
+            floor++;
         }
 
         if (_obstacleSpawner != null)
-        {
             _obstacleSpawner.GenerateFloatingObstacles();
-        }
-
-        Debug.Log("[Server] 전체 맵 생성 완료 (스케일 변화 적용됨)");
     }
 
     [Server]
-    private GameObject GetFromPool(GameObject prefab, Vector3 pos, Quaternion rot, Vector3 scale)
+    private GameObject GetFromPool(GameObject prefab)
     {
-        GameObject obj = _mapPool.Find(x => !x.activeSelf && x.name.Equals(prefab.name + "(Clone)"));
+        GameObject obj = _pool.Find(x => x != null && !x.activeSelf && x.name.Contains(prefab.name));
         if (obj == null)
         {
-            obj = Instantiate(prefab, pos, rot);
-            _mapPool.Add(obj);
+            obj = Instantiate(prefab);
+            _pool.Add(obj);
         }
-        else
-        {
-            obj.transform.position = pos;
-            obj.transform.rotation = rot;
-        }
-
-        // 스케일 적용 (새로 생성하든 풀에서 꺼내든 타겟 스케일로 고정)
-        obj.transform.localScale = scale;
-
         return obj;
     }
 
     [Server]
     public void ReturnMapToPool()
     {
-        foreach (GameObject obj in _mapPool)
+        foreach (var obj in _pool)
         {
             if (obj != null && obj.activeSelf)
             {
                 NetworkServer.UnSpawn(obj);
                 obj.SetActive(false);
+                obj.transform.localScale = Vector3.one;
             }
         }
     }
