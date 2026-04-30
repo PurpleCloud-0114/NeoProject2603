@@ -5309,10 +5309,11 @@ MonoBehaviour:
   _endY: 0
   _step: 40
   _noChangeFloorCount: 5
-  _scaleStep: 0.01
-  _minScale: 0.35
-  _maxScale: 1.5
-  _floorPrefabs:
+  _scaleStep: 0.015
+  _minScale: 0.4
+  _maxScale: 1.4
+  _3F_Chance: 20
+  _1F_Prefabs:
   - {fileID: 4656741095035066466, guid: 538e6adf0ad489540ab7538ad1df0a8d, type: 3}
   - {fileID: 1311382419031291770, guid: 8671a2861100d95479ce8f5b9ce6feb5, type: 3}
   - {fileID: 7301932044659917098, guid: a5601ed608e66ff41ade1fd8010737e1, type: 3}
@@ -5325,7 +5326,9 @@ MonoBehaviour:
   - {fileID: 7048409918847595415, guid: 49341eaea8fecf245b28e3a3b0ec5bd6, type: 3}
   - {fileID: 4931377711398369488, guid: 0f792bddc7b0914419a9aece2e27219f, type: 3}
   - {fileID: 5777826055833206952, guid: 19c02a02179580f4f88e2eca5348c320, type: 3}
-  - {fileID: 4095091632858380476, guid: e7dc7ae3c9bd39f46a731a4ea6b6b335, type: 3}
+  _3F_Prefabs:
+  - {fileID: 1894554279837048132, guid: 1417f5b056f3c6e4bba27713ac5034a4, type: 3}
+  - {fileID: 5119475395513470146, guid: ede6e681da536df43abf95dd7b47c5e5, type: 3}
 --- !u!114 &1899710435
 MonoBehaviour:
   m_ObjectHideFlags: 0

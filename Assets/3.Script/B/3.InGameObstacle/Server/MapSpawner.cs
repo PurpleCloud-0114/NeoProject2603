@@ -1,6 +1,5 @@
 using UnityEngine;
 using Mirror;
-using System.Collections;
 using System.Collections.Generic;
 
 public class MapSpawner : NetworkBehaviour
@@ -19,7 +18,13 @@ public class MapSpawner : NetworkBehaviour
     [SerializeField] private float _minScale = 0.6f;
     [SerializeField] private float _maxScale = 1.0f;
 
-    [SerializeField] private List<GameObject> _floorPrefabs;
+    [Header("Spawn Chance")]
+    [Range(0, 100)]
+    [SerializeField] private int _3F_Chance = 20;
+
+    [Header("Prefabs")]
+    [SerializeField] private List<GameObject> _1F_Prefabs;
+    [SerializeField] private List<GameObject> _3F_Prefabs;
 
     private List<GameObject> _pool = new List<GameObject>();
     private readonly int[] _yRotations = { 0, 30, 60, 90, 120, 150 };
@@ -29,7 +34,7 @@ public class MapSpawner : NetworkBehaviour
     {
         float y = _startY;
         int floor = 0;
-        float scale = _maxScale; // 시작은 1.0 (_maxScale)
+        float scale = _maxScale;
 
         float redzoneY = -9999f;
         if (StageManager.Instance != null)
@@ -39,63 +44,109 @@ public class MapSpawner : NetworkBehaviour
 
         while (y > _endY)
         {
-            // 1. 프리팹 결정 로직
-            GameObject prefab = (floor < 3) ? _floorPrefabs[0] : _floorPrefabs[Random.Range(0, _floorPrefabs.Count)];
+            // ---------------------------
+            // 1. 프리팹 + 높이 결정
+            // ---------------------------
+            GameObject prefab;
+            int heightMultiplier;
+
+            if (floor < 3)
+            {
+                prefab = _1F_Prefabs[Random.Range(0, _1F_Prefabs.Count)];
+                heightMultiplier = 1;
+            }
+            else
+            {
+                bool spawn3F = (Random.Range(0, 100) < _3F_Chance) && _3F_Prefabs.Count > 0;
+
+                if (spawn3F)
+                {
+                    prefab = _3F_Prefabs[Random.Range(0, _3F_Prefabs.Count)];
+                    heightMultiplier = 3;
+                }
+                else
+                {
+                    prefab = _1F_Prefabs[Random.Range(0, _1F_Prefabs.Count)];
+                    heightMultiplier = 1;
+                }
+            }
+
+            // ---------------------------
+            float nextY = y - (_step * heightMultiplier);
 
             GameObject obj = GetFromPool(prefab);
+
             obj.SetActive(false);
-            obj.transform.position = new Vector3(_center.x, y, _center.z);
+
+            obj.transform.position = new Vector3(_center.x, nextY, _center.z);
 
             int angle = _yRotations[Random.Range(0, _yRotations.Length)];
             obj.transform.rotation = Quaternion.Euler(0, angle, 0);
 
-            // _noChangeFloorCount(7)층부터 _scaleStep(0.02)씩 감소
+            // ---------------------------
+            // 스케일
+            // ---------------------------
             if (floor >= _noChangeFloorCount)
             {
-                scale -= _scaleStep;
-                scale = Mathf.Max(scale, _minScale); // _minScale(0.6)까지만 감소
+                scale -= (_scaleStep * heightMultiplier);
+                scale = Mathf.Max(scale, _minScale);
             }
 
             obj.transform.localScale = new Vector3(scale, 1f, scale);
-            // ---------------------------------------------
 
             obj.SetActive(true);
 
+            // ---------------------------
+            // 네트워크 스폰
+            // ---------------------------
             var id = obj.GetComponent<NetworkIdentity>();
             if (id != null && id.netId == 0)
             {
                 NetworkServer.Spawn(obj);
             }
 
-            // 2. 장애물 설정 로직
+            // ---------------------------
+            // 장애물 설정
+            // ---------------------------
             MapFloor mf = obj.GetComponent<MapFloor>();
             if (mf != null)
             {
+                mf.SetupIndices();
                 mf.ResetObstacles();
-                if (floor >= 3 && y > redzoneY)
+
+                if (floor >= 3 && nextY > redzoneY)
                 {
                     mf.RandomizeAttachedObstacles();
                 }
-                mf.SetupIndices();
             }
 
-            y -= _step;
-            floor++;
+            y = nextY;
+            floor += heightMultiplier;
         }
 
         if (_obstacleSpawner != null)
             _obstacleSpawner.GenerateFloatingObstacles();
     }
 
+    // ---------------- 풀링 ----------------
+
     [Server]
     private GameObject GetFromPool(GameObject prefab)
     {
-        GameObject obj = _pool.Find(x => x != null && !x.activeSelf && x.name.Contains(prefab.name));
+        GameObject obj = _pool.Find(x => x != null && !x.activeSelf && x.name == prefab.name);
+
         if (obj == null)
         {
             obj = Instantiate(prefab);
+            obj.name = prefab.name;
             _pool.Add(obj);
         }
+
+        obj.SetActive(true);
+
+        foreach (Transform child in obj.transform)
+            child.gameObject.SetActive(true);
+
         return obj;
     }
 

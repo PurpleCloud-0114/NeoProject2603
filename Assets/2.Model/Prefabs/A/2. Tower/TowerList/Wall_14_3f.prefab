@@ -295,13 +295,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 483992741766514644}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 67.900024, y: 80.42999, z: 33.6}
+  m_LocalRotation: {x: 0.18301275, y: 0.18301275, z: 0.6830127, w: 0.6830127}
+  m_LocalPosition: {x: 75.60315, y: 80.42999, z: -4.8515697}
   m_LocalScale: {x: 5, y: 3, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2809583330685457275}
-  m_Father: {fileID: 5571431645936377396}
+  m_Father: {fileID: 730018833064947000}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!33 &6007076318247351117
 MeshFilter:
@@ -393,7 +393,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
   obstacleIndex: 4
-  parentFloor: {fileID: 0}
+  parentFloor: {fileID: 8891316088228849958}
 --- !u!1 &507842590135809107
 GameObject:
   m_ObjectHideFlags: 0
@@ -844,12 +844,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1204384696703763420}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -29.299988, y: 6.4540024, z: -18.199999}
+  m_LocalRotation: {x: -0, y: 0.2588191, z: -0, w: 0.9659258}
+  m_LocalPosition: {x: -34.474533, y: 6.4540024, z: -1.1116626}
   m_LocalScale: {x: 7.4849997, y: 5.276375, z: 7.4849997}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 5571431645936377396}
+  m_Father: {fileID: 730018833064947000}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1026455106544758339
 MeshFilter:
@@ -942,7 +942,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
   obstacleIndex: 1
-  parentFloor: {fileID: 0}
+  parentFloor: {fileID: 8891316088228849958}
 --- !u!1 &1391471894369167005
 GameObject:
   m_ObjectHideFlags: 0
@@ -1370,7 +1370,16 @@ Transform:
   - {fileID: 1817024449792565453}
   - {fileID: 6712078776979119137}
   - {fileID: 3636828615124831400}
-  - {fileID: 5571431645936377396}
+  - {fileID: 7846136315824990526}
+  - {fileID: 4346885819131394366}
+  - {fileID: 1556254261595885726}
+  - {fileID: 2067552112624250040}
+  - {fileID: 8669929519386322114}
+  - {fileID: 8688663466340615624}
+  - {fileID: 4344165783723985798}
+  - {fileID: 6914807874854241789}
+  - {fileID: 5319915723240994896}
+  - {fileID: 3478207129276072628}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &346822554031332517
@@ -1407,10 +1416,16 @@ MonoBehaviour:
   syncInterval: 0
   _spawnProbability: 0.4
   _attachedObstacles:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 8511388999643752534}
+  - {fileID: 1204384696703763420}
+  - {fileID: 4452904786343382470}
+  - {fileID: 4350300821705843385}
+  - {fileID: 483992741766514644}
+  - {fileID: 5272066690443146712}
+  - {fileID: 5138574249866861694}
+  - {fileID: 3700940209133898494}
+  - {fileID: 6083848116881650664}
+  - {fileID: 4283131682456543841}
 --- !u!1 &2182476439213553382
 GameObject:
   m_ObjectHideFlags: 0
@@ -2281,14 +2296,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3700940209133898494}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0.7071068, z: -0, w: 0}
-  m_LocalPosition: {x: -67.70399, y: 20.819, z: -26.831}
+  m_LocalRotation: {x: 0.6830127, y: 0.6830127, z: -0.18301275, w: -0.18301275}
+  m_LocalPosition: {x: -72.048874, y: 20.819, z: 10.615676}
   m_LocalScale: {x: 5, y: 3, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 491263125896523455}
   - {fileID: 4941537485180757368}
-  m_Father: {fileID: 5571431645936377396}
+  m_Father: {fileID: 730018833064947000}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 90}
 --- !u!33 &7945172039879752147
 MeshFilter:
@@ -2380,7 +2395,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
   obstacleIndex: 7
-  parentFloor: {fileID: 0}
+  parentFloor: {fileID: 8891316088228849958}
 --- !u!1 &4027120693371773136
 GameObject:
   m_ObjectHideFlags: 0
@@ -2865,47 +2880,6 @@ Transform:
   - {fileID: 3707404213071422507}
   m_Father: {fileID: 6712078776979119137}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!1 &4224329892351812461
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5571431645936377396}
-  m_Layer: 0
-  m_Name: Obs
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5571431645936377396
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4224329892351812461}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.2588191, z: 0, w: 0.9659258}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 7846136315824990526}
-  - {fileID: 4346885819131394366}
-  - {fileID: 1556254261595885726}
-  - {fileID: 2067552112624250040}
-  - {fileID: 8669929519386322114}
-  - {fileID: 8688663466340615624}
-  - {fileID: 4344165783723985798}
-  - {fileID: 6914807874854241789}
-  - {fileID: 5319915723240994896}
-  - {fileID: 3478207129276072628}
-  m_Father: {fileID: 730018833064947000}
-  m_LocalEulerAnglesHint: {x: 0, y: 30, z: 0}
 --- !u!1 &4271612128308804895
 GameObject:
   m_ObjectHideFlags: 0
@@ -3023,14 +2997,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4283131682456543841}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.4972436, y: -0.4972436, z: 0.50274134, w: 0.50274134}
-  m_LocalPosition: {x: 27.800018, y: 47.619995, z: -41.600014}
+  m_LocalRotation: {x: -0.35018137, y: -0.35018137, z: 0.614307, w: 0.614307}
+  m_LocalPosition: {x: 3.275507, y: 47.619995, z: -49.926678}
   m_LocalScale: {x: 5, y: 3, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2393412214980398860}
   - {fileID: 7797673853607794404}
-  m_Father: {fileID: 5571431645936377396}
+  m_Father: {fileID: 730018833064947000}
   m_LocalEulerAnglesHint: {x: 0, y: -89.37, z: 90}
 --- !u!33 &1556528567417034372
 MeshFilter:
@@ -3122,7 +3096,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
   obstacleIndex: 9
-  parentFloor: {fileID: 0}
+  parentFloor: {fileID: 8891316088228849958}
 --- !u!1 &4341461338759623087
 GameObject:
   m_ObjectHideFlags: 0
@@ -3240,12 +3214,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4350300821705843385}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 26.800018, y: 65.56999, z: 17.5}
+  m_LocalRotation: {x: -0, y: 0.9659258, z: -0, w: -0.2588191}
+  m_LocalPosition: {x: 31.959497, y: 65.56999, z: 1.7554314}
   m_LocalScale: {x: 7.4849997, y: 5.276375, z: 7.4849997}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 5571431645936377396}
+  m_Father: {fileID: 730018833064947000}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!33 &7923579389918759508
 MeshFilter:
@@ -3338,7 +3312,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
   obstacleIndex: 3
-  parentFloor: {fileID: 0}
+  parentFloor: {fileID: 8891316088228849958}
 --- !u!1 &4352969958822337456
 GameObject:
   m_ObjectHideFlags: 0
@@ -3489,12 +3463,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4452904786343382470}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 17.400024, y: 31.32, z: -29.9}
-  m_LocalScale: {x: 7.4849997, y: 5.276375, z: 7.4849997}
+  m_LocalRotation: {x: -0, y: -0.49999997, z: -0, w: 0.86602545}
+  m_LocalPosition: {x: 0.11885834, y: 31.32, z: -34.59417}
+  m_LocalScale: {x: 7.485001, y: 5.276375, z: 7.485001}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 5571431645936377396}
+  m_Father: {fileID: 730018833064947000}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!33 &585222896063451559
 MeshFilter:
@@ -3587,7 +3561,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
   obstacleIndex: 2
-  parentFloor: {fileID: 0}
+  parentFloor: {fileID: 8891316088228849958}
 --- !u!1 &4530493509843744287
 GameObject:
   m_ObjectHideFlags: 0
@@ -3771,15 +3745,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5138574249866861694}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: -28.632751, y: 20.819, z: -29.152}
+  m_LocalRotation: {x: -0, y: 0.9659258, z: -0, w: -0.2588191}
+  m_LocalPosition: {x: -39.372692, y: 20.819, z: -10.929992}
   m_LocalScale: {x: 11.5, y: 5.276375, z: 11.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6316232751493123773}
   - {fileID: 4438369981908946871}
   - {fileID: 597599246407424463}
-  m_Father: {fileID: 5571431645936377396}
+  m_Father: {fileID: 730018833064947000}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!33 &2927784039463081492
 MeshFilter:
@@ -3872,7 +3846,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
   obstacleIndex: 6
-  parentFloor: {fileID: 0}
+  parentFloor: {fileID: 8891316088228849958}
 --- !u!1 &5202348878331312827
 GameObject:
   m_ObjectHideFlags: 0
@@ -4112,15 +4086,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5272066690443146712}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 26.200043, y: 81.59, z: 29.300001}
+  m_LocalRotation: {x: -0, y: 0.2588191, z: -0, w: 0.9659258}
+  m_LocalPosition: {x: 37.339905, y: 81.59, z: 12.274521}
   m_LocalScale: {x: 11.5, y: 5.276375, z: 11.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 594328164160952891}
   - {fileID: 8739228080742327129}
   - {fileID: 920962791696532693}
-  m_Father: {fileID: 5571431645936377396}
+  m_Father: {fileID: 730018833064947000}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4950130061634924267
 MeshFilter:
@@ -4213,7 +4187,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
   obstacleIndex: 5
-  parentFloor: {fileID: 0}
+  parentFloor: {fileID: 8891316088228849958}
 --- !u!1 &5470328521432447244
 GameObject:
   m_ObjectHideFlags: 0
@@ -4598,15 +4572,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6083848116881650664}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 27, y: 49.269997, z: -30.299963}
+  m_LocalRotation: {x: -0, y: 0.86602545, z: -0, w: 0.49999997}
+  m_LocalPosition: {x: 8.232699, y: 49.269997, z: -39.74054}
   m_LocalScale: {x: 11.499998, y: 5.276375, z: 11.499998}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6718161611009184845}
   - {fileID: 8256580485588242397}
   - {fileID: 232027017812989210}
-  m_Father: {fileID: 5571431645936377396}
+  m_Father: {fileID: 730018833064947000}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!33 &2548298526243123250
 MeshFilter:
@@ -4699,7 +4673,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
   obstacleIndex: 8
-  parentFloor: {fileID: 0}
+  parentFloor: {fileID: 8891316088228849958}
 --- !u!1 &6453777309519415011
 GameObject:
   m_ObjectHideFlags: 0
@@ -5773,12 +5747,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8511388999643752534}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -21.8, y: 94.3, z: 30.1}
-  m_LocalScale: {x: 7.4849997, y: 5.276375, z: 7.4849997}
+  m_LocalRotation: {x: -0, y: 0.86602545, z: -0, w: 0.49999997}
+  m_LocalPosition: {x: -3.8293486, y: 94.3, z: 36.967365}
+  m_LocalScale: {x: 7.485, y: 5.276375, z: 7.485}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 5571431645936377396}
+  m_Father: {fileID: 730018833064947000}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!33 &2211059142353270088
 MeshFilter:
@@ -5871,7 +5845,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleIdentity
   obstacleIndex: 0
-  parentFloor: {fileID: 0}
+  parentFloor: {fileID: 8891316088228849958}
 --- !u!1 &8618216244915229459
 GameObject:
   m_ObjectHideFlags: 0
