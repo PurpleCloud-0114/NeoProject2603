@@ -15,7 +15,7 @@ public class UIManager : MonoBehaviour {
 	
 	[SerializeField] private TextMeshProUGUI _itemText;
 	[SerializeField] private TextMeshProUGUI _rankText;
-	[SerializeField] private TextMeshProUGUI _ResultTextLog;
+	//[SerializeField] private TextMeshProUGUI _ResultTextLog;
 
 	[SerializeField] private StageProgressUi _stageProgressUI;
 	[SerializeField] private Option _option;
@@ -81,10 +81,10 @@ public class UIManager : MonoBehaviour {
 		}
 	}
 
-	public void UpdateResultTextLog(bool result) {
-		if(result) _ResultTextLog.text = "성공";
-		else _ResultTextLog.text = "실패";
-	}
+	//public void UpdateResultTextLog(bool result) {
+	//	if(result) _ResultTextLog.text = "성공";
+	//	else _ResultTextLog.text = "실패";
+	//}
 
 	public void StopTimer() {
 		_timerUI.isStop = true;

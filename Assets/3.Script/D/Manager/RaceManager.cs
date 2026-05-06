@@ -97,25 +97,27 @@ public class RaceManager : NetworkBehaviour {
 		if (current_state_sync != RaceState.Racing) return;
 		bool isDead = impactSpeed > _deathOverSpeedSync;
 
-		_roundResults.Add(sender.identity,
-			new PlayerResult {
-				player = sender.identity,
-				finishTime = finishTime,
-				isDead = isDead
-			}
-		);
+		if (!_roundResults.ContainsKey(sender.identity)) {
+			_roundResults.Add(sender.identity,
+				new PlayerResult {
+					player = sender.identity,
+					finishTime = finishTime,
+					isDead = isDead
+				}
+			);	
+		}
 
-		ReceiveArriveResult(sender, isDead);
+		//ReceiveArriveResult(sender, isDead);
 
 		if(_roundResults.Count >= total_players) {
 			EndRace();
 		}
 	}
 
-	[TargetRpc]
-	private void ReceiveArriveResult(NetworkConnectionToClient target, bool result) {
-		UIManager.Instance.UpdateResultTextLog(result);
-	}
+	//[TargetRpc]
+	//private void ReceiveArriveResult(NetworkConnectionToClient target, bool result) {
+	//	UIManager.Instance.UpdateResultTextLog(result);
+	//}
 
 	//------------[ 레이스 종료 ] -----------------
 	//------------[ 레이스 종료 ] -----------------
