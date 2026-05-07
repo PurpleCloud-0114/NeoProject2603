@@ -62,7 +62,6 @@ public class RaceManager : NetworkBehaviour {
 	//[ServerCallback]
 	private void Start() {
 		if(isServer || isSinglePlay) StageManager.Instance.SetStage();
-		if (isSinglePlay) RandomSpawner.Instance.SetObstacles();
 	}
 
 	[Server]
@@ -107,17 +106,18 @@ public class RaceManager : NetworkBehaviour {
 			);	
 		}
 
-		//ReceiveArriveResult(sender, isDead);
 
 		if(_roundResults.Count >= total_players) {
 			EndRace();
+		} else {
+			ReceiveArriveResult(sender, isDead, finishTime);
 		}
 	}
 
-	//[TargetRpc]
-	//private void ReceiveArriveResult(NetworkConnectionToClient target, bool result) {
-	//	UIManager.Instance.UpdateResultTextLog(result);
-	//}
+	[TargetRpc]
+	private void ReceiveArriveResult(NetworkConnectionToClient target, bool isDead, double finishTime) {
+		UIManager.Instance.ShowPersonalResult(isDead, finishTime);
+	}
 
 	//------------[ 레이스 종료 ] -----------------
 	//------------[ 레이스 종료 ] -----------------
@@ -140,9 +140,11 @@ public class RaceManager : NetworkBehaviour {
 		StartReturnToLobby();
 	}
 
+	//각자 유저들에게 결과창 보여주기.
 	[ClientRpc]
 	private void RpcShowFinalResult(PlayerResult[] results) {
 		UIManager.Instance.ShowFinalResult(results);
+		UIManager.Instance.HideUIforFinish();
 	}
 
 	[Server]
@@ -150,6 +152,7 @@ public class RaceManager : NetworkBehaviour {
 		StartCoroutine(Co_ReturnToLobby());
 	}
 
+	//결과창 7.5초
 	private IEnumerator Co_ReturnToLobby() {
 		Debug.Log("시상식중...(7.5초 걸림)");
 
