@@ -3,14 +3,26 @@ using Mirror;
 
 public class RoomPlayer : NetworkRoomPlayer
 {
+    [SyncVar]
+    public string NicknameSync = "";
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
-
+        string saved_nickname = PlayerPrefs.GetString("PlayerNickname", "NoName");
+        CmdSetNickname(saved_nickname);
         GameObject btn = GameObject.Find("ReadyButton");
         if (btn != null)
         {
             btn.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(OnClickReady);
+        }
+    }
+    [Command]
+    private void CmdSetNickname(string nickname)
+    {
+        NicknameSync = nickname;
+        if(NetworkManager.singleton is RoomManagement rm)
+        {
+            rm.RefreshLobbyUI();
         }
     }
     public override void OnStartClient()

@@ -58,7 +58,7 @@ public class RoomManagement : NetworkRoomManager
             RoomPlayer rp = slot as RoomPlayer;
             if (rp == null) continue;
 
-            string player_name = $"WoWPlayer {slot_index + 1}";
+            string player_name = string.IsNullOrEmpty(rp.NicknameSync) ? $"WoWPlayer{slot_index + 1}" : rp.NicknameSync;
             bool _isReady = rp.readyToBegin;
             Debug.Log($"[RoomManagement] UI °»½Å slot={slot_index}, name={player_name }, isReady={_isReady}");
 
