@@ -9,22 +9,33 @@ using TMPro;
 public class UIManager : MonoBehaviour {
 	public static UIManager Instance = null;
 
-
+	[Header("Player Button Bind")]
 	[SerializeField] private Button _wingButton;
 	[SerializeField] private Button _itemButton;
-	
+
+	[Header("Player Text Bind")]
 	[SerializeField] private TextMeshProUGUI _itemText;
 	[SerializeField] private TextMeshProUGUI _rankText;
-	[SerializeField] private TextMeshProUGUI _ResultTextLog;
+	//[SerializeField] private TextMeshProUGUI _ResultTextLog;
 
+	[Header("Game UI")]
 	[SerializeField] private StageProgressUi _stageProgressUI;
-	[SerializeField] private Option _option;
 	[SerializeField] private TimerUI _timerUI;
+	[SerializeField] private GameObject _playUI;
+	[SerializeField] private GameObject _specUI;
+
+
+
+	[Header("개인 결과 UI")]
+	[SerializeField] private GameObject _personalResultWindow;
+	[SerializeField] private TextMeshProUGUI _personalTitleText;
+	[SerializeField] private TextMeshProUGUI _personalResultText;
+	[SerializeField] private TextMeshProUGUI _personalRecordText;
 
 	[Header("최종 결과 UI")]
-	[SerializeField] private GameObject _resultWindow;    // 결과창 부모 오브젝트
-	[SerializeField] private RectTransform _resultContainer; // RankPrefab이 생성될 부모 (Content)
-	[SerializeField] private GameObject _rankPrefab;
+	[SerializeField] private GameObject _finalResultWindow;    // 결과창 부모 오브젝트
+	[SerializeField] private RectTransform _finalResultContainer; // RankPrefab이 생성될 부모 (Content)
+	[SerializeField] private GameObject _finalRankPrefab;
 
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -39,25 +50,7 @@ public class UIManager : MonoBehaviour {
 		RaceManager.Instance.on_any_rank_changed -= UpdateRankUI;
 	}
 
-	/*
-	 TODO List
 
-	 [ 인게임 ]
-	 * 1. 순위 UI
-	 * 2. 시간 UI
-	 * 3. Progress UI
-	 * 4. Wing 버튼
-	 * 5. 아이템 버튼
-	 * 6. 조이스틱
-	 * 
-	 [ 팝업 ]
-	 * 1. 게임 종료 시 - 결과 창
-	 * 2. 라운드 결과
-	 * 3. 다시하기?	 
-	  
-	 [ 메서드 기능 ] 
-	 레드존 
-	 */
 
 	public void CreatePlayerMarker(Transform playerTransform, bool isLocal) {
 		_stageProgressUI.CreatePlayerMarker(playerTransform, isLocal);
@@ -81,26 +74,39 @@ public class UIManager : MonoBehaviour {
 		}
 	}
 
-	public void UpdateResultTextLog(bool result) {
-		if(result) _ResultTextLog.text = "성공";
-		else _ResultTextLog.text = "실패";
-	}
 
+	// ==========================================
+	// [ 도착 시 결과 집계 ]
+	// ==========================================
 	public void StopTimer() {
 		_timerUI.isStop = true;
 	}
+	public void ShowPersonalResult(bool isDead, double finishTime) {
+		HideUIforFinish();
+		_personalResultWindow.SetActive(true);
+		if(isDead) {
+			_personalTitleText.text = "탈출 실패...";
+			_personalResultText.text = $"결과 : <color=red>사망</color>";
+		} else {
+			_personalTitleText.text = "탈출 성공!";
+			_personalResultText.text = $"결과 : 생존";
+		}
 
+		TimeSpan time = TimeSpan.FromSeconds(finishTime);
+		_personalRecordText.text = string.Format($"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds / 10:00}");   
+	}
 	public void ShowFinalResult(PlayerResult[] results) {
+		HideUIforEndRace();
 		// 1. 기존에 생성된 리스트가 있다면 제거 (초기화)
-		foreach (Transform child in _resultContainer) {
+		foreach (Transform child in _finalResultContainer) {
 			Destroy(child.gameObject);
 		}
 
-		_resultWindow.SetActive(true);
+		_finalResultWindow.SetActive(true);
 
 		for (int i = 0; i < results.Length; i++) {
 			// 2. 프리팹 생성 및 부모 설정
-			GameObject go = Instantiate(_rankPrefab, _resultContainer);
+			GameObject go = Instantiate(_finalRankPrefab, _finalResultContainer);
 			RectTransform rect = go.GetComponent<RectTransform>();
 
 			// 3. 위치 배치 (위에서부터 150 간격으로 하단 배치)
@@ -138,13 +144,26 @@ public class UIManager : MonoBehaviour {
 	}
 
 	// ==========================================
+	// [ 도착 및 관전 시 UI 활성화/비활성화1 ]
+	// ==========================================
+	public void HideUIforFinish() {
+		_playUI.SetActive(false);
+		_stageProgressUI.gameObject.SetActive(false);
+	}
+	public void ShowUIforSpectator() {
+		_personalResultWindow.SetActive(false);
+		_specUI.SetActive(true);
+		_stageProgressUI.gameObject.SetActive(true);
+	}
+	public void HideUIforEndRace() {
+		HideUIforFinish();
+		_specUI.SetActive(false);
+	}
+
+	// ==========================================
 	// [ 클라이언트 UI 바인드 ]
 	// ==========================================
 	[Client] public Button BindWingButton() => _wingButton;
 	[Client] public Button BindItemButton() => _itemButton;
 	[Client] public TextMeshProUGUI BindItemText() => _itemText;
-	public void BindJoystick(Transform player) => _option.BindPlayer(player);
-
-
-
 }

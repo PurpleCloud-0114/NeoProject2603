@@ -3131,7 +3131,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  _spawnProbability: 0.5
+  _spawnProbability: 0.4
   _attachedObstacles:
   - {fileID: 6043006970194871567}
   - {fileID: 23935354838420327}

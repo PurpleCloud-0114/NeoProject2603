@@ -19,13 +19,17 @@ public class PlayerTrigger : NetworkBehaviour
     }
 
     private void OnCollisionEnter(Collision collision) {
-        if (!isLocalPlayer && !RaceManager.Instance.isSinglePlay) return;
+        
 
         if (collision.transform.CompareTag("EndPoint")) {
-            float impactSpeed = Mathf.Abs(collision.relativeVelocity.y);
-            double myFinishTime = NetworkTime.time - RaceManager.Instance.race_start_time_sync;
-            _playerCore.SendArriveResult(impactSpeed, myFinishTime);
-            _playerCore.LandEndpoint();
+            if (isLocalPlayer) {
+                float impactSpeed = Mathf.Abs(collision.relativeVelocity.y);
+                double myFinishTime = NetworkTime.time - RaceManager.Instance.race_start_time_sync;
+                _playerCore.player_state = PlayerState.Finish;
+                _playerCore.SendArriveResult(impactSpeed, myFinishTime);
+                _playerCore.LandEndpoint();
+			}
+            gameObject.SetActive(false);
         }
     }
 
