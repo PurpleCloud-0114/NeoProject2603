@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-// 1. 조작 프리셋을 정의하는 Enum
 public enum ControlPreset
 {
     JoyRight = 0,
