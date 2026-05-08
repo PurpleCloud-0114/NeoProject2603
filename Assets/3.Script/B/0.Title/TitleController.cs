@@ -18,6 +18,8 @@ public class TitleController : MonoBehaviour
     [Header("Greeting UI")]
     [SerializeField] private TextMeshProUGUI _welcome_text;
 
+    [SerializeField] private string _logoutscene = "ClientTitle";
+
     private void Start()
     {
         _start_button.onClick.AddListener(StartGameEvent);
@@ -53,14 +55,8 @@ public class TitleController : MonoBehaviour
         if (_loginPanel != null)
             _loginPanel.SetActive(true);
 
-        if (NetworkClient.active)
-        {
-            NetworkManager.singleton.StopClient();
-            Debug.Log("Network Client Stopped.");
-        }
-
         gameObject.SetActive(false);
 
-        SceneManager.LoadScene("0.B_Prototype");
+        SceneManager.LoadScene(_logoutscene);
     }
 }

@@ -965,6 +965,7 @@ MonoBehaviour:
   _option_button: {fileID: 484712833}
   _logout_button: {fileID: 8384073}
   _welcome_text: {fileID: 1665670954}
+  _logoutscene: ClientTitle
 --- !u!1 &484712830
 GameObject:
   m_ObjectHideFlags: 0
