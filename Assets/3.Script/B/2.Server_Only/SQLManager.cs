@@ -49,7 +49,7 @@ public class SQLManager : MonoBehaviour
     [Header("Network Settings")]
     [SerializeField] private bool _is_it_Client = false;
     [Tooltip("와이파이 연결후 ipconfig, 해당 IPv4 주소 입력")]
-    [SerializeField] private string _serverIP = "192.168.1.45";
+    [SerializeField] private string _serverIP = "192.168.1.135";
     private string _dbName = "neoproject";
     private string _dbPort = "3306";
 
@@ -207,11 +207,11 @@ public class SQLManager : MonoBehaviour
         try
         {
             if (!ConnectionCheck(_connection)) return false;
-            string sql = "SELECT user_name FROM user_info WHERE user_name=@name";
+            string sql = "SELECT COUNT(*) FROM user_info WHERE user_name=@name";
             using (MySqlCommand cmd = new MySqlCommand(sql, _connection))
             {
                 cmd.Parameters.AddWithValue("@name", name);
-                using (MySqlDataReader reader = cmd.ExecuteReader()) { return reader.HasRows; }
+                return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
             }
         }
         catch (Exception e) { Debug.LogError($"ID Check Error: {e.Message}"); return false; }

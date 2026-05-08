@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using Mirror;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class LoginController : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class LoginController : MonoBehaviour
     [SerializeField] private Button _signup_button;
     [SerializeField] private SignupController _signupController;
     [SerializeField] private GameObject _title_ob;
+
+    [SerializeField] private string _load_scene = "ClientMain";
 
     private bool _isWaiting = false;
 
@@ -50,12 +53,13 @@ public class LoginController : MonoBehaviour
             PlayerPrefs.SetString("PlayerNickname", nickname);
             PlayerPrefs.Save();
 
-            NetworkManager networkManager = NetworkManager.singleton;
-            //lan
-            //networkManager.networkAddress = "192.168.45.93";
-            //wifi
-            networkManager.networkAddress = "192.168.45.172";
-            networkManager.StartClient();
+            /* 
+             * [수정 사항]
+             * Mirror의 StartClient()는 서버 연결과 동시에 Online Scene으로 자동 이동합니다.
+             * 단순히 다음 오프라인 씬으로 이동하고 싶다면 아래처럼 SceneManager를 사용합니다.
+             */
+            Debug.Log("로그인 성공 Sceneload!");
+            SceneManager.LoadScene(_load_scene);
         }
         else
         {
