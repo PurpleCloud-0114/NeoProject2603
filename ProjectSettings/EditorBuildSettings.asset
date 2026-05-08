@@ -5,28 +5,28 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/1.Scene/D/Copy/Copy_ClientMain.unity
-    guid: c17f2023f8198e448a9c93cdd62d2335
-  - enabled: 1
+    guid: 1dbe4a1a753713143bc2d2c293dda7a9
+  - enabled: 0
     path: Assets/1.Scene/D/Copy/Copy_Server.unity
-    guid: 6fcfeff151bf94243b8064ac36d2908b
-  - enabled: 1
+    guid: 0ded1ccf89da2774c8d41f47c88ca97c
+  - enabled: 0
     path: Assets/1.Scene/D/Copy/Copy_ClientLobby.unity
     guid: 0082bb92ae2ea7343ba12770fa4dfba3
-  - enabled: 1
-    path: Assets/1.Scene/D/Copy/Copy_ClientIngame.unity
-    guid: 769c00af45eccab448eef98aa75e6fff
   - enabled: 0
+    path: Assets/1.Scene/D/Copy/Copy_ClientIngame.unity
+    guid: 1b89724a5fa064746a5ae1df2a9140e6
+  - enabled: 1
     path: Assets/1.Scene/Main/ClientMain.unity
     guid: 1a018294ffae61343b7bc9a06aa81e44
-  - enabled: 0
+  - enabled: 1
     path: Assets/1.Scene/Main/Server.unity
     guid: d8bde6799f5e1a54f916d46e5208ab1a
-  - enabled: 0
+  - enabled: 1
     path: Assets/1.Scene/Main/ClientLobby.unity
     guid: a1cb03aaf4baab54e9c9f1c5e98cb9ce
-  - enabled: 0
+  - enabled: 1
     path: Assets/1.Scene/Main/ClientIngame.unity
     guid: f3256f9b6d64fc74a8d0679878c11c5b
   m_configObjects:
