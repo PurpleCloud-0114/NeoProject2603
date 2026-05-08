@@ -50,8 +50,8 @@ MonoBehaviour:
   headlessStartMode: 0
   editorAutoStart: 0
   sendRate: 60
-  offlineScene: Assets/1.Scene/E/E_login.unity
-  onlineScene: Assets/1.Scene/E/E_Prototypelobby.unity
+  offlineScene: Assets/1.Scene/Main/ClientMain.unity
+  onlineScene: Assets/1.Scene/Main/ClientLobby.unity
   offlineSceneLoadDelay: 0
   transport: {fileID: 1293794428553162512}
   networkAddress: localhost
@@ -81,8 +81,8 @@ MonoBehaviour:
   showRoomGUI: 1
   minPlayers: 2
   roomPlayerPrefab: {fileID: 3521452114632184150, guid: 436ff6d38b307bd4c97abe8a0868a21d, type: 3}
-  RoomScene: Assets/1.Scene/E/E_Prototypelobby.unity
-  GameplayScene: Assets/1.Scene/E/E_Prototype.unity
+  RoomScene: Assets/1.Scene/Main/ClientLobby.unity
+  GameplayScene: Assets/1.Scene/Main/ClientIngame.unity
   _allPlayersReady: 0
   clientIndex: 0
   start_delay: 3
