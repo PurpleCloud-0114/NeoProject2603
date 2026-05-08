@@ -56,7 +56,7 @@ public class OptionController : MonoBehaviour
         // 데이터 로드 (int를 Enum으로 형변환)
         _currentPreset = (ControlPreset)PlayerPrefs.GetInt(_PRESET_KEY, 0);
 
-        _sensitivity_slider.value = PlayerPrefs.GetFloat(_SENSITIVITY_KEY, 1.0f);
+        _sensitivity_slider.value = PlayerPrefs.GetFloat(_SENSITIVITY_KEY, 6f);
         _bgm_slider.value = PlayerPrefs.GetFloat(_BGM_KEY, 0.75f);
         _sfx_slider.value = PlayerPrefs.GetFloat(_SFX_KEY, 0.75f);
 
