@@ -3502,7 +3502,7 @@ MonoBehaviour:
   _signup_button: {fileID: 72502214}
   _signupController: {fileID: 1976003140}
   _title_ob: {fileID: 0}
-  _load_scene: ClientMain
+  _load_scene: E_login
 --- !u!1 &1621802841
 GameObject:
   m_ObjectHideFlags: 0
