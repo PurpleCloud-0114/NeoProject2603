@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerInputSystem : MonoBehaviour {
+	private const string _PRESET_KEY = "ControlPreset";
+	private ControlPreset preset;
+
 	public Vector2 BasePoint;
 	public Vector2 MovePoint;
 
@@ -30,7 +33,22 @@ public class PlayerInputSystem : MonoBehaviour {
 		if (GravitySensor.current.enabled) Debug.Log("GravitySensor is enabled");
 #endif
 		Application.targetFrameRate = 60;
+
+		preset = (ControlPreset)PlayerPrefs.GetInt(_PRESET_KEY);
+		switch (preset) {
+			case ControlPreset.JoyRight:
+			case ControlPreset.JoyLeft:
+				is_joystick = true;
+				SetBasePoint(Vector2.zero);
+				break;
+			case ControlPreset.GyroRight:
+			case ControlPreset.GyroLeft:
+				is_joystick = false;
+				Calibrate();
+				break;
+		}
 	}
+
 	public void OnMoveVector2(InputAction.CallbackContext context) {
 		if (!is_joystick) return;
 		MovePoint = context.ReadValue<Vector2>();

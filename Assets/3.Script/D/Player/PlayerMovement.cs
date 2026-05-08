@@ -5,6 +5,7 @@ using Mirror;
 using DG.Tweening;
 
 public class PlayerMovement : NetworkBehaviour {
+	private const string _SENSITIVITY_KEY = "GyroSensitivity";
 	private PlayerInputSystem _playerInputSystem;
 	private PlayerCore _playerCore;
 	private Rigidbody _rigidBody;
@@ -23,7 +24,7 @@ public class PlayerMovement : NetworkBehaviour {
 	[SerializeField, Range(0, 500)] private float _dropWingSpeed = 30f;
 	[SerializeField] private float _wingTime;
 	[Header("Mobile용 감도 조절")]
-	[Range(1f, 10f)] public float MoveMobileSensitive = 1f;
+	[Range(2f, 10f)] public float MoveMobileSensitive = 6f;
 
 	private Tween _speedControlSequence;
 	private Tween _stunSequence;
@@ -35,6 +36,7 @@ public class PlayerMovement : NetworkBehaviour {
 		TryGetComponent(out _playerCore);
 
 		base_drop_max_speed = drop_max_speed;
+		MoveMobileSensitive = PlayerPrefs.GetFloat(_SENSITIVITY_KEY);
 	}
 	private void Start() {
 		_rigidBody.isKinematic = true;
@@ -89,7 +91,8 @@ public class PlayerMovement : NetworkBehaviour {
 	private void Update() {
 		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _playerInputSystem == null) return;
 
-		_moveVector = _playerInputSystem.MovePoint * MoveMobileSensitive;
+		_moveVector = _playerInputSystem.MovePoint;
+		if (!_playerInputSystem.is_joystick) _moveVector *= MoveMobileSensitive;
 		_moveDir = new Vector3(Mathf.Clamp(_moveVector.x, -1, 1), 0, Mathf.Clamp(_moveVector.y, -1, 1));
 	}
 

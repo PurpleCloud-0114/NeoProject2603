@@ -18,13 +18,26 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private TextMeshProUGUI _rankText;
 	//[SerializeField] private TextMeshProUGUI _ResultTextLog;
 
+	[Header("대상 UI (배치 변경될 UI)")]
+	[SerializeField] private GameObject _touchzone;
+	[SerializeField] private RectTransform _wingButtons;
+	[SerializeField] private RectTransform _itemButtons;
+
+	[Header("위치 프리셋 (기준점 트랜스폼)")]
+	[SerializeField] private RectTransform _lefttouchzone;
+	[SerializeField] private RectTransform _righttouchzone;
+	[Space]
+	[SerializeField] private RectTransform _itemLeftRef;
+	[SerializeField] private RectTransform _itemRightRef;
+	[Space]
+	[SerializeField] private RectTransform _wingLeftRef;
+	[SerializeField] private RectTransform _wingRightRef;
+
 	[Header("Game UI")]
 	[SerializeField] private StageProgressUi _stageProgressUI;
 	[SerializeField] private TimerUI _timerUI;
 	[SerializeField] private GameObject _playUI;
 	[SerializeField] private GameObject _specUI;
-
-
 
 	[Header("개인 결과 UI")]
 	[SerializeField] private GameObject _personalResultWindow;
@@ -42,18 +55,53 @@ public class UIManager : MonoBehaviour {
 		else Destroy(gameObject);
 	}
 
+	private void Start() {
+		ApplySettings();
+	}
+
 	private void OnEnable() {
 		RaceManager.Instance.on_any_rank_changed += UpdateRankUI;
 	}
-
 	private void OnDisable() {
 		RaceManager.Instance.on_any_rank_changed -= UpdateRankUI;
 	}
 
-
-
 	public void CreatePlayerMarker(Transform playerTransform, bool isLocal) {
 		_stageProgressUI.CreatePlayerMarker(playerTransform, isLocal);
+	}
+
+	// 저장된 데이터를 바탕으로 UI 레이아웃 및 입력 방식 적용
+	private void ApplySettings() {
+		Debug.Log("위치 조정하겠습니다.");
+
+		// PlayerPrefs에서 프리셋 정보 로드 (0:기본, 1:왼손, 2:자이로, 3:자이로+왼손 등)
+		int preset = PlayerPrefs.GetInt("ControlPreset", 0);
+		Debug.Log($"설정된 프리셋 : {preset}");
+		bool isLeft = (preset == 1 || preset == 3);
+		bool isGyro = (preset == 2 || preset == 3);
+		Debug.Log($"왼쪽모드: {isLeft}");
+		Debug.Log($"자이로여부 : {isGyro}");
+
+		if (_touchzone != null)
+			SetLayout(_touchzone.GetComponent<RectTransform>(), isLeft ? _lefttouchzone : _righttouchzone, !isGyro);
+
+		SetLayout(_itemButtons, isLeft ? _itemLeftRef : _itemRightRef, true);
+		SetLayout(_wingButtons, isLeft ? _wingLeftRef : _wingRightRef, true);
+
+		Debug.Log("설정완료..");
+	}
+
+	// 레퍼런스(기준점)를 기반으로 대상 RectTransform의 좌표 및 앵커 복사
+	private void SetLayout(RectTransform target, RectTransform reference, bool active) {
+		if (target == null || reference == null) return;
+
+		target.gameObject.SetActive(active);
+
+		// 앵커, 피벗, 위치값을 기준점과 동일하게 일치시킴
+		target.anchorMin = reference.anchorMin;
+		target.anchorMax = reference.anchorMax;
+		target.pivot = reference.pivot;
+		target.anchoredPosition = reference.anchoredPosition;
 	}
 
 	public void UpdateRankUI() {

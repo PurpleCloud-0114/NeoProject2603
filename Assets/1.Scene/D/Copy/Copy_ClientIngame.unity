@@ -547,6 +547,7 @@ MonoBehaviour:
     map_redzone_height: 0
     map_redzone_height_Y: 0
   _redzoneTrigger: {fileID: 951239201}
+  _portalTrigger: {fileID: 0}
 --- !u!1001 &226196131
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4321,6 +4322,15 @@ MonoBehaviour:
   _itemButton: {fileID: 1280842718}
   _itemText: {fileID: 834119325}
   _rankText: {fileID: 1405792886}
+  _touchzone: {fileID: 1722008135}
+  _wingButtons: {fileID: 2051657840}
+  _itemButtons: {fileID: 1280842717}
+  _lefttouchzone: {fileID: 2131719239}
+  _righttouchzone: {fileID: 2099080760}
+  _itemLeftRef: {fileID: 1400520024}
+  _itemRightRef: {fileID: 1771226516}
+  _wingLeftRef: {fileID: 39624115}
+  _wingRightRef: {fileID: 159182281}
   _stageProgressUI: {fileID: 1363986115}
   _timerUI: {fileID: 1464782992}
   _playUI: {fileID: 1916103044}
