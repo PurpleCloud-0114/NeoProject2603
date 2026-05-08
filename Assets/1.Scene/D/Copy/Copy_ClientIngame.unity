@@ -3776,7 +3776,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  _spiderwebPrefab: {fileID: 1871012326604064682, guid: c9ed8e1df49576b488532fe5ddcb0aa7, type: 3}
+  _spiderwebPrefab: {fileID: 5230189180519417414, guid: 4b907d4e2ca43cd4a9ab20bdb48803e0, type: 3}
 --- !u!4 &1477643673
 Transform:
   m_ObjectHideFlags: 0

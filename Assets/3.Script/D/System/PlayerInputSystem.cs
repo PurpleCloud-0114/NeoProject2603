@@ -39,12 +39,10 @@ public class PlayerInputSystem : MonoBehaviour {
 			case ControlPreset.JoyRight:
 			case ControlPreset.JoyLeft:
 				is_joystick = true;
-				SetBasePoint(Vector2.zero);
 				break;
 			case ControlPreset.GyroRight:
 			case ControlPreset.GyroLeft:
 				is_joystick = false;
-				Calibrate();
 				break;
 		}
 	}
@@ -58,18 +56,6 @@ public class PlayerInputSystem : MonoBehaviour {
 		Gravity = context.ReadValue<Vector3>();
 		_calibratedGravity = _calibrationRotation * Gravity;
 		MovePoint = new Vector2(_calibratedGravity.x, _calibratedGravity.y);
-	}
-
-	public void OnGravitySensorToggle() {
-		is_joystick = !is_joystick; //Toggle
-		if (is_joystick) {
-			//조이스틱 활성화
-			SetBasePoint(Vector2.zero);
-		} 
-		else {
-			//그래비티 활성화
-			Calibrate();
-		}
 	}
 
 	public void SetBasePoint(Vector2 curPoint) => BasePoint = curPoint;

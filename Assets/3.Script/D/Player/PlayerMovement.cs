@@ -63,6 +63,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_obstacle_hit += HitObstacle;
 		_playerCore.on_redzone_entered += SetDecreaseDropSpeedTimeOnWing;
 		_playerCore.on_stun_requested += ApplyStun;
+		_playerCore.on_race_start += SetBasePoint;
 	}
 	private void OnDisable() {
 		_playerCore.on_player_state_change_requested -= StartFalling;
@@ -73,6 +74,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_obstacle_hit -= HitObstacle;
 		_playerCore.on_redzone_entered -= SetDecreaseDropSpeedTimeOnWing;
 		_playerCore.on_stun_requested -= ApplyStun;
+		_playerCore.on_race_start -= SetBasePoint;
 	}
 
 	private void FixedUpdate() {
@@ -184,6 +186,10 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 	private void OpenWing() {
 		DOTween.To(() => drop_max_speed, x => drop_max_speed = x, _dropWingSpeed, _wingTime).SetEase(Ease.OutQuad);
+	}
+	private void SetBasePoint() {
+		if (_playerInputSystem.is_joystick) _playerInputSystem.SetBasePoint(Vector2.zero);
+		else _playerInputSystem.Calibrate();
 	}
 
 	private void HitObstacle() {

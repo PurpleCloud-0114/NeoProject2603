@@ -547,6 +547,7 @@ MonoBehaviour:
     map_redzone_height: 0
     map_redzone_height_Y: 0
   _redzoneTrigger: {fileID: 951239201}
+  _portalTrigger: {fileID: 0}
 --- !u!1001 &226196131
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3775,7 +3776,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  _spiderwebPrefab: {fileID: 1871012326604064682, guid: c9ed8e1df49576b488532fe5ddcb0aa7, type: 3}
+  _spiderwebPrefab: {fileID: 5230189180519417414, guid: 4b907d4e2ca43cd4a9ab20bdb48803e0, type: 3}
 --- !u!4 &1477643673
 Transform:
   m_ObjectHideFlags: 0
@@ -4321,6 +4322,15 @@ MonoBehaviour:
   _itemButton: {fileID: 1280842718}
   _itemText: {fileID: 834119325}
   _rankText: {fileID: 1405792886}
+  _touchzone: {fileID: 0}
+  _wingButtons: {fileID: 0}
+  _itemButtons: {fileID: 0}
+  _lefttouchzone: {fileID: 0}
+  _righttouchzone: {fileID: 0}
+  _itemLeftRef: {fileID: 0}
+  _itemRightRef: {fileID: 0}
+  _wingLeftRef: {fileID: 0}
+  _wingRightRef: {fileID: 0}
   _stageProgressUI: {fileID: 1363986115}
   _timerUI: {fileID: 1464782992}
   _playUI: {fileID: 1916103044}

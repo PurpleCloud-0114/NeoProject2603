@@ -75,6 +75,7 @@ public class PlayerTrigger : NetworkBehaviour
             case TAG_SPIDERWEB:
                 if (_playerCore.status_effect == StatusEffect.Invinsible) return;
                 _playerCore.on_spiderweb_hit?.Invoke(other);
+                Debug.Log("나 거미줄 걸렸어~");
                 break;
 
             case TAG_PLAYER:

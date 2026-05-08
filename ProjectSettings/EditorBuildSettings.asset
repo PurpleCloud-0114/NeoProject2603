@@ -6,8 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/1.Scene/D/Copy/Copy_ClientTitle.unity
+    guid: 1ea181015c79f2348aa87b27a138ef21
+  - enabled: 1
     path: Assets/1.Scene/D/Copy/Copy_ClientMain.unity
-    guid: 1dbe4a1a753713143bc2d2c293dda7a9
+    guid: 5f07f667ad07f694fb4b64f869b12c51
   - enabled: 1
     path: Assets/1.Scene/D/Copy/Copy_Server.unity
     guid: 0ded1ccf89da2774c8d41f47c88ca97c

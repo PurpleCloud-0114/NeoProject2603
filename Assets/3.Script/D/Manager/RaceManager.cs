@@ -36,7 +36,6 @@ public class RaceManager : NetworkBehaviour {
 
 	public int START_MAX_PLAYER = 10;
 
-
 	// 참가자 리스트 (순위)
 	public List<Transform> active_players = new List<Transform>();
 	// 이전 순위 기록용 딕셔너리
@@ -87,7 +86,6 @@ public class RaceManager : NetworkBehaviour {
 			}
 		}
 	}
-
 
 	[Server]
 	//서버 수신 - 클라이언트 통과 정보 받기

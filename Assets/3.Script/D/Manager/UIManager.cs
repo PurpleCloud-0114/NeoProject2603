@@ -72,23 +72,16 @@ public class UIManager : MonoBehaviour {
 
 	// 저장된 데이터를 바탕으로 UI 레이아웃 및 입력 방식 적용
 	private void ApplySettings() {
-		Debug.Log("위치 조정하겠습니다.");
-
 		// PlayerPrefs에서 프리셋 정보 로드 (0:기본, 1:왼손, 2:자이로, 3:자이로+왼손 등)
 		int preset = PlayerPrefs.GetInt("ControlPreset", 0);
-		Debug.Log($"설정된 프리셋 : {preset}");
 		bool isLeft = (preset == 1 || preset == 3);
 		bool isGyro = (preset == 2 || preset == 3);
-		Debug.Log($"왼쪽모드: {isLeft}");
-		Debug.Log($"자이로여부 : {isGyro}");
 
 		if (_touchzone != null)
 			SetLayout(_touchzone.GetComponent<RectTransform>(), isLeft ? _lefttouchzone : _righttouchzone, !isGyro);
 
 		SetLayout(_itemButtons, isLeft ? _itemLeftRef : _itemRightRef, true);
 		SetLayout(_wingButtons, isLeft ? _wingLeftRef : _wingRightRef, true);
-
-		Debug.Log("설정완료..");
 	}
 
 	// 레퍼런스(기준점)를 기반으로 대상 RectTransform의 좌표 및 앵커 복사
@@ -192,10 +185,12 @@ public class UIManager : MonoBehaviour {
 	}
 
 	// ==========================================
-	// [ 도착 및 관전 시 UI 활성화/비활성화1 ]
+	// [ 도착 및 관전 시 UI 활성화/비활성화 ]
 	// ==========================================
 	public void HideUIforFinish() {
 		_playUI.SetActive(false);
+		_specUI.SetActive(false);
+		_personalResultWindow.SetActive(false);
 		_stageProgressUI.gameObject.SetActive(false);
 	}
 	public void ShowUIforSpectator() {
