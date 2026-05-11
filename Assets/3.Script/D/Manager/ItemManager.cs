@@ -47,7 +47,8 @@ public class ItemManager : NetworkBehaviour {
 
 	public void SpanwSpiderweb(Vector3 postion) {
 		if (_spiderwebPrefab.TryGetComponent(out SpiderwebObstacle _spiderweb)) {
-			GameObject webInst = Instantiate(_spiderwebPrefab, postion + Vector3.up * _spiderweb.distance, Quaternion.identity);
+			Quaternion rotation = Quaternion.Euler(-90, 0, 0);
+			GameObject webInst = Instantiate(_spiderwebPrefab, postion + Vector3.up * _spiderweb.distance, rotation);
 			NetworkServer.Spawn(webInst);
 		}
 	}

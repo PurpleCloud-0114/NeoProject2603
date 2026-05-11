@@ -29,6 +29,7 @@ public class PlayerCore : NetworkBehaviour {
 	public Action<PlayerState> on_player_state_change_requested;
 	public Action<StatusEffect> on_state_effect_change_requested;
 	public Action<IUseable> on_item_acquired;
+	public Action on_race_start;
 	public Action on_redzone_entered;
 	public Action on_endpoint_landed;
 	public Action on_wing_button_clicked;
@@ -61,7 +62,12 @@ public class PlayerCore : NetworkBehaviour {
 		on_state_effect_change_requested -= ChangeStatusEffect;
 	}
 
-	private void ChangePlayerState(PlayerState newState) { player_state = newState; }
+	private void ChangePlayerState(PlayerState newState) { 
+		player_state = newState; 
+		if(newState == PlayerState.Falling) {
+			on_race_start?.Invoke();
+		}
+	}
 	private void ChangeStatusEffect(StatusEffect newState) { status_effect = newState; }
 
 	//----- 네트워킹

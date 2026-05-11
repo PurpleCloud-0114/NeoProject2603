@@ -1353,7 +1353,7 @@ MonoBehaviour:
   base_drop_max_speed: 0
   _dropWingSpeed: 30
   _wingTime: 0
-  MoveMobileSensitive: 1
+  MoveMobileSensitive: 25
 --- !u!114 &546341614421835030
 MonoBehaviour:
   m_ObjectHideFlags: 0
