@@ -27,7 +27,14 @@ public class ItemManager : NetworkBehaviour {
 	}
 
 	public IUseable RandomItem() {
-		ItemType type = (ItemType)Random.Range(1, 4);
+		ItemType type = ItemType.None;
+		if (UIManager.Instance.myRank == 1) {
+			type = (ItemType)2;
+		} else if(UIManager.Instance.myRank > RaceManager.Instance.total_players/2) {
+			type = (ItemType)Random.Range(1, 4);
+		} else {
+			type = (ItemType)Random.Range(1, 1);
+		}
 		switch (type) {
 			case ItemType.WeightAcceleration: return new WeightAccelerationItem();
 			case ItemType.Spiderweb: return new SpiderwebItem();

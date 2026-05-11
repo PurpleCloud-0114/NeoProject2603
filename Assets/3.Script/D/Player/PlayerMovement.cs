@@ -64,6 +64,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_redzone_entered += SetDecreaseDropSpeedTimeOnWing;
 		_playerCore.on_stun_requested += ApplyStun;
 		_playerCore.on_race_start += SetBasePoint;
+		_playerCore.on_race_finish += EndRace;
 	}
 	private void OnDisable() {
 		_playerCore.on_player_state_change_requested -= StartFalling;
@@ -75,6 +76,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_redzone_entered -= SetDecreaseDropSpeedTimeOnWing;
 		_playerCore.on_stun_requested -= ApplyStun;
 		_playerCore.on_race_start -= SetBasePoint;
+		_playerCore.on_race_finish -= EndRace;
 	}
 
 	private void FixedUpdate() {
@@ -91,7 +93,7 @@ public class PlayerMovement : NetworkBehaviour {
 		//_velocityTracker = _rigidBody.linearVelocity;
 	}
 	private void Update() {
-		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _playerInputSystem == null) return;
+		if (!isLocalPlayer || _playerInputSystem == null || _playerCore.player_state != PlayerState.Falling) return;
 
 		_moveVector = _playerInputSystem.MovePoint;
 		if (!_playerInputSystem.is_joystick) _moveVector *= MoveMobileSensitive;
@@ -244,5 +246,11 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 	private void CancleSequence() {
 		_speedControlSequence?.Kill();
+	}
+	private void EndRace() {
+		_playerInputSystem.DisableInputSystem();
+		_moveVector = Vector3.zero;
+		_moveDir = Vector3.zero;
+		_rigidBody.linearVelocity = new Vector3(0f, _rigidBody.linearVelocity.y, 0f);
 	}
 }

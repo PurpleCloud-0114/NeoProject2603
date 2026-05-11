@@ -9,6 +9,8 @@ using TMPro;
 public class UIManager : MonoBehaviour {
 	public static UIManager Instance = null;
 
+	public int myRank = 1;
+
 	[Header("Player Button Bind")]
 	[SerializeField] private Button _wingButton;
 	[SerializeField] private Button _itemButton;
@@ -44,6 +46,9 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private TextMeshProUGUI _personalTitleText;
 	[SerializeField] private TextMeshProUGUI _personalResultText;
 	[SerializeField] private TextMeshProUGUI _personalRecordText;
+
+	private bool SetResultBool;
+	private double SetResultTime;
 
 	[Header("최종 결과 UI")]
 	[SerializeField] private GameObject _finalResultWindow;    // 결과창 부모 오브젝트
@@ -107,7 +112,7 @@ public class UIManager : MonoBehaviour {
 		List<Transform> sortedList = RaceManager.Instance.active_players;
 
 		// 3. 리스트에서 내 캐릭터(로컬)가 몇 번째인지 찾습니다.
-		int myRank = sortedList.IndexOf(myTransform) + 1;
+		myRank = sortedList.IndexOf(myTransform) + 1;
 
 		// 4. 내 화면의 순위 텍스트 갱신
 		if (_rankText != null) {
@@ -122,10 +127,16 @@ public class UIManager : MonoBehaviour {
 	public void StopTimer() {
 		_timerUI.isStop = true;
 	}
-	public void ShowPersonalResult(bool isDead, double finishTime) {
+
+	public void SetResult(bool isDead, double finishTime) {
+		SetResultBool = isDead;
+		SetResultTime = finishTime;
+	}
+
+	public void ShowPersonalResult() {
 		HideUIforFinish();
 		_personalResultWindow.SetActive(true);
-		if(isDead) {
+		if(SetResultBool) {
 			_personalTitleText.text = "탈출 실패...";
 			_personalResultText.text = $"결과 : <color=red>사망</color>";
 		} else {
@@ -133,7 +144,7 @@ public class UIManager : MonoBehaviour {
 			_personalResultText.text = $"결과 : 생존";
 		}
 
-		TimeSpan time = TimeSpan.FromSeconds(finishTime);
+		TimeSpan time = TimeSpan.FromSeconds(SetResultTime);
 		_personalRecordText.text = string.Format($"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds / 10:00}");   
 	}
 	public void ShowFinalResult(PlayerResult[] results) {

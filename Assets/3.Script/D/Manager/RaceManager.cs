@@ -103,18 +103,20 @@ public class RaceManager : NetworkBehaviour {
 				}
 			);	
 		}
+		ReceiveArriveResult(sender, isDead, finishTime);
+	}
 
-
-		if(_roundResults.Count >= total_players) {
+	[Server]
+	public void EndRaceCheck() {
+		if (_roundResults.Count >= total_players) {
 			EndRace();
-		} else {
-			ReceiveArriveResult(sender, isDead, finishTime);
 		}
 	}
 
 	[TargetRpc]
 	private void ReceiveArriveResult(NetworkConnectionToClient target, bool isDead, double finishTime) {
-		UIManager.Instance.ShowPersonalResult(isDead, finishTime);
+		UIManager.Instance.SetResult(isDead, finishTime);
+		if (!isDead) StageManager.Instance.ChangeFloorTrigger(true);
 	}
 
 	//------------[ 레이스 종료 ] -----------------

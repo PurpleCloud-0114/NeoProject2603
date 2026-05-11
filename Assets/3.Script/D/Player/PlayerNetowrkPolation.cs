@@ -87,6 +87,22 @@ public class PlayerNetowrkPolation : NetworkBehaviour {
 		transform.rotation = Quaternion.Slerp(transform.rotation, _latestStateSync.rotation, Time.deltaTime * smooth_speed);
 	}
 
+	//channel = Channels.Unreliable
+	//게임에서 사용하는 통신(네트워크)에서 TCP와 UDP가 있습니다.
+	//TCP는 연결(connect)라는 함수가 있다. ACK가 있어서 응답이 있다.
+	//UDP는 응답 없음.
+
+	//TCP = Reliable / UDP = Unreliable
+	//-> TCP는 느리다. 반응이 없기 때문
+
+	//NGO가 되던 포톤이 되던 미러가되던 Unreliable UDP라는 알고리즘을 만든다.
+	//UDP 자체에는 신뢰성이 없기 때문에, 신뢰성 검증하는걸 따로 만든다는것.
+
+	//따라서 Unreliable = UDP인데, 신뢰성 검증이 추가된 버전.
+
+	//소켓 알면 해결할게 많긴 한데.
+	//전 팀이 UDP 사용해서 정보를 못받는 줄 알았지만, 사실 다른게 문제였을 가능성이 높을듯 하다.
+
 	[Command(channel = Channels.Unreliable)]
 	private void CmdSendState(Vector3 pos, Quaternion rot, Vector3 vel, double timeStamp) {
 		//TODO : 서버 검증 로직 추가하기. (핵 방지)

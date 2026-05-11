@@ -9,6 +9,7 @@ TagManager:
   - Redzone
   - ItemBox
   - Spiderweb
+  - FinishLine
   layers:
   - Default
   - TransparentFX
