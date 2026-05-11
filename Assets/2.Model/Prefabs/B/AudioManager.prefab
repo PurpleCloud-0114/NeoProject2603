@@ -176,10 +176,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   _audio_mixer: {fileID: 24100000, guid: 8347d0f8366fe44488af38544f7a2508, type: 2}
-  _bgm: []
-  _sfx: []
-  _bgm_player: {fileID: 0}
-  _sfx_player: {fileID: 0}
+  _bgm:
+  - name: 
+    clip: {fileID: 0}
+  _sfx:
+  - name: 
+    clip: {fileID: 0}
+  - name: 
+    clip: {fileID: 0}
+  - name: 
+    clip: {fileID: 0}
+  - name: 
+    clip: {fileID: 0}
+  - name: 
+    clip: {fileID: 0}
+  _bgm_player: {fileID: 4685257034113292481}
+  _sfx_player: {fileID: 5162046310400134931}
 --- !u!1 &7966252439678033813
 GameObject:
   m_ObjectHideFlags: 0
