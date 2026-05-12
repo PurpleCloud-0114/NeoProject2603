@@ -345,6 +345,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 8558712499247452231, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: b29b2128ad71ad649baeac918d2d5a2e, type: 2}
     - target: {fileID: 8886728869848558828, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
       propertyPath: sceneId
       value: 124487567
