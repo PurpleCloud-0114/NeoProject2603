@@ -87,4 +87,14 @@ public class AudioManager : MonoBehaviour
             _sfx_player.PlayOneShot(clip);
         }
     }
+
+    public AudioClip GetSFXClip(string name)
+    {
+        if (_sfxDictionary.TryGetValue(name, out AudioClip clip))
+        {
+            return clip;
+        }
+        Debug.LogWarning($"SFX Clip {name}을 찾을 수 없습니다!");
+        return null;
+    }
 }
