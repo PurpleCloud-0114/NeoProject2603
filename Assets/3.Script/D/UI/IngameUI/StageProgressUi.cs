@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 
-public class StageProgressUi : NetworkBehaviour {
+public class StageProgressUi : MonoBehaviour {
 	[Header("∏ 	µ•¿Ã≈Õ")]
 	[SerializeField] private RectTransform _redZone;
 	[SerializeField] private float _mapHeight;

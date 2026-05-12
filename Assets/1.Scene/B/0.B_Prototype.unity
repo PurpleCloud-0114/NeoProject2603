@@ -2412,63 +2412,6 @@ Material:
     - _WidthHeightRadius: {r: 375, g: 160, b: 80, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!1001 &1182194841
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2843131405774688720, guid: cf88ee5a333bb724186a558656475da2, type: 3}
-      propertyPath: m_Name
-      value: RoomManagement
-      objectReference: {fileID: 0}
-    - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 113.24678
-      objectReference: {fileID: 0}
-    - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -1.08582
-      objectReference: {fileID: 0}
-    - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: cf88ee5a333bb724186a558656475da2, type: 3}
 --- !u!1 &1254771613
 GameObject:
   m_ObjectHideFlags: 0
@@ -3559,6 +3502,7 @@ MonoBehaviour:
   _signup_button: {fileID: 72502214}
   _signupController: {fileID: 1976003140}
   _title_ob: {fileID: 0}
+  _load_scene: ClientMain
 --- !u!1 &1621802841
 GameObject:
   m_ObjectHideFlags: 0
@@ -4092,7 +4036,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SQLManager
   _is_it_Client: 1
-  _serverIP: 192.168.45.172
+  _serverIP: 192.168.45.135
   _overwriteConfig: 1
 --- !u!4 &1922734576
 Transform:
@@ -5869,5 +5813,4 @@ SceneRoots:
   - {fileID: 4255866386696191741}
   - {fileID: 1060180972}
   - {fileID: 1656865549}
-  - {fileID: 1182194841}
   - {fileID: 1922734576}

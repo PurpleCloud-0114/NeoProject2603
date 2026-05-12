@@ -20,8 +20,7 @@ public enum StatusEffect {
 public class PlayerCore : NetworkBehaviour {
 	private ClientPlayer _clientPlayer;
 	private GameObject _mainCamera;
-	[SerializeField] private GameObject _playerModel;
-
+	[SerializeField] private GameObject _portalPrefabs;
 
 	public PlayerState player_state = PlayerState.Wait;
 	public StatusEffect status_effect = StatusEffect.None;
@@ -29,6 +28,8 @@ public class PlayerCore : NetworkBehaviour {
 	public Action<PlayerState> on_player_state_change_requested;
 	public Action<StatusEffect> on_state_effect_change_requested;
 	public Action<IUseable> on_item_acquired;
+	public Action on_race_start;
+	public Action on_race_finish;
 	public Action on_redzone_entered;
 	public Action on_endpoint_landed;
 	public Action on_wing_button_clicked;
@@ -61,7 +62,17 @@ public class PlayerCore : NetworkBehaviour {
 		on_state_effect_change_requested -= ChangeStatusEffect;
 	}
 
-	private void ChangePlayerState(PlayerState newState) { player_state = newState; }
+	private void ChangePlayerState(PlayerState newState) { 
+		player_state = newState;
+		switch (newState) {
+			case PlayerState.Falling:
+				on_race_start?.Invoke();
+				break;
+			case PlayerState.Finish:
+				on_race_finish?.Invoke();
+				break;
+		}
+	}
 	private void ChangeStatusEffect(StatusEffect newState) { status_effect = newState; }
 
 	//----- 네트워킹
@@ -100,12 +111,20 @@ public class PlayerCore : NetworkBehaviour {
 	}
 
 	[Command]
-	//서버에게 보내는 도착 신호. (도착 속도 / 시간,
+	//서버에게 보내는 Finish 신호. (도착 속도 / 시간,
 	public void SendArriveResult(float impactSpeed, double finishTime) {
 		RaceManager.Instance.GetArriveResult(connectionToClient, impactSpeed, finishTime);
 	}
 
-	public void LandEndpoint() {
-		_playerModel.SetActive(false);
+	[Command]
+	//서버에게 보내는 EndPoint 신호.
+	public void SendEndpoint() {
+		RaceManager.Instance.EndRaceCheck();
+	}
+	
+	public void SpawnPortal() {
+		Vector3 spawnPos = new Vector3(transform.position.x, -37f, transform.position.z);
+		Quaternion rotation = Quaternion.Euler(-90, 0, 0);
+		Instantiate(_portalPrefabs, spawnPos, rotation);
 	}
 }

@@ -36,7 +36,6 @@ public class RaceManager : NetworkBehaviour {
 
 	public int START_MAX_PLAYER = 10;
 
-
 	// 참가자 리스트 (순위)
 	public List<Transform> active_players = new List<Transform>();
 	// 이전 순위 기록용 딕셔너리
@@ -62,7 +61,6 @@ public class RaceManager : NetworkBehaviour {
 	//[ServerCallback]
 	private void Start() {
 		if(isServer || isSinglePlay) StageManager.Instance.SetStage();
-		if (isSinglePlay) RandomSpawner.Instance.SetObstacles();
 	}
 
 	[Server]
@@ -89,7 +87,6 @@ public class RaceManager : NetworkBehaviour {
 		}
 	}
 
-
 	[Server]
 	//서버 수신 - 클라이언트 통과 정보 받기
 	public void GetArriveResult(NetworkConnectionToClient sender, float impactSpeed, double finishTime) {
@@ -97,24 +94,29 @@ public class RaceManager : NetworkBehaviour {
 		if (current_state_sync != RaceState.Racing) return;
 		bool isDead = impactSpeed > _deathOverSpeedSync;
 
-		_roundResults.Add(sender.identity,
-			new PlayerResult {
-				player = sender.identity,
-				finishTime = finishTime,
-				isDead = isDead
-			}
-		);
+		if (!_roundResults.ContainsKey(sender.identity)) {
+			_roundResults.Add(sender.identity,
+				new PlayerResult {
+					player = sender.identity,
+					finishTime = finishTime,
+					isDead = isDead
+				}
+			);	
+		}
+		ReceiveArriveResult(sender, isDead, finishTime);
+	}
 
-		ReceiveArriveResult(sender, isDead);
-
-		if(_roundResults.Count >= total_players) {
+	[Server]
+	public void EndRaceCheck() {
+		if (_roundResults.Count >= total_players) {
 			EndRace();
 		}
 	}
 
 	[TargetRpc]
-	private void ReceiveArriveResult(NetworkConnectionToClient target, bool result) {
-		UIManager.Instance.UpdateResultTextLog(result);
+	private void ReceiveArriveResult(NetworkConnectionToClient target, bool isDead, double finishTime) {
+		UIManager.Instance.SetResult(isDead, finishTime);
+		if (!isDead) StageManager.Instance.ChangeFloorTrigger(true);
 	}
 
 	//------------[ 레이스 종료 ] -----------------
@@ -138,9 +140,11 @@ public class RaceManager : NetworkBehaviour {
 		StartReturnToLobby();
 	}
 
+	//각자 유저들에게 결과창 보여주기.
 	[ClientRpc]
 	private void RpcShowFinalResult(PlayerResult[] results) {
 		UIManager.Instance.ShowFinalResult(results);
+		UIManager.Instance.HideUIforFinish();
 	}
 
 	[Server]
@@ -148,6 +152,7 @@ public class RaceManager : NetworkBehaviour {
 		StartCoroutine(Co_ReturnToLobby());
 	}
 
+	//결과창 7.5초
 	private IEnumerator Co_ReturnToLobby() {
 		Debug.Log("시상식중...(7.5초 걸림)");
 

@@ -22,7 +22,6 @@ public class PlayerUIController : NetworkBehaviour {
 
 		if(isLocalPlayer)BindButton();
 		BindBtnAction();
-		BindUI();
 	}
 
 	public override void OnStartClient() {
@@ -57,8 +56,6 @@ public class PlayerUIController : NetworkBehaviour {
 		_itemButton.onClick.AddListener(() => _playerCore.on_item_button_clicked());
 		_itemButton.onClick.AddListener(DeActivateItemBtn);
 	}
-
-	private void BindUI() => UIManager.Instance.BindJoystick(transform);
 
 	public void ActivateWingBtn() => _wingButton.interactable = true;
 	public void DeActivateWingBtn() => _wingButton.interactable = false;

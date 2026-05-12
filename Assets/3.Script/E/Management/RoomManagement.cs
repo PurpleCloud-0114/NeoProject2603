@@ -42,7 +42,7 @@ public class RoomManagement : NetworkRoomManager
         RefreshLobbyUI(); 
     }
 
-    void RefreshLobbyUI()
+    public void RefreshLobbyUI()
     {
         if (LobbyTextUI.Instance == null)
         {
@@ -58,11 +58,12 @@ public class RoomManagement : NetworkRoomManager
             RoomPlayer rp = slot as RoomPlayer;
             if (rp == null) continue;
 
-            string name = $"WoWPlayer {slot_index + 1}";
+            string player_name = string.IsNullOrEmpty(rp.NicknameSync) ? $"WoWPlayer{slot_index + 1}" : rp.NicknameSync;
             bool _isReady = rp.readyToBegin;
-            Debug.Log($"[RoomManagement] UI 갱신 slot={slot_index}, name={name}, isReady={_isReady}");
+            Debug.Log($"[RoomManagement] UI 갱신 slot={slot_index}, name={player_name }, isReady={_isReady}");
 
-            LobbyTextUI.Instance.UpdateUI(slot_index, name, _isReady);
+            LobbyTextUI.Instance.UpdateUI(slot_index, player_name, _isReady);
+            rp.RpcUpdateUI(slot_index, player_name, _isReady);
             slot_index++;
         }
     }
@@ -124,7 +125,9 @@ public class RoomManagement : NetworkRoomManager
         {
             if (player == null) continue;
             if (player.connectionToClient == null) continue;
-            LobbyTextUI.Instance.ui?.SetTime(time);
+            RoomPlayer rp = player as RoomPlayer;
+            if (rp == null) continue;
+            rp.RpcSetCountdown(time);
         }
     }
 
@@ -134,7 +137,9 @@ public class RoomManagement : NetworkRoomManager
         {
             if (player == null) continue;
             if (player.connectionToClient == null) continue;
-            LobbyTextUI.Instance.ui?.Hide();
+            RoomPlayer rp = player as RoomPlayer;
+            if (rp == null) continue;
+            rp.RpcCancelCountdown();
         }
     }
 }

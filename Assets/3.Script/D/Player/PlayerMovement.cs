@@ -5,6 +5,7 @@ using Mirror;
 using DG.Tweening;
 
 public class PlayerMovement : NetworkBehaviour {
+	private const string _SENSITIVITY_KEY = "GyroSensitivity";
 	private PlayerInputSystem _playerInputSystem;
 	private PlayerCore _playerCore;
 	private Rigidbody _rigidBody;
@@ -23,7 +24,7 @@ public class PlayerMovement : NetworkBehaviour {
 	[SerializeField, Range(0, 500)] private float _dropWingSpeed = 30f;
 	[SerializeField] private float _wingTime;
 	[Header("Mobile용 감도 조절")]
-	[Range(1f, 10f)] public float MoveMobileSensitive = 1f;
+	[Range(2f, 10f)] public float MoveMobileSensitive = 6f;
 
 	private Tween _speedControlSequence;
 	private Tween _stunSequence;
@@ -35,6 +36,7 @@ public class PlayerMovement : NetworkBehaviour {
 		TryGetComponent(out _playerCore);
 
 		base_drop_max_speed = drop_max_speed;
+		MoveMobileSensitive = PlayerPrefs.GetFloat(_SENSITIVITY_KEY);
 	}
 	private void Start() {
 		_rigidBody.isKinematic = true;
@@ -61,6 +63,8 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_obstacle_hit += HitObstacle;
 		_playerCore.on_redzone_entered += SetDecreaseDropSpeedTimeOnWing;
 		_playerCore.on_stun_requested += ApplyStun;
+		_playerCore.on_race_start += SetBasePoint;
+		_playerCore.on_race_finish += EndRace;
 	}
 	private void OnDisable() {
 		_playerCore.on_player_state_change_requested -= StartFalling;
@@ -71,6 +75,8 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_obstacle_hit -= HitObstacle;
 		_playerCore.on_redzone_entered -= SetDecreaseDropSpeedTimeOnWing;
 		_playerCore.on_stun_requested -= ApplyStun;
+		_playerCore.on_race_start -= SetBasePoint;
+		_playerCore.on_race_finish -= EndRace;
 	}
 
 	private void FixedUpdate() {
@@ -87,9 +93,10 @@ public class PlayerMovement : NetworkBehaviour {
 		//_velocityTracker = _rigidBody.linearVelocity;
 	}
 	private void Update() {
-		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _playerInputSystem == null) return;
+		if (!isLocalPlayer || _playerInputSystem == null || _playerCore.player_state != PlayerState.Falling) return;
 
-		_moveVector = _playerInputSystem.MovePoint * MoveMobileSensitive;
+		_moveVector = _playerInputSystem.MovePoint;
+		if (!_playerInputSystem.is_joystick) _moveVector *= MoveMobileSensitive;
 		_moveDir = new Vector3(Mathf.Clamp(_moveVector.x, -1, 1), 0, Mathf.Clamp(_moveVector.y, -1, 1));
 	}
 
@@ -123,20 +130,45 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 	private void Rotate() {
 		// 회전
-		float targetX = 90f + (_moveDir.z * 35f);
-		float targetZ = _moveDir.x * -35f;
-		Quaternion targetRotation = Quaternion.Euler(targetX, 0f, targetZ);
-		//transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 20f);
-		_rigidBody.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 20f));
+		//float targetX = 90f + (_moveDir.z * 35f);
+		//float targetZ = _moveDir.x * -35f;
+		//Quaternion targetRotation = Quaternion.Euler(targetX, 0f, targetZ);
+		////transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 20f);
+		//_rigidBody.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 20f));
+
+		// 1. 기본적으로 90도 누워 있는 기본 회전값 (기준점)
+		Quaternion baseRotation = Quaternion.Euler(90f, 0f, 0f);
+
+		// 2. 상하 입력(_moveDir.z)에 따른 X축 회전 (앞뒤 굽히기)
+		Quaternion xRotation = Quaternion.AngleAxis(_moveDir.z * 35f, Vector3.right);
+
+		// 3. 좌우 입력(_moveDir.x)에 따른 Y축 회전 (옆으로 기울이기)
+		// 누워 있는 상태에서는 로컬 Y축을 돌려야 '기울어짐'이 표현됩니다.
+		Quaternion yRotation = Quaternion.AngleAxis(_moveDir.x * -35f, Vector3.up);
+
+		// 4. 모든 회전을 조합 (순서 중요: 기본 상태 * 상하 * 좌우)
+		Quaternion targetRotation = baseRotation * xRotation * yRotation;
+
+		// 적용
+		_rigidBody.MoveRotation(Quaternion.Slerp(_rigidBody.rotation, targetRotation, Time.fixedDeltaTime * 20f));
 	}
 	private void ClampPositionToMapBounds() {
 		Vector3 currentPos = transform.position;
 		Vector3 mapCetner = _mapSize.map_center;
 		currentPos.y = mapCetner.y;
 		float distanceFromCenter = Vector3.Distance(currentPos, mapCetner);
-		if (distanceFromCenter > _mapSize.boundaryRadius) {
+
+		//최저-25 | 최고-90 => 75를 백분율화.
+		//높이 3000
+		float percent = 100f;
+		if (transform.position.y > 3000f) percent = 100f;
+		else {
+			percent = transform.position.y * 0.0003f;
+		}
+		float boundary = _mapSize.boundaryRadius + (75f * percent);
+		if (distanceFromCenter > boundary) {
 			Vector3 direction = (currentPos - mapCetner).normalized;
-			Vector3 clampedPosition = mapCetner + (direction * _mapSize.boundaryRadius);
+			Vector3 clampedPosition = mapCetner + (direction * boundary);
 			clampedPosition.y = transform.position.y;
 			_rigidBody.MovePosition(clampedPosition);
 			_rigidBody.linearVelocity = new Vector3(0, _rigidBody.linearVelocity.y, 0);
@@ -156,6 +188,10 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 	private void OpenWing() {
 		DOTween.To(() => drop_max_speed, x => drop_max_speed = x, _dropWingSpeed, _wingTime).SetEase(Ease.OutQuad);
+	}
+	private void SetBasePoint() {
+		if (_playerInputSystem.is_joystick) _playerInputSystem.SetBasePoint(Vector2.zero);
+		else _playerInputSystem.Calibrate();
 	}
 
 	private void HitObstacle() {
@@ -210,5 +246,11 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 	private void CancleSequence() {
 		_speedControlSequence?.Kill();
+	}
+	private void EndRace() {
+		_playerInputSystem.DisableInputSystem();
+		_moveVector = Vector3.zero;
+		_moveDir = Vector3.zero;
+		_rigidBody.linearVelocity = new Vector3(0f, _rigidBody.linearVelocity.y, 0f);
 	}
 }

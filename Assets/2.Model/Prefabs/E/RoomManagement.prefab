@@ -11,10 +11,9 @@ GameObject:
   - component: {fileID: 9012150870923315108}
   - component: {fileID: 8849018464848831088}
   - component: {fileID: 1293794428553162512}
-  - component: {fileID: 7821459773627726984}
   m_Layer: 0
   m_Name: RoomManagement
-  m_TagString: ItemBox
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -55,27 +54,15 @@ MonoBehaviour:
   onlineScene: Assets/1.Scene/Main/ClientLobby.unity
   offlineSceneLoadDelay: 0
   transport: {fileID: 1293794428553162512}
-  networkAddress: 192.168.45.148
+  networkAddress: localhost
   maxConnections: 10
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
-  playerPrefab: {fileID: 6497241950661712083, guid: c9925a3255b9bef4bbbbd11039d1e733, type: 3}
+  playerPrefab: {fileID: 2404973702814356879, guid: 8a8821c010965fa40af3a487b7475720, type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
-  spawnPrefabs:
-  - {fileID: 4656741095035066466, guid: 538e6adf0ad489540ab7538ad1df0a8d, type: 3}
-  - {fileID: 1311382419031291770, guid: 8671a2861100d95479ce8f5b9ce6feb5, type: 3}
-  - {fileID: 7301932044659917098, guid: a5601ed608e66ff41ade1fd8010737e1, type: 3}
-  - {fileID: 7806309783579552340, guid: 2e6a1915cb48ba94c85c1f4bfecdea2d, type: 3}
-  - {fileID: 6411370768708494045, guid: 99ae815042b86294fba9465e3c9b7cc1, type: 3}
-  - {fileID: 8693534039953576507, guid: 619df07a6c2a9f2458c2fe49b31162af, type: 3}
-  - {fileID: 7089493655727706451, guid: c44d59c23e3357f47a61b46812f96fef, type: 3}
-  - {fileID: 4568036107791384648, guid: 0536952ae449aea479443add8a56da0c, type: 3}
-  - {fileID: 6224785930336252568, guid: 8dec10600b53b7a408a5ab322c1b2eb0, type: 3}
-  - {fileID: 7048409918847595415, guid: 49341eaea8fecf245b28e3a3b0ec5bd6, type: 3}
-  - {fileID: 4857432051056301919, guid: da253e943ae1a524f8bd5a960523c2dc, type: 3}
-  - {fileID: 8542186906585345430, guid: 7ec3337192cb0d44ea73cf067d2ba913, type: 3}
+  spawnPrefabs: []
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -128,24 +115,3 @@ MonoBehaviour:
   debugLog: 0
   statisticsGUI: 0
   statisticsLog: 0
---- !u!65 &7821459773627726984
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2843131405774688720}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}

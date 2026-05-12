@@ -6827,6 +6827,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomManagement
       objectReference: {fileID: 0}
+    - target: {fileID: 8849018464848831088, guid: cf88ee5a333bb724186a558656475da2, type: 3}
+      propertyPath: playerPrefab
+      value: 
+      objectReference: {fileID: 2404973702814356879, guid: 8a8821c010965fa40af3a487b7475720, type: 3}
     - target: {fileID: 9012150870923315108, guid: cf88ee5a333bb724186a558656475da2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 138.9238
