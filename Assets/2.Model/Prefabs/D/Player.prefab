@@ -1952,12 +1952,12 @@ GameObject:
   m_Component:
   - component: {fileID: 2029676155698232541}
   m_Layer: 3
-  m_Name: ' Parachute'
+  m_Name: Parachute
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2029676155698232541
 Transform:
   m_ObjectHideFlags: 0
