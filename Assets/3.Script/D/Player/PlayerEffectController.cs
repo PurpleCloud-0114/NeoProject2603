@@ -92,17 +92,50 @@ public class PlayerEffectController : NetworkBehaviour {
 	}
 
 
-	// 하단 일단 미구현.
-	public void UseMagneticMagicItem() {
-		//일단 미구현
+	// =========================
+	// [ 마 그 네 틱 ] - 유유유유유유유유
+	// =========================
+	public void UseMagneticItem(GameObject target, float duration, float power) {
+		if (!isServer) return;
+
+		TargetApplyMagneticEffect(netIdentity.connectionToClient, target, true, duration, power);
+		if(target.TryGetComponent(out NetworkIdentity targetIdentity)) {
+			TargetApplyMagneticEffect(targetIdentity.connectionToClient, gameObject, false, duration, power);
+		}
 	}
+	[TargetRpc]
+	public void TargetApplyMagneticEffect(NetworkConnectionToClient target, GameObject opponent, bool isAttacker, float duration, float power) {
+		if (opponent == null) return;
+		StartCoroutine(Co_MagneticForce(opponent, isAttacker, duration, power));
+	}
+	private IEnumerator Co_MagneticForce(GameObject opponent, bool isAttacker, float duration, float power) {
+		float elapsed = 0f;
+		while (elapsed < duration) {
+			if (opponent == null) break;
+
+			// 상대방을 향한 방향 벡터
+			Vector3 dir = (opponent.transform.position - transform.position).normalized;
+
+			// PlayerCore의 impulse 이벤트를 통해 물리 힘 전달
+			_playerCore.on_impulse_requested?.Invoke(dir * power * Time.deltaTime * 60f);
+
+			elapsed += Time.deltaTime;
+			yield return null;
+		}
+	}
+
+
+
+	// =========================
+	// [ 가속 게이트 ] - 통과시
+	// =========================
 	public void UseAntiMagicItem(float duration) {
 		StopCoroutine("Invinsibling_co");
 		StartCoroutine("Invinsibling_co",duration);
 	}
 
-	public void HitMagnetic() {
-		//조작 불가 및 그 사람한테 쭉 달려간다.
-		//일단 미구현
-	}
+	// =========================
+	// [ 텔레포트 게이트 ] - 통과시
+	// =========================
+
 }

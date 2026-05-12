@@ -2,11 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShockwaveMagicItem : IUseable {
-	public string Name => "충격파 마법";
-	public ItemType Type => ItemType.Shockwave;
+[CreateAssetMenu(menuName = "ItemOption/ShockwaveMagicItem")]
+public class ShockwaveMagicItem : ScriptableObject, IUseable {
+	[SerializeField] private string _itemName = "충격파 마법";
+	[SerializeField] private ItemType _itemType = ItemType.Shockwave;
 
-	public float range = 10f;
+	public string Name => _itemName;
+	public ItemType Type => _itemType;
+
+	public float range = 15f;
 	public float push_force = 25f;
 	public float stun_duration = 2f;
 

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 785ba82fc2c1e304cbc1ba3a0370a2a1, type: 3}
+  m_Name: ShockwaveMagicItem
+  m_EditorClassIdentifier: Assembly-CSharp::ShockwaveMagicItem
+  _itemName: "\uCDA9\uACA9\uD30C \uB9C8\uBC95"
+  _itemType: 2
+  range: 15
+  push_force: 25
+  stun_duration: 2

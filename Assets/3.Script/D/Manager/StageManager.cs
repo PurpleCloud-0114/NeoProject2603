@@ -23,7 +23,7 @@ public class StageManager : NetworkBehaviour {
 	public void SetStage() {
 		float rnd_RedZone = Random.Range(250f, 400f);
 		float rnd_RedZoneHeight = Random.Range(50f, 300f);
-		stage_data_sync = new StageData(3000f, rnd_RedZone, rnd_RedZoneHeight);
+		stage_data_sync = new StageData(6000f, rnd_RedZone, rnd_RedZoneHeight);
 	}
 
 	private void OnStageDataChanged(StageData oldData, StageData newData) {

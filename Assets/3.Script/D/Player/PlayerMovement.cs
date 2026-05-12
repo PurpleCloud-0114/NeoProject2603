@@ -60,6 +60,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_wing_button_clicked += OpenWing;
 		_playerCore.on_max_drop_speed_change_requested += ApplySpeedChange;
 		_playerCore.on_impulse_requested += ApplyImpulse;
+		_playerCore.on_continuous_force_requested += ApplyContinuousForce;
 		_playerCore.on_obstacle_hit += HitObstacle;
 		_playerCore.on_redzone_entered += SetDecreaseDropSpeedTimeOnWing;
 		_playerCore.on_stun_requested += ApplyStun;
@@ -72,6 +73,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_wing_button_clicked -= OpenWing;
 		_playerCore.on_max_drop_speed_change_requested -= ApplySpeedChange;
 		_playerCore.on_impulse_requested -= ApplyImpulse;
+		_playerCore.on_continuous_force_requested += ApplyContinuousForce;
 		_playerCore.on_obstacle_hit -= HitObstacle;
 		_playerCore.on_redzone_entered -= SetDecreaseDropSpeedTimeOnWing;
 		_playerCore.on_stun_requested -= ApplyStun;
@@ -130,27 +132,11 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 	private void Rotate() {
 		// 회전
-		//float targetX = 90f + (_moveDir.z * 35f);
-		//float targetZ = _moveDir.x * -35f;
-		//Quaternion targetRotation = Quaternion.Euler(targetX, 0f, targetZ);
-		////transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 20f);
-		//_rigidBody.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 20f));
-
-		// 1. 기본적으로 90도 누워 있는 기본 회전값 (기준점)
-		Quaternion baseRotation = Quaternion.Euler(90f, 0f, 0f);
-
-		// 2. 상하 입력(_moveDir.z)에 따른 X축 회전 (앞뒤 굽히기)
-		Quaternion xRotation = Quaternion.AngleAxis(_moveDir.z * 35f, Vector3.right);
-
-		// 3. 좌우 입력(_moveDir.x)에 따른 Y축 회전 (옆으로 기울이기)
-		// 누워 있는 상태에서는 로컬 Y축을 돌려야 '기울어짐'이 표현됩니다.
-		Quaternion yRotation = Quaternion.AngleAxis(_moveDir.x * -35f, Vector3.up);
-
-		// 4. 모든 회전을 조합 (순서 중요: 기본 상태 * 상하 * 좌우)
-		Quaternion targetRotation = baseRotation * xRotation * yRotation;
-
-		// 적용
-		_rigidBody.MoveRotation(Quaternion.Slerp(_rigidBody.rotation, targetRotation, Time.fixedDeltaTime * 20f));
+		float targetX = _moveDir.z * 35f;
+		float targetZ = _moveDir.x * -35f;
+		Quaternion targetRotation = Quaternion.Euler(targetX, 0f, targetZ);
+		//transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 20f);
+		_rigidBody.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 20f));
 	}
 	private void ClampPositionToMapBounds() {
 		Vector3 currentPos = transform.position;
@@ -161,7 +147,7 @@ public class PlayerMovement : NetworkBehaviour {
 		//최저-25 | 최고-90 => 75를 백분율화.
 		//높이 3000
 		float percent = 100f;
-		if (transform.position.y > 3000f) percent = 100f;
+		if (transform.position.y > StageManager.Instance.stage_data_sync.map_height) percent = 100f;
 		else {
 			percent = transform.position.y * 0.0003f;
 		}
@@ -196,7 +182,7 @@ public class PlayerMovement : NetworkBehaviour {
 
 	private void HitObstacle() {
 		Vector3 currentVelocity = _rigidBody.linearVelocity;
-		float nextYVelocity = currentVelocity.y + 30f;
+		float nextYVelocity = currentVelocity.y + 50f;
 		currentVelocity.y = Mathf.Min(nextYVelocity, 0f);
 		_rigidBody.linearVelocity = currentVelocity;
 	}
@@ -229,6 +215,9 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 	private void ApplyImpulse(Vector3 force) {
 		_rigidBody.AddForce(force, ForceMode.VelocityChange);
+	}
+	private void ApplyContinuousForce(Vector3 force) {
+		_rigidBody.AddForce(force, ForceMode.Acceleration);
 	}
 	private void ApplyStun(float duration) {
 		_stunSequence?.Kill();

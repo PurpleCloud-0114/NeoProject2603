@@ -2626,9 +2626,9 @@ MonoBehaviour:
   syncInterval: 0
   _center: {x: 0, y: 0, z: 0}
   _radius: 23
-  _startY: 2950
+  _startY: 5900
   _endY: 350
-  _count: 50
+  _count: 100
   _list:
   - prefab: {fileID: 6050089829315985338, guid: 7f8b0b4b626390a43903e79c4bd8e6ad, type: 3}
     checkRadius: 8
@@ -3394,6 +3394,11 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _spiderwebPrefab: {fileID: 5230189180519417414, guid: 4b907d4e2ca43cd4a9ab20bdb48803e0, type: 3}
+  _itemTemplates:
+  - {fileID: 11400000, guid: 7517b9946b908924ba27193d13a1b8ac, type: 2}
+  - {fileID: 11400000, guid: 88f8efc5f1b28e64d8fb916f003742e8, type: 2}
+  - {fileID: 11400000, guid: 808d7b12080345f4b885840b17912e6d, type: 2}
+  - {fileID: 11400000, guid: 7af4c04cbf3b370418706cb87607d5fe, type: 2}
 --- !u!4 &1477643673
 Transform:
   m_ObjectHideFlags: 0
@@ -4740,11 +4745,11 @@ MonoBehaviour:
   syncInterval: 0
   _obstacleSpawner: {fileID: 1151484589}
   _center: {x: 0, y: 0, z: 0}
-  _startY: 3000
+  _startY: 6000
   _endY: -40
   _step: 40
   _noChangeFloorCount: 5
-  _scaleStep: 0.015
+  _scaleStep: 0.0075
   _minScale: 0.4
   _maxScale: 1.4
   _3F_Chance: 20

@@ -28,6 +28,7 @@ public class PlayerItemController : NetworkBehaviour {
 	public void UseItem() {
 		if(current_item != null) {
 			CmdUseItem(current_item.Type);
+			//È¿°úÀ½
 		}
 		current_item = null;
 	}
