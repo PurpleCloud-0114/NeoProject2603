@@ -20,6 +20,7 @@ public enum StatusEffect {
 public class PlayerCore : NetworkBehaviour {
 	private ClientPlayer _clientPlayer;
 	private GameObject _mainCamera;
+	public Animator animator;
 	[SerializeField] private GameObject _portalPrefabs;
 
 	public PlayerState player_state = PlayerState.Wait;

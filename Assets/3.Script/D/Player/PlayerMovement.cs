@@ -173,6 +173,9 @@ public class PlayerMovement : NetworkBehaviour {
 		_wingTime = (3f * StageManager.Instance.stage_data_sync.map_redzone) / (drop_max_speed + 2f * _dropWingSpeed);
 	}
 	private void OpenWing() {
+		if (_playerCore.animator != null) {
+			_playerCore.animator.SetTrigger("OnParasuit");
+		}
 		DOTween.To(() => drop_max_speed, x => drop_max_speed = x, _dropWingSpeed, _wingTime).SetEase(Ease.OutQuad);
 	}
 	private void SetBasePoint() {

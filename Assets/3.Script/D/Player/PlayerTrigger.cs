@@ -49,7 +49,7 @@ public class PlayerTrigger : NetworkBehaviour
             case TAG_ITEMBOX:
                 if (!isLocalPlayer) return;
                 CmdDisableRoot(other.transform.root.GetComponent<NetworkIdentity>());
-                _playerCore.on_item_acquired?.Invoke(ItemManager.Instance.RandomItem());
+                _playerCore.CmdRequestItemSelection();
                 PlayLocalSFX("ItemWeightActivate");
                 break;
 
