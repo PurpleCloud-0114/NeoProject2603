@@ -32,17 +32,19 @@ public class PlayerTrigger : NetworkBehaviour
         wfs2 = new WaitForSeconds(_hitObstacleInvincibilityDuration * 0.1f);
     }
 
-	private void OnCollisionEnter(Collision collision) {
-		if(collision.transform.CompareTag(TAG_ENDPOINT)) {
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.CompareTag(TAG_ENDPOINT))
+        {
             _characterModel.SetActive(false);
             UIManager.Instance.ShowPersonalResult();
             _playerCore.SendEndpoint();
 
             if (isLocalPlayer) CmdPlay3DSFX("PlayerLandFail");
         }
-	}
+    }
 
-	private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         switch (other.tag)
         {
@@ -54,30 +56,31 @@ public class PlayerTrigger : NetworkBehaviour
                 break;
 
             case TAG_OBSTACLE:
+                // ★ 중요: 장애물 충돌 판정은 오직 로컬 플레이어(본인)만 계산하도록 최상단에서 차단
+                if (!isLocalPlayer) return;
+
                 ObstacleIdentity obs = other.GetComponentInParent<ObstacleIdentity>();
 
                 // 1. MapFloor에 속한 모듈형 장애물인 경우
-                if (isLocalPlayer) {
-                    if (obs != null && obs.parentFloor != null)
+                if (obs != null && obs.parentFloor != null)
+                {
+                    CmdHitModuleObstacle(obs.parentFloor.netIdentity, obs.obstacleIndex);
+                }
+                // 2. MapFloor가 없는 독립형(공중) 장애물인 경우
+                else
+                {
+                    NetworkIdentity identity = other.transform.root.GetComponent<NetworkIdentity>();
+                    if (identity != null)
                     {
-                        CmdHitModuleObstacle(obs.parentFloor.netIdentity, obs.obstacleIndex);
+                        CmdDisableRoot(identity);
                     }
-                    // 2. MapFloor가 없는 독립형(공중) 장애물인 경우 (아이템박스처럼 처리)
-                    else
-                    {
-                        // root에서 NetworkIdentity를 찾아 서버에서 UnSpawn 및 삭제 요청
-                        NetworkIdentity identity = other.transform.root.GetComponent<NetworkIdentity>();
-                        if (identity != null)
-                        {
-                            CmdDisableRoot(identity);
-                        }
-                    }
-				}
-                if (!Invincibility) {
+                }
+
+                // 본인만 무적 체크 및 사운드 요청
+                if (!Invincibility)
+                {
                     StartCoroutine(Co_Invincibility());
-
                     _playerCore.on_obstacle_hit?.Invoke();
-
                     CmdPlay3DSFX("ObstacleBreak");
                 }
                 break;
@@ -101,6 +104,7 @@ public class PlayerTrigger : NetworkBehaviour
 
                 CmdPlay3DSFX("PlayerCollision");
                 break;
+
             case TAG_FINISHLINE:
                 if (!isLocalPlayer) return;
                 float impactSpeed = 0f;
@@ -113,15 +117,18 @@ public class PlayerTrigger : NetworkBehaviour
         }
     }
 
-    private IEnumerator Co_Invincibility() {
+    private IEnumerator Co_Invincibility()
+    {
         Invincibility = true;
         StartCoroutine(Co_InvincibilityVisual());
         yield return wfs;
         Invincibility = false;
     }
 
-    private IEnumerator Co_InvincibilityVisual() {
-        while(Invincibility) {
+    private IEnumerator Co_InvincibilityVisual()
+    {
+        while (Invincibility)
+        {
             _characterModel.SetActive(!_characterModel.activeSelf);
             yield return wfs2;
         }
@@ -143,7 +150,6 @@ public class PlayerTrigger : NetworkBehaviour
     private void CmdDisableRoot(NetworkIdentity identity)
     {
         if (identity == null) return;
-
         NetworkServer.UnSpawn(identity.gameObject);
         identity.gameObject.SetActive(false);
     }
@@ -170,7 +176,8 @@ public class PlayerTrigger : NetworkBehaviour
     [ClientRpc]
     private void RpcPlay3DSFX(string sfxName)
     {
-        // 3D 공간 사운드 재생
+        // 서버가 "여기서 소리 내라!" 라고 명령하면, 
+        // 해당 플레이어의 오디오 소스에서 소리가 납니다.
         AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
         if (clip != null && _player3DAudioSource != null)
         {
@@ -180,7 +187,6 @@ public class PlayerTrigger : NetworkBehaviour
 
     private void PlayLocalSFX(string sfxName)
     {
-        // UI 소리나 본인만 들어도 되는 소리
         AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
         if (clip != null) AudioManager.Instance.PlaySFX(sfxName);
     }
