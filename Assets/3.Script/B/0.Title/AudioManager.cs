@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class Sound
@@ -12,19 +13,19 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
 
+    [Header("Settings")]
     [SerializeField] private AudioMixer _audio_mixer;
 
-    [Space(10f)]
-    [Header("Audio Clip")]
-    [Space(10f)]
+    [Header("Audio Clips")]
     [SerializeField] private Sound[] _bgm;
     [SerializeField] private Sound[] _sfx;
 
-    [Space(50f)]
-    [Header("Audio Source")]
-    [Space(10f)]
+    [Header("Audio Source References")]
     [SerializeField] private AudioSource _bgm_player;
     [SerializeField] private AudioSource _sfx_player;
+
+    private Dictionary<string, AudioClip> _bgmDictionary = new Dictionary<string, AudioClip>();
+    private Dictionary<string, AudioClip> _sfxDictionary = new Dictionary<string, AudioClip>();
 
     private void Awake()
     {
@@ -32,77 +33,68 @@ public class AudioManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            Init();
         }
         else
         {
             Destroy(gameObject);
         }
-        AutoSetting();
+    }
+
+    private void Init()
+    {
+        // 인스펙터에서 비어있을 경우만 자동 할당 (자식 오브젝트 순서 기준)
+        if (_bgm_player == null) _bgm_player = transform.GetChild(0).GetComponent<AudioSource>();
+        if (_sfx_player == null) _sfx_player = transform.GetChild(1).GetComponent<AudioSource>();
+
+        // 딕셔너리에 데이터 캐싱
+        foreach (var s in _bgm) _bgmDictionary[s.name] = s.clip;
+        foreach (var s in _sfx) _sfxDictionary[s.name] = s.clip;
     }
 
     private void Start()
     {
-        float bgmVol = PlayerPrefs.GetFloat("BGM", 0.75f);
-        float sfxVol = PlayerPrefs.GetFloat("SFX", 0.75f);
-
-        SetVolume("BGM", bgmVol);
-        SetVolume("SFX", sfxVol);
-
+        // 게임 시작 시 저장된 볼륨 값 적용
+        SetVolume("BGM", PlayerPrefs.GetFloat("BGM", 0.6f));
+        SetVolume("SFX", PlayerPrefs.GetFloat("SFX", 0.6f));
     }
 
-    public void SetVolume(string parametername, float slidervalue)
+    public void SetVolume(string parameterName, float sliderValue)
     {
-        float dB = Mathf.Log10(Mathf.Max(0.0001f, slidervalue)) * 20;
+        if (_audio_mixer == null) return;
 
-        _audio_mixer.SetFloat(parametername, dB);
-    }
-
-    private void AutoSetting()
-    {
-        _bgm_player = transform.GetChild(0).GetComponent<AudioSource>();
-        _sfx_player = transform.GetChild(1).GetComponent<AudioSource>();
+        // 슬라이더 0~1 값을 -80dB~0dB로 변환
+        float dB = Mathf.Log10(Mathf.Max(0.0001f, sliderValue)) * 20;
+        _audio_mixer.SetFloat(parameterName, dB);
     }
 
     public void PlayBGM(string name)
     {
-        foreach (Sound s in _bgm)
+        if (_bgmDictionary.TryGetValue(name, out AudioClip clip))
         {
-            if (s.name.Equals(name))
-            {
-                _bgm_player.clip = s.clip;
-                _bgm_player.Play();
-                break;
-            }
+            if (_bgm_player.clip == clip && _bgm_player.isPlaying) return;
+            _bgm_player.clip = clip;
+            _bgm_player.Play();
         }
     }
-    public void StopBGM()
-    {
-        _bgm_player.Stop();
-    }
 
-    public void PlaySFX(string name) //RPC로 해야돼는 경우도 있음, Client개인 UI는 그냥 쓰면 됌
+    public void StopBGM() => _bgm_player.Stop();
+
+    public void PlaySFX(string name)
     {
-        foreach (Sound s in _sfx)
+        if (_sfxDictionary.TryGetValue(name, out AudioClip clip))
         {
-            if (s.name.Equals(name))
-            {
-                _sfx_player.PlayOneShot(s.clip);
-            }
+            _sfx_player.PlayOneShot(clip);
         }
     }
-    /* 예시 대신 3D SFX를 써야하지 않을까 합니다.
-     [Command]
-    public void CmdPlayCrashSound()
-    {
-    // 서버가 모든 클라이언트에게 소리 재생 명령을 내림
-    RpcPlayCrashSound();
-    }
 
-    [ClientRpc]
-    private void RpcPlayCrashSound()
+    public AudioClip GetSFXClip(string name)
     {
-    // 각 클라이언트의 AudioManager가 효과음을 재생
-    AudioManager.Instance.PlaySFX("Crash");
+        if (_sfxDictionary.TryGetValue(name, out AudioClip clip))
+        {
+            return clip;
+        }
+        Debug.LogWarning($"SFX Clip {name}을 찾을 수 없습니다!");
+        return null;
     }
-    */
 }

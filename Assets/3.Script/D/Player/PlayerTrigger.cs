@@ -15,6 +15,9 @@ public class PlayerTrigger : NetworkBehaviour
     private const string TAG_FINISHLINE = "FinishLine";
     private const string TAG_ENDPOINT = "EndPoint";
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource _player3DAudioSource;
+
     [SerializeField] private GameObject _characterModel;
     [SerializeField] private float _hitPlayerImpulsePower = 25f;
     [SerializeField] private float _hitObstacleInvincibilityDuration = 1f;
@@ -34,6 +37,8 @@ public class PlayerTrigger : NetworkBehaviour
             _characterModel.SetActive(false);
             UIManager.Instance.ShowPersonalResult();
             _playerCore.SendEndpoint();
+
+            if (isLocalPlayer) CmdPlay3DSFX("PlayerLandFail");
         }
 	}
 
@@ -44,7 +49,8 @@ public class PlayerTrigger : NetworkBehaviour
             case TAG_ITEMBOX:
                 if (!isLocalPlayer) return;
                 CmdDisableRoot(other.transform.root.GetComponent<NetworkIdentity>());
-                _playerCore.CmdRequestItemSelection();
+                _playerCore.on_item_acquired?.Invoke(ItemManager.Instance.RandomItem());
+                PlayLocalSFX("ItemWeightActivate");
                 break;
 
             case TAG_OBSTACLE:
@@ -70,7 +76,9 @@ public class PlayerTrigger : NetworkBehaviour
                 if (!Invincibility) {
                     StartCoroutine(Co_Invincibility());
 
-                    _playerCore.on_obstacle_hit?.Invoke(); 
+                    _playerCore.on_obstacle_hit?.Invoke();
+
+                    CmdPlay3DSFX("ObstacleBreak");
                 }
                 break;
 
@@ -83,11 +91,15 @@ public class PlayerTrigger : NetworkBehaviour
                 if (!isLocalPlayer) return;
                 if (_playerCore.status_effect == StatusEffect.Invinsible) return;
                 _playerCore.on_spiderweb_hit?.Invoke(other);
+
+                CmdPlay3DSFX("ItemWebHit");
                 break;
 
             case TAG_PLAYER:
                 if (!isLocalPlayer) return;
                 PushPlayer(other);
+
+                CmdPlay3DSFX("PlayerCollision");
                 break;
             case TAG_FINISHLINE:
                 if (!isLocalPlayer) return;
@@ -145,5 +157,31 @@ public class PlayerTrigger : NetworkBehaviour
 
         if (dir.sqrMagnitude > 0.001f)
             _playerCore.on_impulse_requested?.Invoke(dir.normalized * _hitPlayerImpulsePower);
+    }
+
+    // ---------------- 3D SOUND RPC ----------------
+
+    [Command]
+    private void CmdPlay3DSFX(string sfxName)
+    {
+        RpcPlay3DSFX(sfxName);
+    }
+
+    [ClientRpc]
+    private void RpcPlay3DSFX(string sfxName)
+    {
+        // 3D 공간 사운드 재생
+        AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
+        if (clip != null && _player3DAudioSource != null)
+        {
+            _player3DAudioSource.PlayOneShot(clip);
+        }
+    }
+
+    private void PlayLocalSFX(string sfxName)
+    {
+        // UI 소리나 본인만 들어도 되는 소리
+        AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
+        if (clip != null) AudioManager.Instance.PlaySFX(sfxName);
     }
 }
