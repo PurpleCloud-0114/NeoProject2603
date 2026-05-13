@@ -13,6 +13,8 @@ public class PlayerTrigger : NetworkBehaviour
 
     private float _hitPlayerImpulsePower = 25f;
 
+    [SerializeField] private AudioSource _player3DAudioSource;
+
     private void Awake()
     {
         TryGetComponent(out _playerCore);
@@ -44,6 +46,7 @@ public class PlayerTrigger : NetworkBehaviour
             case TAG_ITEMBOX:
                 CmdDisableRoot(other.transform.root.GetComponent<NetworkIdentity>());
                 _playerCore.on_item_acquired?.Invoke(ItemManager.Instance.RandomItem());
+                Play3DSFX("ItemWeightActivate");
                 break;
 
             case TAG_OBSTACLE:
@@ -66,6 +69,7 @@ public class PlayerTrigger : NetworkBehaviour
                 }
 
                 _playerCore.on_obstacle_hit?.Invoke();
+                CmdPlaySFX("ObstacleBreak"); // 서버에 소리 재생 요청
                 break;
 
             case TAG_REDZONE:
@@ -75,11 +79,13 @@ public class PlayerTrigger : NetworkBehaviour
             case TAG_SPIDERWEB:
                 if (_playerCore.status_effect == StatusEffect.Invinsible) return;
                 _playerCore.on_spiderweb_hit?.Invoke(other);
+                CmdPlaySFX("ItemWebHit"); // 거미줄 걸림 소리
                 Debug.Log("나 거미줄 걸렸어~");
                 break;
 
             case TAG_PLAYER:
                 PushPlayer(other);
+                CmdPlaySFX("PlayerCollision"); // 플레이어 충돌 소리
                 break;
         }
     }
@@ -113,5 +119,28 @@ public class PlayerTrigger : NetworkBehaviour
 
         if (dir.sqrMagnitude > 0.001f)
             _playerCore.on_impulse_requested?.Invoke(dir.normalized * _hitPlayerImpulsePower);
+    }
+
+    // ---------------- 3D SOUND ----------------
+    [Command]
+    private void CmdPlaySFX(string sfxName)
+    {
+        RpcPlay3DSFX(sfxName);
+    }
+
+    [ClientRpc]
+    private void RpcPlay3DSFX(string sfxName)
+    {
+        Play3DSFX(sfxName);
+    }
+
+    private void Play3DSFX(string sfxName)
+    {
+        if (_player3DAudioSource == null) return;
+        AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
+        if (clip != null)
+        {
+            _player3DAudioSource.PlayOneShot(clip);
+        }
     }
 }
