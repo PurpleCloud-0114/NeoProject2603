@@ -34,7 +34,7 @@ public class PlayerTrigger : NetworkBehaviour
 
 	private void OnCollisionEnter(Collision collision) {
 		if(collision.transform.CompareTag(TAG_ENDPOINT)) {
-            _characterModel.SetActive(false);
+            HidePlayerModel();
             UIManager.Instance.ShowPersonalResult();
             _playerCore.SendEndpoint();
 
@@ -47,6 +47,12 @@ public class PlayerTrigger : NetworkBehaviour
             }
         }
 	}
+
+    [ClientRpc]
+    private void HidePlayerModel() {
+        _characterModel.SetActive(false);
+    }
+
 
 	private void OnTriggerEnter(Collider other)
     {
@@ -99,7 +105,7 @@ public class PlayerTrigger : NetworkBehaviour
 
             case TAG_SPIDERWEB:
                 if (!isLocalPlayer) return;
-                if (_playerCore.status_effect == StatusEffect.Invinsible) return;
+                //if (_playerCore.status_effect == StatusEffect.Invinsible) return;
                 _playerCore.on_spiderweb_hit?.Invoke(other);
 
 
