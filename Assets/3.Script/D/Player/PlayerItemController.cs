@@ -12,6 +12,12 @@ public class PlayerItemController : NetworkBehaviour
     [Header("3D Audio")]
     [SerializeField] private AudioSource _player3DAudioSource;
 
+    [Header("Player Attached Particles")]
+    [SerializeField] private ParticleSystem item_WeightAcceleration;
+    [SerializeField] private ParticleSystem item_Shockwave;
+    [SerializeField] private ParticleSystem item_Magnetic;
+    [SerializeField] private ParticleSystem item_Spiderweb;
+
     private void Awake()
     {
         TryGetComponent(out _playerCore);
@@ -88,15 +94,39 @@ public class PlayerItemController : NetworkBehaviour
         }
 
         // 모든 클라이언트 재생
-        RpcPlayItemSFX(sfxName);
+        RpcPlayItemEffect(itemType,sfxName);
     }
 
     [ClientRpc]
-    private void RpcPlayItemSFX(string sfxName)
+    private void RpcPlayItemEffect(ItemType itemType, string sfxName)
     {
-        Debug.Log($"[CLIENT RPC] ITEM RPC SFX : {sfxName} / {gameObject.name}");
+        Debug.Log($"[CLIENT RPC] ITEM RPC : {itemType} / {gameObject.name}");
 
         Play3DSFXLocal(sfxName);
+
+        PlayItemParticle(itemType);
+    }
+
+    // ---------------- NEW: PARTICLE LOGIC ----------------
+
+    private void PlayItemParticle(ItemType type)
+    {
+        // 아이템 타입에 맞춰 할당된 파티클 Play
+        ParticleSystem targetParticle = type switch
+        {
+            ItemType.WeightAcceleration => item_WeightAcceleration,
+            ItemType.Shockwave => item_Shockwave,
+            ItemType.Magnetic => item_Magnetic,
+            ItemType.Spiderweb => item_Spiderweb,
+            _ => null
+        };
+
+        if (targetParticle != null)
+        {
+            targetParticle.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
+
+            targetParticle.Play();
+        }
     }
 
     // ---------------- LOCAL 3D SOUND ----------------
@@ -149,22 +179,6 @@ public class PlayerItemController : NetworkBehaviour
         _player3DAudioSource.PlayOneShot(clip);
 
         Debug.Log($"[{name}] PlayOneShot CALLED");
-
-        // 1. 오디오 리스너 존재 확인
-        if (FindObjectOfType<AudioListener>() == null)
-        {
-            Debug.LogError("[CRITICAL] 씬에 AudioListener가 없습니다! 소리가 들릴 수 없는 상태입니다.");
-        }
-        else
-        {
-            AudioListener listener = FindObjectOfType<AudioListener>();
-            Debug.Log($" Listener Found on: {listener.gameObject.name} | Enabled: {listener.enabled}");
-        }
-
-        _player3DAudioSource.PlayOneShot(clip);
-
-        // 2. PlayOneShot 직후 재생 상태 로그 (PlayOneShot은 isPlaying을 True로 만들지 않으므로 수동 체크 필요)
-        Debug.Log($" [{name}] PlayOneShot executed for clip: {clip.name}");
     }
 
     // ---------------- SFX NAME ----------------

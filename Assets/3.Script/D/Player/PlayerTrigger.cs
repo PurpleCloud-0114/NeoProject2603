@@ -18,6 +18,11 @@ public class PlayerTrigger : NetworkBehaviour
     [Header("Audio")]
     [SerializeField] private AudioSource _player3DAudioSource;
 
+    [Header("Attached Hit Particles")]
+    [SerializeField] private ParticleSystem obstacleHitParticle;
+    [SerializeField] private ParticleSystem playerHitParticle;
+    [SerializeField] private ParticleSystem spiderwebHitParticle;
+
     [SerializeField] private GameObject _characterModel;
     [SerializeField] private float _hitPlayerImpulsePower = 25f;
     [SerializeField] private float _hitObstacleInvincibilityDuration = 1f;
@@ -30,11 +35,6 @@ public class PlayerTrigger : NetworkBehaviour
     private void Awake()
     {
         TryGetComponent(out _playerCore);
-
-        if (_player3DAudioSource == null)
-        {
-            _player3DAudioSource = GetComponentInChildren<AudioSource>(true);
-        }
 
         wfs = new WaitForSeconds(_hitObstacleInvincibilityDuration);
         wfs2 = new WaitForSeconds(_hitObstacleInvincibilityDuration * 0.1f);
@@ -79,6 +79,8 @@ public class PlayerTrigger : NetworkBehaviour
 
                 if (isLocalPlayer)
                 {
+                    CmdPlayHitEffect(0);
+
                     // 모듈형 장애물
                     if (obs != null && obs.parentFloor != null)
                     {
@@ -125,6 +127,8 @@ public class PlayerTrigger : NetworkBehaviour
 
                 _playerCore.on_spiderweb_hit?.Invoke(other);
 
+                CmdPlayHitEffect(2);
+
                 CmdPlay3DSFX("ItemWebHit");
 
                 break;
@@ -134,6 +138,8 @@ public class PlayerTrigger : NetworkBehaviour
                 if (!isLocalPlayer) return;
 
                 PushPlayer(other);
+
+                CmdPlayHitEffect(1);
 
                 CmdPlay3DSFX("PlayerCollision");
 
@@ -214,6 +220,12 @@ public class PlayerTrigger : NetworkBehaviour
         RpcPlay3DSFX(sfxName);
     }
 
+    [Command]
+    private void CmdPlayHitEffect(int effectType)
+    {
+        RpcPlayHitEffect(effectType);
+    }
+
     // ---------------- RPC ----------------
 
     [ClientRpc]
@@ -222,6 +234,37 @@ public class PlayerTrigger : NetworkBehaviour
         Debug.Log($"RPC SFX : {sfxName} / {gameObject.name}");
 
         Play3DSFXLocal(sfxName);
+    }
+
+    [ClientRpc]
+    private void RpcPlayHitEffect(int effectType)
+    {
+        switch (effectType)
+        {
+            case 0:
+                PlayParticle(obstacleHitParticle);
+                break;
+
+            case 1:
+                PlayParticle(playerHitParticle);
+                break;
+
+            case 2:
+                PlayParticle(spiderwebHitParticle);
+                break;
+        }
+    }
+
+    // ---------------- PARTICLE ----------------
+
+    private void PlayParticle(ParticleSystem ps)
+    {
+        if (ps == null)
+            return;
+
+        ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+        ps.Play();
     }
 
     // ---------------- PUSH ----------------
