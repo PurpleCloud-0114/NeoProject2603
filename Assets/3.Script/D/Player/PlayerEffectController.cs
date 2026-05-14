@@ -69,6 +69,7 @@ public class PlayerEffectController : NetworkBehaviour {
 	public void HitSpiderweb(Collider spiderweb) {
 		if (spiderweb.TryGetComponent(out SpiderwebObstacle _spiderweb)) {
 			_playerCore.on_max_drop_speed_change_requested(_spiderweb.SetPlayerVelocity, _spiderweb.duration, 0f, StatusEffect.Stun);
+			_playerCore.on_stun_requested?.Invoke(_spiderweb.duration);
 		}
 	}
 
@@ -88,7 +89,6 @@ public class PlayerEffectController : NetworkBehaviour {
 		// 맞은 클라이언트가 스스로 날아감
 		_playerCore.on_impulse_requested?.Invoke(force);
 		_playerCore.on_stun_requested?.Invoke(stunDuration);
-		Debug.Log($"충격파 피격! 밀려나는 힘: {force}");
 	}
 
 
