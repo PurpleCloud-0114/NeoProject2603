@@ -581,7 +581,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa4ed24cd6a406541aee84dfd913f091, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnterRoomUI
-  _inputField: {fileID: 0}
+  _inputField: {fileID: 1795778555}
 --- !u!1 &206916583
 GameObject:
   m_ObjectHideFlags: 0

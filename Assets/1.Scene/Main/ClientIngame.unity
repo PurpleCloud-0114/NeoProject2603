@@ -948,7 +948,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c9d995cae69ab143ba1404d30171dac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BGM
-  is_lobby: 1
+  is_lobby: 0
 --- !u!4 &372768772
 Transform:
   m_ObjectHideFlags: 0
