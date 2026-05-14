@@ -20,4 +20,4 @@ public class EnterRoomUI : MonoBehaviour
         _inputField.text = "Server Address: " + NetworkManager.singleton.networkAddress;
         networkManager.StartClient();
     }
-}
+}   

@@ -50,6 +50,10 @@ public class RaceManager : NetworkBehaviour {
 	[Header("레이스 종료")]
 	[SerializeField] private float returnDelay = 7.5f;
 
+	[Header("라운드 관리")]
+	[SyncVar] public int current_round_sync = 0;
+	public const int MAX_ROUND = 10;
+
 	//----- 메서드
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -153,21 +157,41 @@ public class RaceManager : NetworkBehaviour {
 	}
 
 	//결과창 7.5초
-	private IEnumerator Co_ReturnToLobby() {
-		Debug.Log("시상식중...(7.5초 걸림)");
-
+	private IEnumerator Co_ReturnToLobby()
+	{
+		Debug.Log($"시상식중...(7.5초 걸림) | 현재 라운드: {current_round_sync + 1} / {MAX_ROUND}");
 		yield return new WaitForSeconds(returnDelay);
 
-		var roomManager = NetworkManager.singleton as NetworkRoomManager;
+		current_round_sync++;  // <<--- 라운드 증가
 
-		if(roomManager != null) {
-			roomManager.ServerChangeScene(roomManager.RoomScene);
-		} else {
-			Debug.Log("RoomManager를 찾을 수 없습니다. 기본 Scene 전환 시도.");
-			NetworkManager.singleton.ServerChangeScene("Copy_ClientLobby");
+		var roomManager = NetworkManager.singleton as NetworkRoomManager;
+		if (roomManager == null)
+		{
+			Debug.LogError("[RaceManager] RoomManager를 찾을 수 없습니다.");
+			yield break;
+		}
+
+		if (current_round_sync < MAX_ROUND)  // <<--- 10라운드 미만 -> 게임 씬 재시작
+		{
+			Debug.Log($"[RaceManager] 라운드 {current_round_sync} / {MAX_ROUND} → 게임 씬 재시작");
+			ResetRoundState();                                              // <<--- 상태 초기화
+			roomManager.ServerChangeScene(roomManager.GameplayScene);      // <<--- 게임 씬 재시작
+		}
+		else                                 // <<--- 10라운드 완료 -> 로비 복귀
+		{
+			Debug.Log($"[RaceManager] {MAX_ROUND}라운드 완료 → 로비 복귀");
+			current_round_sync = 0;                                        // <<--- 라운드 초기화
+			roomManager.ServerChangeScene(roomManager.RoomScene);          // <<--- 로비 복귀
 		}
 	}
-
+	[Server]
+	private void ResetRoundState()  // <<--- 추가
+	{
+		_roundResults.Clear();          // 도착 결과 초기화
+		_playersReadyCount = 0;         // 준비 카운트 초기화
+		current_state_sync = RaceState.Waiting;  // 레이스 상태 초기화
+		Debug.Log("[RaceManager] 라운드 상태 초기화 완료");
+	}
 
 
 
