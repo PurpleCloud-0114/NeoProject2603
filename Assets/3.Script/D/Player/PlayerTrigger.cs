@@ -21,13 +21,22 @@ public class PlayerTrigger : NetworkBehaviour
     [SerializeField] private GameObject _characterModel;
     [SerializeField] private float _hitPlayerImpulsePower = 25f;
     [SerializeField] private float _hitObstacleInvincibilityDuration = 1f;
+
     private bool Invincibility = false;
+
     private WaitForSeconds wfs;
     private WaitForSeconds wfs2;
 
     private void Awake()
     {
         TryGetComponent(out _playerCore);
+
+        // 자동 탐색
+        if (_player3DAudioSource == null)
+        {
+            _player3DAudioSource = GetComponentInChildren<AudioSource>();
+        }
+
         wfs = new WaitForSeconds(_hitObstacleInvincibilityDuration);
         wfs2 = new WaitForSeconds(_hitObstacleInvincibilityDuration * 0.1f);
     }
@@ -37,10 +46,19 @@ public class PlayerTrigger : NetworkBehaviour
         if (collision.transform.CompareTag(TAG_ENDPOINT))
         {
             _characterModel.SetActive(false);
+
             UIManager.Instance.ShowPersonalResult();
+
             _playerCore.SendEndpoint();
 
-            if (isLocalPlayer) CmdPlay3DSFX("PlayerLandFail");
+            if (isLocalPlayer)
+            {
+                // 본인 즉시 재생
+                Play3DSFXLocal("PlayerLandFail");
+
+                // 다른 클라이언트 재생
+                CmdPlay3DSFX("PlayerLandFail");
+            }
         }
     }
 
@@ -49,70 +67,110 @@ public class PlayerTrigger : NetworkBehaviour
         switch (other.tag)
         {
             case TAG_ITEMBOX:
+
                 if (!isLocalPlayer) return;
+
                 CmdDisableRoot(other.transform.root.GetComponent<NetworkIdentity>());
+
                 _playerCore.on_item_acquired?.Invoke(ItemManager.Instance.RandomItem());
+
                 PlayLocalSFX("ItemWeightActivate");
+
                 break;
 
             case TAG_OBSTACLE:
-                // ★ 중요: 장애물 충돌 판정은 오직 로컬 플레이어(본인)만 계산하도록 최상단에서 차단
+
                 if (!isLocalPlayer) return;
 
                 ObstacleIdentity obs = other.GetComponentInParent<ObstacleIdentity>();
 
-                // 1. MapFloor에 속한 모듈형 장애물인 경우
                 if (obs != null && obs.parentFloor != null)
                 {
                     CmdHitModuleObstacle(obs.parentFloor.netIdentity, obs.obstacleIndex);
                 }
-                // 2. MapFloor가 없는 독립형(공중) 장애물인 경우
                 else
                 {
                     NetworkIdentity identity = other.transform.root.GetComponent<NetworkIdentity>();
+
                     if (identity != null)
                     {
                         CmdDisableRoot(identity);
                     }
                 }
 
-                // 본인만 무적 체크 및 사운드 요청
                 if (!Invincibility)
                 {
                     StartCoroutine(Co_Invincibility());
+
                     _playerCore.on_obstacle_hit?.Invoke();
+
+                    // 본인 즉시 재생
+                    Play3DSFXLocal("ObstacleBreak");
+
+                    // 다른 플레이어들에게 전달
                     CmdPlay3DSFX("ObstacleBreak");
                 }
+
                 break;
 
             case TAG_REDZONE:
+
                 if (!isLocalPlayer) return;
+
                 _playerCore.on_redzone_entered?.Invoke();
+
                 break;
 
             case TAG_SPIDERWEB:
+
                 if (!isLocalPlayer) return;
+
                 if (_playerCore.status_effect == StatusEffect.Invinsible) return;
+
                 _playerCore.on_spiderweb_hit?.Invoke(other);
 
+                // 본인 즉시 재생
+                Play3DSFXLocal("ItemWebHit");
+
+                // 다른 플레이어들에게 전달
                 CmdPlay3DSFX("ItemWebHit");
+
                 break;
 
             case TAG_PLAYER:
+
                 if (!isLocalPlayer) return;
+
                 PushPlayer(other);
 
+                // 본인 즉시 재생
+                Play3DSFXLocal("PlayerCollision");
+
+                // 다른 플레이어들에게 전달
                 CmdPlay3DSFX("PlayerCollision");
+
                 break;
 
             case TAG_FINISHLINE:
+
                 if (!isLocalPlayer) return;
+
                 float impactSpeed = 0f;
-                if (TryGetComponent(out Rigidbody rb)) impactSpeed = Mathf.Abs(rb.linearVelocity.y);
-                double myFinishTime = NetworkTime.time - RaceManager.Instance.race_start_time_sync;
+
+                if (TryGetComponent(out Rigidbody rb))
+                {
+                    impactSpeed = Mathf.Abs(rb.linearVelocity.y);
+                }
+
+                double myFinishTime =
+                    NetworkTime.time - RaceManager.Instance.race_start_time_sync;
+
                 _playerCore.player_state = PlayerState.Finish;
+
                 _playerCore.SpawnPortal();
+
                 _playerCore.SendArriveResult(impactSpeed, myFinishTime);
+
                 break;
         }
     }
@@ -120,8 +178,11 @@ public class PlayerTrigger : NetworkBehaviour
     private IEnumerator Co_Invincibility()
     {
         Invincibility = true;
+
         StartCoroutine(Co_InvincibilityVisual());
+
         yield return wfs;
+
         Invincibility = false;
     }
 
@@ -130,8 +191,10 @@ public class PlayerTrigger : NetworkBehaviour
         while (Invincibility)
         {
             _characterModel.SetActive(!_characterModel.activeSelf);
+
             yield return wfs2;
         }
+
         _characterModel.SetActive(true);
     }
 
@@ -150,7 +213,9 @@ public class PlayerTrigger : NetworkBehaviour
     private void CmdDisableRoot(NetworkIdentity identity)
     {
         if (identity == null) return;
+
         NetworkServer.UnSpawn(identity.gameObject);
+
         identity.gameObject.SetActive(false);
     }
 
@@ -159,35 +224,71 @@ public class PlayerTrigger : NetworkBehaviour
     private void PushPlayer(Collider other)
     {
         Vector3 dir = transform.position - other.transform.position;
+
         dir.y = 0;
 
         if (dir.sqrMagnitude > 0.001f)
-            _playerCore.on_impulse_requested?.Invoke(dir.normalized * _hitPlayerImpulsePower);
+        {
+            _playerCore.on_impulse_requested?.Invoke(
+                dir.normalized * _hitPlayerImpulsePower
+            );
+        }
     }
 
-    // ---------------- 3D SOUND RPC ----------------
+    // ---------------- 3D SOUND ----------------
+
+    private void Play3DSFXLocal(string sfxName)
+    {
+        if (_player3DAudioSource == null)
+        {
+            Debug.LogWarning($"[{name}] AudioSource NULL");
+            return;
+        }
+
+        if (AudioManager.Instance == null)
+        {
+            Debug.LogWarning($"[{name}] AudioManager NULL");
+            return;
+        }
+
+        AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
+
+        if (clip == null)
+        {
+            Debug.LogWarning($"[{name}] SFX NOT FOUND : {sfxName}");
+            return;
+        }
+
+        _player3DAudioSource.PlayOneShot(clip);
+    }
 
     [Command]
     private void CmdPlay3DSFX(string sfxName)
     {
-        RpcPlay3DSFX(sfxName);
+        RpcPlay3DSFX(sfxName, netId);
     }
 
     [ClientRpc]
-    private void RpcPlay3DSFX(string sfxName)
+    private void RpcPlay3DSFX(string sfxName, uint senderNetId)
     {
-        // 서버가 "여기서 소리 내라!" 라고 명령하면, 
-        // 해당 플레이어의 오디오 소스에서 소리가 납니다.
-        AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
-        if (clip != null && _player3DAudioSource != null)
+        // 본인은 이미 로컬 재생했으므로 제외
+        if (NetworkClient.localPlayer != null &&
+            NetworkClient.localPlayer.netId == senderNetId)
         {
-            _player3DAudioSource.PlayOneShot(clip);
+            return;
         }
+
+        Debug.Log($"RPC RECEIVED : {sfxName} / {gameObject.name}");
+
+        Play3DSFXLocal(sfxName);
     }
+
+    // ---------------- 2D/UI SOUND ----------------
 
     private void PlayLocalSFX(string sfxName)
     {
-        AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
-        if (clip != null) AudioManager.Instance.PlaySFX(sfxName);
+        if (AudioManager.Instance == null) return;
+
+        AudioManager.Instance.PlaySFX(sfxName);
     }
 }
