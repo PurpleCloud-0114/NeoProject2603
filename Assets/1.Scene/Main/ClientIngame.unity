@@ -547,7 +547,7 @@ MonoBehaviour:
     map_redzone_height: 0
     map_redzone_height_Y: 0
   _redzoneTrigger: {fileID: 951239201}
-  _portalTrigger: {fileID: 0}
+  _floor: {fileID: 0}
 --- !u!1001 &226196131
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3777,6 +3777,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _spiderwebPrefab: {fileID: 5230189180519417414, guid: 4b907d4e2ca43cd4a9ab20bdb48803e0, type: 3}
+  _itemTemplates: []
 --- !u!4 &1477643673
 Transform:
   m_ObjectHideFlags: 0
@@ -4318,6 +4319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65f439261934d55428548ae2d2dc3025, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  myRank: 1
   _wingButton: {fileID: 2051657841}
   _itemButton: {fileID: 1280842718}
   _itemText: {fileID: 834119325}
