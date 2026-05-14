@@ -4895,6 +4895,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Alert_Dot_Red
       objectReference: {fileID: 0}
+    - target: {fileID: 966303932782199792, guid: c1d7e440de9434c91ab30affe9b83142, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

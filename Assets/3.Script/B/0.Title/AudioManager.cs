@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using System.Collections.Generic;
+using Mirror; // NetworkServer 체크를 위해 추가
 
 [System.Serializable]
 public class Sound
@@ -12,19 +14,19 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
 
+    [Header("Settings")]
     [SerializeField] private AudioMixer _audio_mixer;
 
-    [Space(10f)]
-    [Header("Audio Clip")]
-    [Space(10f)]
+    [Header("Audio Clips")]
     [SerializeField] private Sound[] _bgm;
     [SerializeField] private Sound[] _sfx;
 
-    [Space(50f)]
-    [Header("Audio Source")]
-    [Space(10f)]
+    [Header("Audio Source References")]
     [SerializeField] private AudioSource _bgm_player;
     [SerializeField] private AudioSource _sfx_player;
+
+    private Dictionary<string, AudioClip> _bgmDictionary = new Dictionary<string, AudioClip>();
+    private Dictionary<string, AudioClip> _sfxDictionary = new Dictionary<string, AudioClip>();
 
     private void Awake()
     {
@@ -32,77 +34,99 @@ public class AudioManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            Init();
         }
         else
         {
             Destroy(gameObject);
         }
-        AutoSetting();
+    }
+
+    private void Init()
+    {
+        // 1. 서버 전용 빌드라면 딕셔너리 채우기만 하고 리소스 할당은 건너뜀
+        // (서버가 클립 이름은 알아야 RPC를 보낼 수 있음)
+        foreach (var s in _bgm) _bgmDictionary[s.name] = s.clip;
+        foreach (var s in _sfx) _sfxDictionary[s.name] = s.clip;
+
+        // 서버 전용 빌드(오디오 없음)인 경우 여기서 중단하여 NullReference 방지
+        if (isServerOnly) return;
+
+        if (_bgm_player == null && transform.childCount > 0)
+            _bgm_player = transform.GetChild(0).GetComponent<AudioSource>();
+        if (_sfx_player == null && transform.childCount > 1)
+            _sfx_player = transform.GetChild(1).GetComponent<AudioSource>();
     }
 
     private void Start()
     {
-        float bgmVol = PlayerPrefs.GetFloat("BGM", 0.75f);
-        float sfxVol = PlayerPrefs.GetFloat("SFX", 0.75f);
+        // 서버 전용 빌드라면 볼륨 설정을 하지 않음
+        if (isServerOnly) return;
 
-        SetVolume("BGM", bgmVol);
-        SetVolume("SFX", sfxVol);
-
+        SetVolume("BGM", PlayerPrefs.GetFloat("BGM", 0.6f));
+        SetVolume("SFX", PlayerPrefs.GetFloat("SFX", 0.6f));
     }
 
-    public void SetVolume(string parametername, float slidervalue)
+    // 서버인지 체크하는 프로퍼티 (Mirror가 없는 환경에서도 에러 안 나게 안전장치)
+    private bool isServerOnly
     {
-        float dB = Mathf.Log10(Mathf.Max(0.0001f, slidervalue)) * 20;
-
-        _audio_mixer.SetFloat(parametername, dB);
+        get
+        {
+#if UNITY_SERVER
+                return true;
+#else
+            return false;
+#endif
+        }
     }
 
-    private void AutoSetting()
+    public void SetVolume(string parameterName, float sliderValue)
     {
-        _bgm_player = transform.GetChild(0).GetComponent<AudioSource>();
-        _sfx_player = transform.GetChild(1).GetComponent<AudioSource>();
+        // 믹서가 없거나 서버라면 실행 안 함
+        if (_audio_mixer == null || isServerOnly) return;
+
+        float dB = Mathf.Log10(Mathf.Max(0.0001f, sliderValue)) * 20;
+        _audio_mixer.SetFloat(parameterName, dB);
     }
 
     public void PlayBGM(string name)
     {
-        foreach (Sound s in _bgm)
+        if (isServerOnly) return; // 서버는 소리를 재생하지 않음
+
+        if (_bgmDictionary.TryGetValue(name, out AudioClip clip))
         {
-            if (s.name.Equals(name))
+            if (_bgm_player != null)
             {
-                _bgm_player.clip = s.clip;
+                if (_bgm_player.clip == clip && _bgm_player.isPlaying) return;
+                _bgm_player.clip = clip;
                 _bgm_player.Play();
-                break;
             }
         }
     }
+
     public void StopBGM()
     {
+        if (isServerOnly || _bgm_player == null) return;
         _bgm_player.Stop();
     }
 
-    public void PlaySFX(string name) //RPC로 해야돼는 경우도 있음, Client개인 UI는 그냥 쓰면 됌
+    public void PlaySFX(string name)
     {
-        foreach (Sound s in _sfx)
+        if (isServerOnly) return; // 서버는 소리를 재생하지 않음
+
+        if (_sfxDictionary.TryGetValue(name, out AudioClip clip))
         {
-            if (s.name.Equals(name))
-            {
-                _sfx_player.PlayOneShot(s.clip);
-            }
+            if (_sfx_player != null) _sfx_player.PlayOneShot(clip);
         }
     }
-    /* 예시 대신 3D SFX를 써야하지 않을까 합니다.
-     [Command]
-    public void CmdPlayCrashSound()
-    {
-    // 서버가 모든 클라이언트에게 소리 재생 명령을 내림
-    RpcPlayCrashSound();
-    }
 
-    [ClientRpc]
-    private void RpcPlayCrashSound()
+    // 서버가 클립을 찾을 때 사용 (에러 방지용)
+    public AudioClip GetSFXClip(string name)
     {
-    // 각 클라이언트의 AudioManager가 효과음을 재생
-    AudioManager.Instance.PlaySFX("Crash");
+        if (_sfxDictionary.TryGetValue(name, out AudioClip clip))
+        {
+            return clip;
+        }
+        return null;
     }
-    */
 }

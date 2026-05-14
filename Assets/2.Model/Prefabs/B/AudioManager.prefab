@@ -176,10 +176,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   _audio_mixer: {fileID: 24100000, guid: 8347d0f8366fe44488af38544f7a2508, type: 2}
-  _bgm: []
-  _sfx: []
-  _bgm_player: {fileID: 0}
-  _sfx_player: {fileID: 0}
+  _bgm:
+  - name: Title
+    clip: {fileID: 8300000, guid: 38f0d46dcf6d14a4ba06281a895c7718, type: 3}
+  - name: InGame
+    clip: {fileID: 8300000, guid: 73e800617cbae8843909627cf37f3b01, type: 3}
+  _sfx:
+  - name: Jump
+    clip: {fileID: 8300000, guid: 73ea2426fbb5dd74484217e8bc8c1b8c, type: 3}
+  - name: PlayerCollision
+    clip: {fileID: 8300000, guid: 8974ca98e71a45345b4fe4990b773e8d, type: 3}
+  - name: PlayerKnockback
+    clip: {fileID: 8300000, guid: 1b16e0458b3fe3542ad0f9ed5e700bdd, type: 3}
+  - name: PlayerStun
+    clip: {fileID: 8300000, guid: ba42228f4fe6ad449b6cb8d0e6fe0f6b, type: 3}
+  - name: PlayerLandFail
+    clip: {fileID: 8300000, guid: 730d372cd91658841ba0198ba4062b74, type: 3}
+  - name: ItemWeightActivate
+    clip: {fileID: 8300000, guid: 6ec3b48b4ff8fdc408c4f5912c7ccd26, type: 3}
+  - name: ItemWeightImpact
+    clip: {fileID: 8300000, guid: ea49de789aeacc84aab6861d5a115b34, type: 3}
+  - name: ItemWebHit
+    clip: {fileID: 8300000, guid: 8ab1dca826bd5204eb60c48be79f20ad, type: 3}
+  - name: ItemShockwaveActivate
+    clip: {fileID: 8300000, guid: 3025da1e171da974b9aab3dbdf0b4caa, type: 3}
+  - name: ItemMagneticActivate
+    clip: {fileID: 8300000, guid: f908ff28ccedc7b47a5777acfb959024, type: 3}
+  - name: ItemMagnetic
+    clip: {fileID: 8300000, guid: 683116c735887f748b74f6f8855d13d4, type: 3}
+  - name: ObstacleBreak
+    clip: {fileID: 8300000, guid: a4b7b77103869894b90aa052286c5f61, type: 3}
+  - name: ObstacleWallHit
+    clip: {fileID: 8300000, guid: 683116c735887f748b74f6f8855d13d4, type: 3}
+  _bgm_player: {fileID: 4685257034113292481}
+  _sfx_player: {fileID: 5162046310400134931}
 --- !u!1 &7966252439678033813
 GameObject:
   m_ObjectHideFlags: 0

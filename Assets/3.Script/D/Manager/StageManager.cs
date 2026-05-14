@@ -12,7 +12,7 @@ public class StageManager : NetworkBehaviour {
 
 	[SyncVar(hook = nameof(OnStageDataChanged))] public StageData stage_data_sync;
 	[SerializeField] private Transform _redzoneTrigger;
-	[SerializeField] private Transform _portalTrigger;
+	[SerializeField] private Collider _floor;
 
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -23,13 +23,16 @@ public class StageManager : NetworkBehaviour {
 	public void SetStage() {
 		float rnd_RedZone = Random.Range(250f, 400f);
 		float rnd_RedZoneHeight = Random.Range(50f, 300f);
-		stage_data_sync = new StageData(3000f, rnd_RedZone, rnd_RedZoneHeight);
+		stage_data_sync = new StageData(6000f, rnd_RedZone, rnd_RedZoneHeight);
 	}
 
 	private void OnStageDataChanged(StageData oldData, StageData newData) {
 		stageProgressUi.Initialize();
 		if (_redzoneTrigger != null) _redzoneTrigger.position = new Vector3(0, newData.map_redzone_height_Y, 0);
-		if (_portalTrigger != null) _portalTrigger.position = new Vector3(0, newData.map_redzone_height_Y / 4f, 0);
+		//if (_portalTrigger != null) _portalTrigger.position = new Vector3(0, newData.map_redzone_height_Y * 0.75f, 0);
+	}
 
+	public void ChangeFloorTrigger(bool isTrigger) {
+		_floor.isTrigger = isTrigger;
 	}
 }

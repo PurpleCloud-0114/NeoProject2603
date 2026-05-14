@@ -36,12 +36,10 @@ public class RaceManager : NetworkBehaviour {
 
 	public int START_MAX_PLAYER = 10;
 
-
 	// 참가자 리스트 (순위)
 	public List<Transform> active_players = new List<Transform>();
 	// 이전 순위 기록용 딕셔너리
 	private Dictionary<Transform, int> _previousRanks = new Dictionary<Transform, int>();
-	public event Action on_any_rank_changed;
 
 	// 도착 순위
 	//private List<PlayerResult> final_results = new List<PlayerResult>();
@@ -88,10 +86,10 @@ public class RaceManager : NetworkBehaviour {
 			if(NetworkTime.time >= race_start_time_sync) {
 				current_state_sync = RaceState.Racing;
 				race_start_time_sync = NetworkTime.time;
+				StartRankTracking();
 			}
 		}
 	}
-
 
 	[Server]
 	//서버 수신 - 클라이언트 통과 정보 받기
@@ -109,18 +107,20 @@ public class RaceManager : NetworkBehaviour {
 				}
 			);	
 		}
+		ReceiveArriveResult(sender, isDead, finishTime);
+	}
 
-
-		if(_roundResults.Count >= total_players) {
+	[Server]
+	public void EndRaceCheck() {
+		if (_roundResults.Count >= total_players) {
 			EndRace();
-		} else {
-			ReceiveArriveResult(sender, isDead, finishTime);
 		}
 	}
 
 	[TargetRpc]
 	private void ReceiveArriveResult(NetworkConnectionToClient target, bool isDead, double finishTime) {
-		UIManager.Instance.ShowPersonalResult(isDead, finishTime);
+		UIManager.Instance.SetResult(isDead, finishTime);
+		if (!isDead) StageManager.Instance.ChangeFloorTrigger(true);
 	}
 
 	//------------[ 레이스 종료 ] -----------------
@@ -207,7 +207,6 @@ public class RaceManager : NetworkBehaviour {
 				break;
 			case RaceState.Racing:
 				playerNewState = PlayerState.Falling;
-				StartRankTracking();
 				break;
 			case RaceState.Finished:
 				playerNewState = PlayerState.Finish;
@@ -232,11 +231,13 @@ public class RaceManager : NetworkBehaviour {
 
 	//플레이어 생성시, PlayerCore에서 호출됨.
 	public void RegisterPlayer(Transform player) {
+		if (!isServer) return;
 		if (!active_players.Contains(player)) {
 			active_players.Add(player);
 		}
 	}
 	public void UnregisterPlayer(Transform player) {
+		if (!isServer) return;
 		if (active_players.Contains(player)) {
 			active_players.Remove(player);
 			_previousRanks.Remove(player);
@@ -248,37 +249,28 @@ public class RaceManager : NetworkBehaviour {
 	}
 
 	private IEnumerator Co_TrackRankingRoutine() {
-		WaitForSeconds wfs = new WaitForSeconds(0.2f);
+		WaitForSeconds wfs = new WaitForSeconds(0.1f); // 0.01초는 너무 잦아 성능에 부하를 줄 수 있습니다.
 
-		while (current_state_sync == RaceState.Racing) {
+		do {
 			if (active_players.Count > 1) {
 				CalculateRanks();
 			}
 			yield return wfs;
-		}
+		} while (current_state_sync == RaceState.Racing);
 	}
 
 	private void CalculateRanks() {
-		bool isRankChangedThisTick = false;
+		if (!isServer) return;
 
-		active_players.RemoveAll(p => p == null);   //null이 된 플레이어 리스트에서 제거 (튕긴 플레이어 예외처리)
-		active_players.Sort((a, b) => a.position.y.CompareTo(b.position.y));    //Y값 기준 오름차순 정렬
+		active_players.RemoveAll(p => p == null);
+		active_players.Sort((a, b) => a.position.y.CompareTo(b.position.y));
+
 		for (int i = 0; i < active_players.Count; i++) {
-			Transform player = active_players[i];
-			int currentRank = i + 1;
-
-			//사전에 등록되지 않았거나, 순위가 달라졌을 경우.
-			if (!_previousRanks.ContainsKey(player) || _previousRanks[player] != currentRank) {
-				_previousRanks[player] = currentRank;
-				isRankChangedThisTick = true;
-
-				//TODO : 개별 유저 순위 UI 업데이트 필요하다면 여기서 호출.
-				UIManager.Instance.UpdateRankUI();
+			int rank = i + 1;
+			if (active_players[i].TryGetComponent(out PlayerCore pc)) {
+				// 서버에서 각 클라이언트의 PlayerCore에 등수 업데이트 명령
+				pc.TargetUpdateRank(pc.connectionToClient, rank);
 			}
-		}
-
-		if (isRankChangedThisTick) {
-			on_any_rank_changed?.Invoke();
 		}
 	}
 }

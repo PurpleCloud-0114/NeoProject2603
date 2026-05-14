@@ -9,6 +9,8 @@ using TMPro;
 public class UIManager : MonoBehaviour {
 	public static UIManager Instance = null;
 
+	public int myRank = 1;
+
 	[Header("Player Button Bind")]
 	[SerializeField] private Button _wingButton;
 	[SerializeField] private Button _itemButton;
@@ -18,19 +20,35 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private TextMeshProUGUI _rankText;
 	//[SerializeField] private TextMeshProUGUI _ResultTextLog;
 
+	[Header("대상 UI (배치 변경될 UI)")]
+	[SerializeField] private GameObject _touchzone;
+	[SerializeField] private RectTransform _wingButtons;
+	[SerializeField] private RectTransform _itemButtons;
+
+	[Header("위치 프리셋 (기준점 트랜스폼)")]
+	[SerializeField] private RectTransform _lefttouchzone;
+	[SerializeField] private RectTransform _righttouchzone;
+	[Space]
+	[SerializeField] private RectTransform _itemLeftRef;
+	[SerializeField] private RectTransform _itemRightRef;
+	[Space]
+	[SerializeField] private RectTransform _wingLeftRef;
+	[SerializeField] private RectTransform _wingRightRef;
+
 	[Header("Game UI")]
 	[SerializeField] private StageProgressUi _stageProgressUI;
 	[SerializeField] private TimerUI _timerUI;
 	[SerializeField] private GameObject _playUI;
 	[SerializeField] private GameObject _specUI;
 
-
-
 	[Header("개인 결과 UI")]
 	[SerializeField] private GameObject _personalResultWindow;
 	[SerializeField] private TextMeshProUGUI _personalTitleText;
 	[SerializeField] private TextMeshProUGUI _personalResultText;
 	[SerializeField] private TextMeshProUGUI _personalRecordText;
+
+	private bool SetResultBool;
+	private double SetResultTime;
 
 	[Header("최종 결과 UI")]
 	[SerializeField] private GameObject _finalResultWindow;    // 결과창 부모 오브젝트
@@ -42,35 +60,45 @@ public class UIManager : MonoBehaviour {
 		else Destroy(gameObject);
 	}
 
-	private void OnEnable() {
-		RaceManager.Instance.on_any_rank_changed += UpdateRankUI;
+	private void Start() {
+		ApplySettings();
 	}
-
-	private void OnDisable() {
-		RaceManager.Instance.on_any_rank_changed -= UpdateRankUI;
-	}
-
-
 
 	public void CreatePlayerMarker(Transform playerTransform, bool isLocal) {
 		_stageProgressUI.CreatePlayerMarker(playerTransform, isLocal);
 	}
 
-	public void UpdateRankUI() {
-		// 1. 미러에서 제공하는 '내 로컬 플레이어'의 Transform을 즉시 가져옵니다.
-		// 아직 스폰 전이거나 로컬 플레이어가 없으면 안전하게 리턴
-		if (NetworkClient.localPlayer == null) return;
-		Transform myTransform = NetworkClient.localPlayer.transform;
+	// 저장된 데이터를 바탕으로 UI 레이아웃 및 입력 방식 적용
+	private void ApplySettings() {
+		// PlayerPrefs에서 프리셋 정보 로드 (0:기본, 1:왼손, 2:자이로, 3:자이로+왼손 등)
+		int preset = PlayerPrefs.GetInt("ControlPreset", 0);
+		bool isLeft = (preset == 1 || preset == 3);
+		bool isGyro = (preset == 2 || preset == 3);
 
-		// 2. RaceManager의 정렬된 리스트를 가져옵니다.
-		List<Transform> sortedList = RaceManager.Instance.active_players;
+		if (_touchzone != null)
+			SetLayout(_touchzone.GetComponent<RectTransform>(), isLeft ? _lefttouchzone : _righttouchzone, !isGyro);
 
-		// 3. 리스트에서 내 캐릭터(로컬)가 몇 번째인지 찾습니다.
-		int myRank = sortedList.IndexOf(myTransform) + 1;
+		SetLayout(_itemButtons, isLeft ? _itemLeftRef : _itemRightRef, true);
+		SetLayout(_wingButtons, isLeft ? _wingLeftRef : _wingRightRef, true);
+	}
 
-		// 4. 내 화면의 순위 텍스트 갱신
+	// 레퍼런스(기준점)를 기반으로 대상 RectTransform의 좌표 및 앵커 복사
+	private void SetLayout(RectTransform target, RectTransform reference, bool active) {
+		if (target == null || reference == null) return;
+
+		target.gameObject.SetActive(active);
+
+		// 앵커, 피벗, 위치값을 기준점과 동일하게 일치시킴
+		target.anchorMin = reference.anchorMin;
+		target.anchorMax = reference.anchorMax;
+		target.pivot = reference.pivot;
+		target.anchoredPosition = reference.anchoredPosition;
+	}
+
+	public void UpdateMyRank(int newRank) {
+		myRank = newRank;
 		if (_rankText != null) {
-			_rankText.text = $"{myRank} / {sortedList.Count}";
+			_rankText.text = $"{myRank}등";
 		}
 	}
 
@@ -81,10 +109,16 @@ public class UIManager : MonoBehaviour {
 	public void StopTimer() {
 		_timerUI.isStop = true;
 	}
-	public void ShowPersonalResult(bool isDead, double finishTime) {
+
+	public void SetResult(bool isDead, double finishTime) {
+		SetResultBool = isDead;
+		SetResultTime = finishTime;
+	}
+
+	public void ShowPersonalResult() {
 		HideUIforFinish();
 		_personalResultWindow.SetActive(true);
-		if(isDead) {
+		if(SetResultBool) {
 			_personalTitleText.text = "탈출 실패...";
 			_personalResultText.text = $"결과 : <color=red>사망</color>";
 		} else {
@@ -92,7 +126,7 @@ public class UIManager : MonoBehaviour {
 			_personalResultText.text = $"결과 : 생존";
 		}
 
-		TimeSpan time = TimeSpan.FromSeconds(finishTime);
+		TimeSpan time = TimeSpan.FromSeconds(SetResultTime);
 		_personalRecordText.text = string.Format($"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds / 10:00}");   
 	}
 	public void ShowFinalResult(PlayerResult[] results) {
@@ -144,10 +178,12 @@ public class UIManager : MonoBehaviour {
 	}
 
 	// ==========================================
-	// [ 도착 및 관전 시 UI 활성화/비활성화1 ]
+	// [ 도착 및 관전 시 UI 활성화/비활성화 ]
 	// ==========================================
 	public void HideUIforFinish() {
 		_playUI.SetActive(false);
+		_specUI.SetActive(false);
+		_personalResultWindow.SetActive(false);
 		_stageProgressUI.gameObject.SetActive(false);
 	}
 	public void ShowUIforSpectator() {
