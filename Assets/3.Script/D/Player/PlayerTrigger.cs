@@ -38,7 +38,13 @@ public class PlayerTrigger : NetworkBehaviour
             UIManager.Instance.ShowPersonalResult();
             _playerCore.SendEndpoint();
 
-            if (isLocalPlayer) CmdPlay3DSFX("PlayerLandFail");
+            if (isLocalPlayer) {
+                // 본인 즉시 재생
+                Play3DSFXLocal("PlayerLandFail");
+
+                // 다른 클라이언트 재생
+                CmdPlay3DSFX("PlayerLandFail");
+            }
         }
 	}
 
@@ -72,13 +78,17 @@ public class PlayerTrigger : NetworkBehaviour
                             CmdDisableRoot(identity);
                         }
                     }
-				}
+
+                    // 본인 즉시 재생
+                    Play3DSFXLocal("ObstacleBreak");
+
+                    // 다른 플레이어들에게 전달
+                    CmdPlay3DSFX("ObstacleBreak");
+                }
                 if (!Invincibility) {
                     StartCoroutine(Co_Invincibility());
 
                     _playerCore.on_obstacle_hit?.Invoke();
-
-                    CmdPlay3DSFX("ObstacleBreak");
                 }
                 break;
 
@@ -92,13 +102,23 @@ public class PlayerTrigger : NetworkBehaviour
                 if (_playerCore.status_effect == StatusEffect.Invinsible) return;
                 _playerCore.on_spiderweb_hit?.Invoke(other);
 
+
+                // 본인 즉시 재생
+                Play3DSFXLocal("ItemWebHit");
+
+                // 다른 플레이어들에게 전달
                 CmdPlay3DSFX("ItemWebHit");
+
                 break;
 
             case TAG_PLAYER:
                 if (!isLocalPlayer) return;
                 PushPlayer(other);
 
+                // 본인 즉시 재생
+                Play3DSFXLocal("PlayerCollision");
+
+                // 다른 플레이어들에게 전달
                 CmdPlay3DSFX("PlayerCollision");
                 break;
             case TAG_FINISHLINE:
@@ -150,38 +170,64 @@ public class PlayerTrigger : NetworkBehaviour
 
     // ---------------- PUSH ----------------
 
-    private void PushPlayer(Collider other)
-    {
+    private void PushPlayer(Collider other) {
         Vector3 dir = transform.position - other.transform.position;
+
         dir.y = 0;
 
-        if (dir.sqrMagnitude > 0.001f)
-            _playerCore.on_impulse_requested?.Invoke(dir.normalized * _hitPlayerImpulsePower);
-    }
-
-    // ---------------- 3D SOUND RPC ----------------
-
-    [Command]
-    private void CmdPlay3DSFX(string sfxName)
-    {
-        RpcPlay3DSFX(sfxName);
-    }
-
-    [ClientRpc]
-    private void RpcPlay3DSFX(string sfxName)
-    {
-        // 3D 공간 사운드 재생
-        AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
-        if (clip != null && _player3DAudioSource != null)
-        {
-            _player3DAudioSource.PlayOneShot(clip);
+        if (dir.sqrMagnitude > 0.001f) {
+            _playerCore.on_impulse_requested?.Invoke(
+                dir.normalized * _hitPlayerImpulsePower
+            );
         }
     }
 
-    private void PlayLocalSFX(string sfxName)
-    {
-        // UI 소리나 본인만 들어도 되는 소리
+    // ---------------- 3D SOUND ----------------
+
+    private void Play3DSFXLocal(string sfxName) {
+        if (_player3DAudioSource == null) {
+            Debug.LogWarning($"[{name}] AudioSource NULL");
+            return;
+        }
+
+        if (AudioManager.Instance == null) {
+            Debug.LogWarning($"[{name}] AudioManager NULL");
+            return;
+        }
+
         AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
-        if (clip != null) AudioManager.Instance.PlaySFX(sfxName);
+
+        if (clip == null) {
+            Debug.LogWarning($"[{name}] SFX NOT FOUND : {sfxName}");
+            return;
+        }
+
+        _player3DAudioSource.PlayOneShot(clip);
+    }
+
+    [Command]
+    private void CmdPlay3DSFX(string sfxName) {
+        RpcPlay3DSFX(sfxName, netId);
+    }
+
+    [ClientRpc]
+    private void RpcPlay3DSFX(string sfxName, uint senderNetId) {
+        // 본인은 이미 로컬 재생했으므로 제외
+        if (NetworkClient.localPlayer != null &&
+            NetworkClient.localPlayer.netId == senderNetId) {
+            return;
+        }
+
+        Debug.Log($"RPC RECEIVED : {sfxName} / {gameObject.name}");
+
+        Play3DSFXLocal(sfxName);
+    }
+
+    // ---------------- 2D/UI SOUND ----------------
+
+    private void PlayLocalSFX(string sfxName) {
+        if (AudioManager.Instance == null) return;
+
+        AudioManager.Instance.PlaySFX(sfxName);
     }
 }
