@@ -45,17 +45,32 @@ public class PlayerTrigger : NetworkBehaviour
     {
         if (collision.transform.CompareTag(TAG_ENDPOINT))
         {
-            _characterModel.SetActive(false);
-
-            UIManager.Instance.ShowPersonalResult();
-
-            _playerCore.SendEndpoint();
-
             if (isLocalPlayer)
             {
+                CmdRequestHideModel();
+
+                UIManager.Instance.ShowPersonalResult();
+                _playerCore.SendEndpoint();
                 CmdPlay3DSFX("PlayerLandFail");
             }
         }
+    }
+
+    // ---------------- COMMANDS ----------------
+
+    [Command]
+    private void CmdRequestHideModel()
+    {
+        RpcHidePlayerModel();
+    }
+
+    // ---------------- RPC ----------------
+
+    [ClientRpc]
+    private void RpcHidePlayerModel()
+    {
+        if (_characterModel != null)
+            _characterModel.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -124,9 +139,6 @@ public class PlayerTrigger : NetworkBehaviour
             case TAG_SPIDERWEB:
 
                 if (!isLocalPlayer) return;
-
-                if (_playerCore.status_effect == StatusEffect.Invinsible)
-                    return;
 
                 _playerCore.on_spiderweb_hit?.Invoke(other);
 
