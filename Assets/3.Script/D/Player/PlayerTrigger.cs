@@ -23,6 +23,9 @@ public class PlayerTrigger : NetworkBehaviour
     [SerializeField] private ParticleSystem playerHitParticle;
     [SerializeField] private ParticleSystem spiderwebHitParticle;
     [SerializeField] private ParticleSystem itemBoxHitParticle;
+    [SerializeField] private ParticleSystem magneticHitParticle;
+    [SerializeField] private ParticleSystem magneticHitParticle_attack;
+    [SerializeField] private ParticleSystem deathParticle;
 
     [SerializeField] private GameObject _characterModel;
     [SerializeField] private float _hitPlayerImpulsePower = 25f;
@@ -234,8 +237,23 @@ public class PlayerTrigger : NetworkBehaviour
         RpcPlay3DSFX(sfxName);
     }
 
+    public void PlayHitEffect(int effectType)
+    {
+        if (isServer)
+        {
+            // 서버에서 직접 호출한 경우 바로 모든 클라이언트에게 RPC 전송
+            RpcPlayHitEffect(effectType);
+        }
+        else if (isLocalPlayer)
+        {
+            // 클라이언트에서 호출한 경우 서버로 요청 (Command)
+            CmdPlayHitEffect(effectType);
+        }
+    }
+
+
     [Command]
-    private void CmdPlayHitEffect(int effectType)
+    public void CmdPlayHitEffect(int effectType)
     {
         RpcPlayHitEffect(effectType);
     }
@@ -256,19 +274,25 @@ public class PlayerTrigger : NetworkBehaviour
         switch (effectType)
         {
             case 0:
-                PlayParticle(obstacleHitParticle);
-                break;
+                PlayParticle(obstacleHitParticle);break;
 
             case 1:
-                PlayParticle(playerHitParticle);
-                break;
+                PlayParticle(playerHitParticle);break;
 
             case 2:
-                PlayParticle(spiderwebHitParticle);
-                break;
+                PlayParticle(spiderwebHitParticle);break;
+
             case 3:
-                PlayParticle(itemBoxHitParticle);
-                break;
+                PlayParticle(itemBoxHitParticle);break;
+
+            case 4:
+                PlayParticle(magneticHitParticle);break;
+
+            case 5:
+                PlayParticle(deathParticle);break;
+
+            case 6:
+                PlayParticle(magneticHitParticle_attack);break;
         }
     }
 

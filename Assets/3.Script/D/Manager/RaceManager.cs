@@ -108,6 +108,14 @@ public class RaceManager : NetworkBehaviour {
 			);	
 		}
 		ReceiveArriveResult(sender, isDead, finishTime);
+
+		if (isDead)
+		{
+			if (sender.identity.TryGetComponent(out PlayerTrigger trigger))
+			{
+				trigger.PlayHitEffect(5);
+			}
+		}
 	}
 
 	[Server]

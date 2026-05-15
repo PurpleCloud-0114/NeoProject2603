@@ -107,7 +107,16 @@ public class PlayerEffectController : NetworkBehaviour {
 	public void TargetApplyMagneticEffect(NetworkConnectionToClient target, GameObject opponent, bool isAttacker, float duration, float power) {
 		if (opponent == null) return;
 		if (_playerCore.player_state != PlayerState.Falling) return;
-		//ui 활성화
+		// 1. 공격자가 아닌 '당한 사람'일 경우에만 UI 표시 및 파티클 재생
+		if (UIManager.Instance != null)
+		{
+			UIManager.Instance.ShowMagneticIndicator(isAttacker, 2.5f);
+		}
+		// 2. 각자 역할에 맞는 파티클 재생
+		if (TryGetComponent(out PlayerTrigger trigger))
+		{
+			trigger.PlayHitEffect(isAttacker ? 4 : 6);
+		}
 		StartCoroutine(Co_MagneticForce(opponent, isAttacker, duration, power));
 	}
 	private IEnumerator Co_MagneticForce(GameObject opponent, bool isAttacker, float duration, float power) {
