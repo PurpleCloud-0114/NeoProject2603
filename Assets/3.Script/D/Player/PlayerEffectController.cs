@@ -106,6 +106,8 @@ public class PlayerEffectController : NetworkBehaviour {
 	[TargetRpc]
 	public void TargetApplyMagneticEffect(NetworkConnectionToClient target, GameObject opponent, bool isAttacker, float duration, float power) {
 		if (opponent == null) return;
+		if (_playerCore.player_state != PlayerState.Falling) return;
+		//ui È°¼ºÈ­
 		StartCoroutine(Co_MagneticForce(opponent, isAttacker, duration, power));
 	}
 	private IEnumerator Co_MagneticForce(GameObject opponent, bool isAttacker, float duration, float power) {

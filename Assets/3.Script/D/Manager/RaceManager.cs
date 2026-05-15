@@ -119,6 +119,7 @@ public class RaceManager : NetworkBehaviour {
 
 	[TargetRpc]
 	private void ReceiveArriveResult(NetworkConnectionToClient target, bool isDead, double finishTime) {
+		//플레이어에게 결과값에 대한 반응 처리.
 		UIManager.Instance.SetResult(isDead, finishTime);
 		if (!isDead) StageManager.Instance.ChangeFloorTrigger(true);
 	}

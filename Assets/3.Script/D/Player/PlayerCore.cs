@@ -14,7 +14,7 @@ public enum PlayerState {
 public enum StatusEffect {
 	None,
 	Stun,
-	Invinsible
+	Magnetic
 }
 
 public class PlayerCore : NetworkBehaviour {
