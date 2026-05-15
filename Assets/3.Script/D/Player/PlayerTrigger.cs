@@ -22,6 +22,7 @@ public class PlayerTrigger : NetworkBehaviour
     [SerializeField] private ParticleSystem obstacleHitParticle;
     [SerializeField] private ParticleSystem playerHitParticle;
     [SerializeField] private ParticleSystem spiderwebHitParticle;
+    [SerializeField] private ParticleSystem itemBoxHitParticle;
 
     [SerializeField] private GameObject _characterModel;
     [SerializeField] private float _hitPlayerImpulsePower = 25f;
@@ -64,6 +65,8 @@ public class PlayerTrigger : NetworkBehaviour
             case TAG_ITEMBOX:
 
                 if (!isLocalPlayer) return;
+
+                CmdPlayHitEffect(3);
 
                 CmdDisableRoot(other.transform.root.GetComponent<NetworkIdentity>());
 
@@ -251,6 +254,9 @@ public class PlayerTrigger : NetworkBehaviour
 
             case 2:
                 PlayParticle(spiderwebHitParticle);
+                break;
+            case 3:
+                PlayParticle(itemBoxHitParticle);
                 break;
         }
     }
