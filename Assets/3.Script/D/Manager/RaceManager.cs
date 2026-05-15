@@ -73,7 +73,7 @@ public class RaceManager : NetworkBehaviour {
 
 		//NetworkTime.time = 서버 시간
 		//5초 뒤 출발 하는거. (나중에 수정)
-		race_start_time_sync = NetworkTime.time + 4.0;
+		race_start_time_sync = NetworkTime.time + 0.1f;
 
 		//TODO - ClientRPC로 카운트다운 UI 넣을건가?
 	}
@@ -108,6 +108,14 @@ public class RaceManager : NetworkBehaviour {
 			);	
 		}
 		ReceiveArriveResult(sender, isDead, finishTime);
+
+		if (isDead)
+		{
+			if (sender.identity.TryGetComponent(out PlayerTrigger trigger))
+			{
+				trigger.PlayHitEffect(5);
+			}
+		}
 	}
 
 	[Server]
@@ -119,6 +127,7 @@ public class RaceManager : NetworkBehaviour {
 
 	[TargetRpc]
 	private void ReceiveArriveResult(NetworkConnectionToClient target, bool isDead, double finishTime) {
+		//플레이어에게 결과값에 대한 반응 처리.
 		UIManager.Instance.SetResult(isDead, finishTime);
 		if (!isDead) StageManager.Instance.ChangeFloorTrigger(true);
 	}
@@ -224,8 +233,9 @@ public class RaceManager : NetworkBehaviour {
 		Debug.Log($"플레이어 준비 완료: {_playersReadyCount} / {total_players}");
 
 		if(_playersReadyCount >= total_players && current_state_sync == RaceState.Waiting) {
-		//if(_playersReadyCount >= START_MAX_PLAYER) { 
-			StartCountdown();
+			//if(_playersReadyCount >= START_MAX_PLAYER) { 
+			//StartCountdown();
+			CutsceneController.Instance.PlayIntro();
 		}
 	}
 

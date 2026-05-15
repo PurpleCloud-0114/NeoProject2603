@@ -59,11 +59,18 @@ public class ItemManager : NetworkBehaviour {
 		return _itemDict.GetValueOrDefault(type);
 	}
 
-	public void SpanwSpiderweb(Vector3 postion) {
+	public void SpanwSpiderweb(Vector3 position) {
 		if (_spiderwebPrefab.TryGetComponent(out SpiderwebObstacle _spiderweb)) {
 			Quaternion rotation = Quaternion.Euler(-90, 0, 0);
-			GameObject webInst = Instantiate(_spiderwebPrefab, postion + Vector3.up * _spiderweb.distance, rotation);
-			NetworkServer.Spawn(webInst);
+			float distance = _spiderweb.distance;
+
+			Vector3 pos1 = position + ((Vector3.up + Vector3.forward) * distance);
+			Vector3 pos2 = position + ((Vector3.up + Vector3.left + Vector3.back) * distance);
+			Vector3 pos3 = position + ((Vector3.up + Vector3.right + Vector3.back) * distance);
+
+			NetworkServer.Spawn(Instantiate(_spiderwebPrefab, pos1, rotation));
+			NetworkServer.Spawn(Instantiate(_spiderwebPrefab, pos2, rotation));
+			NetworkServer.Spawn(Instantiate(_spiderwebPrefab, pos3, rotation));
 		}
 	}
 }

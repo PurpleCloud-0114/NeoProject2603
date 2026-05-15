@@ -41,6 +41,10 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _playUI;
 	[SerializeField] private GameObject _specUI;
 
+	[Header("자석 상태 알림 UI")]
+	[SerializeField] private GameObject _magneticWarningUI; // 피격자용 (붉은색/경고)
+	[SerializeField] private GameObject _magneticAttackUI;  // 공격자용 (푸른색/활성)
+
 	[Header("개인 결과 UI")]
 	[SerializeField] private GameObject _personalResultWindow;
 	[SerializeField] private TextMeshProUGUI _personalTitleText;
@@ -98,7 +102,20 @@ public class UIManager : MonoBehaviour {
 	public void UpdateMyRank(int newRank) {
 		myRank = newRank;
 		if (_rankText != null) {
-			_rankText.text = $"{myRank}등";
+			switch(myRank) {
+				case 1:
+					_rankText.text = $"{myRank}st";
+					break;
+				case 2:
+					_rankText.text = $"{myRank}nd";
+					break;
+				case 3:
+					_rankText.text = $"{myRank}rd";
+					break;
+				default:
+					_rankText.text = $"{myRank}th";
+					break;
+			}
 		}
 	}
 
@@ -180,6 +197,17 @@ public class UIManager : MonoBehaviour {
 	// ==========================================
 	// [ 도착 및 관전 시 UI 활성화/비활성화 ]
 	// ==========================================
+	public void PlayerUISetActive(bool isTrue) {
+		// 1. _playUI 체크
+		if (_playUI != null) {
+			_playUI.SetActive(isTrue);
+		}
+
+		// 2. _stageProgressUI 및 그 GameObject 체크
+		if (_stageProgressUI != null && _stageProgressUI.gameObject != null) {
+			_stageProgressUI.gameObject.SetActive(isTrue);
+		}
+	}
 	public void HideUIforFinish() {
 		_playUI.SetActive(false);
 		_specUI.SetActive(false);
@@ -194,6 +222,25 @@ public class UIManager : MonoBehaviour {
 	public void HideUIforEndRace() {
 		HideUIforFinish();
 		_specUI.SetActive(false);
+	}
+	//---------- 자석 UI ------------
+	public void ShowMagneticIndicator(bool isAttacker, float duration = 2.5f)
+	{
+		GameObject targetUI = isAttacker ? _magneticAttackUI : _magneticWarningUI;
+		if (targetUI == null) return;
+
+		CancelInvoke(nameof(HideAllMagneticUI));
+		_magneticAttackUI?.SetActive(false);
+		_magneticWarningUI?.SetActive(false);
+		targetUI.SetActive(true);
+
+		Invoke(nameof(HideAllMagneticUI), duration);
+	}
+
+	private void HideAllMagneticUI()
+	{
+		_magneticAttackUI?.SetActive(false);
+		_magneticWarningUI?.SetActive(false);
 	}
 
 	// ==========================================
