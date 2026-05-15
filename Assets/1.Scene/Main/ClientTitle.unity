@@ -4265,7 +4265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SQLManager
   _is_it_Client: 1
-  _serverIP: 192.168.45.197
+  _serverIP: 192.168.45.42
   _overwriteConfig: 1
 --- !u!4 &1922734576
 Transform:
