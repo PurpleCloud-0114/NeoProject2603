@@ -73,7 +73,7 @@ public class RaceManager : NetworkBehaviour {
 
 		//NetworkTime.time = 서버 시간
 		//5초 뒤 출발 하는거. (나중에 수정)
-		race_start_time_sync = NetworkTime.time + 4.0;
+		race_start_time_sync = NetworkTime.time + 0.1f;
 
 		//TODO - ClientRPC로 카운트다운 UI 넣을건가?
 	}
@@ -225,8 +225,9 @@ public class RaceManager : NetworkBehaviour {
 		Debug.Log($"플레이어 준비 완료: {_playersReadyCount} / {total_players}");
 
 		if(_playersReadyCount >= total_players && current_state_sync == RaceState.Waiting) {
-		//if(_playersReadyCount >= START_MAX_PLAYER) { 
-			StartCountdown();
+			//if(_playersReadyCount >= START_MAX_PLAYER) { 
+			//StartCountdown();
+			CutsceneController.Instance.PlayIntro();
 		}
 	}
 

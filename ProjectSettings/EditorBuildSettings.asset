@@ -7,10 +7,10 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 0
     path: Assets/1.Scene/D/Copy/Copy_ClientTitle.unity
-    guid: 1ea181015c79f2348aa87b27a138ef21
+    guid: d4e6c893355a3ae489e056a8ce769034
   - enabled: 0
     path: Assets/1.Scene/D/Copy/Copy_ClientMain.unity
-    guid: 29d640a40f46cdb40982222f8cb91564
+    guid: e95b450f3a1f06d4d8707656fbf5ae17
   - enabled: 0
     path: Assets/1.Scene/D/Copy/Copy_Server.unity
     guid: d245ed0d4e094f74ca1bc39d0c045e8c
@@ -34,7 +34,7 @@ EditorBuildSettings:
     guid: a1cb03aaf4baab54e9c9f1c5e98cb9ce
   - enabled: 1
     path: Assets/1.Scene/Main/ClientIngame.unity
-    guid: 98792c6b542f5e24b80a6d4eaac2ae50
+    guid: 4adde7283cf7765438d135ab96db410e
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 4a0a069c32ac0154fb4fd05ddd3923b8, type: 2}
   m_UseUCBPForAssetBundles: 0

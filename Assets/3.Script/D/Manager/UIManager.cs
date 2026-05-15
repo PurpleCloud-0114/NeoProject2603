@@ -98,7 +98,20 @@ public class UIManager : MonoBehaviour {
 	public void UpdateMyRank(int newRank) {
 		myRank = newRank;
 		if (_rankText != null) {
-			_rankText.text = $"{myRank}등";
+			switch(myRank) {
+				case 1:
+					_rankText.text = $"{myRank}st";
+					break;
+				case 2:
+					_rankText.text = $"{myRank}nd";
+					break;
+				case 3:
+					_rankText.text = $"{myRank}rd";
+					break;
+				default:
+					_rankText.text = $"{myRank}th";
+					break;
+			}
 		}
 	}
 
@@ -180,6 +193,17 @@ public class UIManager : MonoBehaviour {
 	// ==========================================
 	// [ 도착 및 관전 시 UI 활성화/비활성화 ]
 	// ==========================================
+	public void PlayerUISetActive(bool isTrue) {
+		// 1. _playUI 체크
+		if (_playUI != null) {
+			_playUI.SetActive(isTrue);
+		}
+
+		// 2. _stageProgressUI 및 그 GameObject 체크
+		if (_stageProgressUI != null && _stageProgressUI.gameObject != null) {
+			_stageProgressUI.gameObject.SetActive(isTrue);
+		}
+	}
 	public void HideUIforFinish() {
 		_playUI.SetActive(false);
 		_specUI.SetActive(false);

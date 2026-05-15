@@ -106,6 +106,7 @@ public class PlayerMovement : NetworkBehaviour {
 		if (isLocalPlayer) {
 			if (playerState == PlayerState.Falling) {
 				_rigidBody.isKinematic = false;
+				ApplyImpulse(Vector3.down * 20f);
 			} else {
 				_rigidBody.isKinematic = true;
 			}
