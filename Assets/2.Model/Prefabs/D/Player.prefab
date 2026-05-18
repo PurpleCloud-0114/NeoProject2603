@@ -5224,7 +5224,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 2.45}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 4, y: 4, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2427358950748895361}
@@ -5305,7 +5305,7 @@ ParticleSystem:
       m_RotationOrder: 4
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
-  scalingMode: 1
+  scalingMode: 0
   randomSeed: 0
   InitialModule:
     serializedVersion: 3
@@ -10075,7 +10075,7 @@ ParticleSystemRenderer:
   m_MeshDistribution: 0
   m_SortMode: 0
   m_MinParticleSize: 0
-  m_MaxParticleSize: 0.5
+  m_MaxParticleSize: 3
   m_CameraVelocityScale: 0
   m_VelocityScale: 0
   m_LengthScale: 2
@@ -54526,7 +54526,6 @@ GameObject:
   - component: {fileID: -4233077273478090972}
   - component: {fileID: 6583540796084539334}
   - component: {fileID: 1646610182803105880}
-  - component: {fileID: 3583870615762622709}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -54913,22 +54912,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &3583870615762622709
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6497241950661712083}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c92d92beb948b9e47aa2928b2f79ca71, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InGameDataSync
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  InGameDataSync_Name: 
 --- !u!1 &6524700338615600787
 GameObject:
   m_ObjectHideFlags: 0
