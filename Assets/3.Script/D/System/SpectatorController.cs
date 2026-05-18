@@ -74,15 +74,11 @@ public class SpectatorController : MonoBehaviour {
 			return;
 		}
 
-
 		_currentIndex = (_currentIndex + direction + _validTargets.Count) % _validTargets.Count;
 		vcam.Follow = vcam.LookAt = _validTargets[_currentIndex];
 
-		if (_validTargets[_currentIndex].TryGetComponent(out NetworkIdentity networkIdentity)) {
-			RoomPlayer roomPlayer = networkRoommManager.roomSlots.FirstOrDefault(t => t != null && t.netId == networkIdentity.netId) as RoomPlayer;
-			if (roomPlayer != null) {
-				_specNicknameUI.text = roomPlayer.NicknameSync;
-			}
+		if (_validTargets[_currentIndex].TryGetComponent(out PlayerDataSync playerData)) {
+			_specNicknameUI.text = playerData.SyncNickname;
 		}
 	}
 }
