@@ -85,7 +85,7 @@ public class PlayerTrigger : NetworkBehaviour
 
                 CmdPlayHitEffect(3);
 
-                CmdDisableRoot(other.transform.root.GetComponent<NetworkIdentity>());
+                //CmdDisableRoot(other.transform.root.GetComponent<NetworkIdentity>());
 
                 _playerCore.CmdRequestItemSelection();
 

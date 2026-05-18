@@ -16,9 +16,11 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private Button _itemButton;
 
 	[Header("Player Text Bind")]
-	[SerializeField] private TextMeshProUGUI _itemText;
 	[SerializeField] private TextMeshProUGUI _rankText;
 	//[SerializeField] private TextMeshProUGUI _ResultTextLog;
+
+	[Header("Player Image Bind")]
+	[SerializeField] private Image _itemImage;
 
 	[Header("대상 UI (배치 변경될 UI)")]
 	[SerializeField] private GameObject _touchzone;
@@ -173,7 +175,7 @@ public class UIManager : MonoBehaviour {
 				if (tmp.name == "Rank") {
 					if(results[i].isDead) {
 						tmp.color = Color.red;
-						tmp.text = "사망";
+						tmp.text = "DEAD";
 					} else {
 						tmp.text = (i + 1).ToString();
 					}
@@ -248,5 +250,5 @@ public class UIManager : MonoBehaviour {
 	// ==========================================
 	[Client] public Button BindWingButton() => _wingButton;
 	[Client] public Button BindItemButton() => _itemButton;
-	[Client] public TextMeshProUGUI BindItemText() => _itemText;
+	[Client] public Image BindItemImage() => _itemImage;
 }

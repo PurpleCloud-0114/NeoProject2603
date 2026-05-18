@@ -12,5 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d23121f0ad81ad24aaef9b08c0579110, type: 3}
   m_Name: MagneticItem
   m_EditorClassIdentifier: Assembly-CSharp::MagneticItem
+  _itemName: "\uB9C8\uADF8\uB124\uD2F1"
+  _itemType: 4
+  _itmeImage: {fileID: 21300000, guid: 2601d79c5fa073a43a86d44536c414aa, type: 3}
   duration: 1
   power: 3

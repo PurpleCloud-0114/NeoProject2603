@@ -51,6 +51,7 @@ public class LoginController : MonoBehaviour
         {
             // PlayerPrefs에 닉네임 저장 (TitleController 환영 메시지용)
             PlayerPrefs.SetString("PlayerNickname", nickname);
+            PlayerPrefs.SetInt("PlayerScore", score);
             PlayerPrefs.Save();
 
             /* 
