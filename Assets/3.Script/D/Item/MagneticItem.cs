@@ -1,14 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [CreateAssetMenu(menuName = "ItemOption/MagneticItem")]
 public class MagneticItem : ScriptableObject, IUseable {
 	[SerializeField] private string _itemName = "¸¶±×³×Æ½";
 	[SerializeField] private ItemType _itemType = ItemType.Magnetic;
-
+	[SerializeField] private Sprite _itmeImage;
+	
 	public string Name => _itemName;
 	public ItemType Type => _itemType;
+	public Sprite Item_Image => _itmeImage;
 
 	public float duration = 1f;
 	public float power = 3f;

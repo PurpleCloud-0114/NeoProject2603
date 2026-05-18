@@ -47,6 +47,7 @@ public class RaceManager : NetworkBehaviour {
 
 	[Header("레이스 종료")]
 	[SerializeField] private float returnDelay = 7.5f;
+	private bool isSceneChanging = false;
 
 	[Header("라운드 관리")]
 	[SyncVar] public int current_round_sync = 0;
@@ -168,6 +169,9 @@ public class RaceManager : NetworkBehaviour {
 	//결과창 7.5초
 	private IEnumerator Co_ReturnToLobby()
 	{
+		if (isSceneChanging) yield break;
+		isSceneChanging = true;
+
 		Debug.Log($"시상식중...(7.5초 걸림) | 현재 라운드: {current_round_sync + 1} / {MAX_ROUND}");
 		yield return new WaitForSeconds(returnDelay);
 
@@ -241,13 +245,11 @@ public class RaceManager : NetworkBehaviour {
 
 	//플레이어 생성시, PlayerCore에서 호출됨.
 	public void RegisterPlayer(Transform player) {
-		if (!isServer) return;
 		if (!active_players.Contains(player)) {
 			active_players.Add(player);
 		}
 	}
 	public void UnregisterPlayer(Transform player) {
-		if (!isServer) return;
 		if (active_players.Contains(player)) {
 			active_players.Remove(player);
 			_previousRanks.Remove(player);

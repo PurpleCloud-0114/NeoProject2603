@@ -14823,6 +14823,7 @@ GameObject:
   - component: {fileID: 7986897327550498012}
   - component: {fileID: 6975345663408747873}
   - component: {fileID: 6754235208263970072}
+  - component: {fileID: 8846744009268867670}
   m_Layer: 7
   m_Name: FX_ItemBox
   m_TagString: ItemBox
@@ -19694,3 +19695,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8846744009268867670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8542186906585345430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc41a969d575b3c488254fe51cff3674, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemBox
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  _cube: {fileID: 1562468208570716886}

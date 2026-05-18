@@ -54712,7 +54712,8 @@ MonoBehaviour:
   syncInterval: 0
   _wingButton: {fileID: 0}
   _itemButton: {fileID: 0}
-  _itemName: {fileID: 0}
+  _itemImg: {fileID: 0}
+  _noneImg: {fileID: 21300000, guid: 34d03150220ed1d4b9b828356066f892, type: 3}
 --- !u!114 &2803637901400589826
 MonoBehaviour:
   m_ObjectHideFlags: 0
