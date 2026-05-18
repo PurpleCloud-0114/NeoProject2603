@@ -37,12 +37,14 @@ public class PlayerUIController : NetworkBehaviour {
 		_playerCore.on_endpoint_landed += StopTimer;
 		_playerCore.on_item_acquired += ActivateItemBtn;
 		_playerCore.on_item_acquired += SetItemImgOnUI;
+		_playerCore.on_item_button_clicked += UsedItemImgOnUI;
 	}
 	private void OnDisable() {
 		_playerCore.on_redzone_entered -= ActivateWingBtn;
 		_playerCore.on_endpoint_landed -= StopTimer;
 		_playerCore.on_item_acquired -= ActivateItemBtn;
 		_playerCore.on_item_acquired -= SetItemImgOnUI;
+		_playerCore.on_item_button_clicked -= UsedItemImgOnUI;
 	}
 
 	private void BindButton() {
@@ -63,5 +65,6 @@ public class PlayerUIController : NetworkBehaviour {
 	public void ActivateItemBtn(IUseable _item) => _itemButton.interactable = true;
 	public void DeActivateItemBtn() => _itemButton.interactable = false;
 	public void SetItemImgOnUI(IUseable _item) => _itemImg.sprite = _item.Item_Image;
+	public void UsedItemImgOnUI() => _itemImg.sprite = _noneImg;
 	public void StopTimer() => UIManager.Instance.StopTimer();
 }
