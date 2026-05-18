@@ -20668,8 +20668,8 @@ MonoBehaviour:
   myRank: 1
   _wingButton: {fileID: 2051657841}
   _itemButton: {fileID: 1280842718}
-  _itemText: {fileID: 834119325}
   _rankText: {fileID: 1405792886}
+  _itemImage: {fileID: 0}
   _touchzone: {fileID: 1722008135}
   _wingButtons: {fileID: 2051657840}
   _itemButtons: {fileID: 1280842717}
@@ -23488,6 +23488,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpectatorController
   vcam: {fileID: 1573687698}
+  _specNicknameUI: {fileID: 0}
 --- !u!1 &1867011057
 GameObject:
   m_ObjectHideFlags: 0
@@ -24034,9 +24035,9 @@ MonoBehaviour:
   _endY: -40
   _step: 40
   _noChangeFloorCount: 5
-  _scaleStep: 0.0075
-  _minScale: 0.4
-  _maxScale: 1.4
+  _scaleStep: 0.0055
+  _minScale: 0.42
+  _maxScale: 1.3
   _3F_Chance: 20
   _1F_Prefabs:
   - {fileID: 4656741095035066466, guid: 538e6adf0ad489540ab7538ad1df0a8d, type: 3}
