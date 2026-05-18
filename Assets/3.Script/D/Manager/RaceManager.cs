@@ -245,13 +245,11 @@ public class RaceManager : NetworkBehaviour {
 
 	//플레이어 생성시, PlayerCore에서 호출됨.
 	public void RegisterPlayer(Transform player) {
-		if (!isServer) return;
 		if (!active_players.Contains(player)) {
 			active_players.Add(player);
 		}
 	}
 	public void UnregisterPlayer(Transform player) {
-		if (!isServer) return;
 		if (active_players.Contains(player)) {
 			active_players.Remove(player);
 			_previousRanks.Remove(player);
