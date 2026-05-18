@@ -175,7 +175,7 @@ public class UIManager : MonoBehaviour {
 				if (tmp.name == "Rank") {
 					if(results[i].isDead) {
 						tmp.color = Color.red;
-						tmp.text = "»ç¸Á";
+						tmp.text = "DEAD";
 					} else {
 						tmp.text = (i + 1).ToString();
 					}
