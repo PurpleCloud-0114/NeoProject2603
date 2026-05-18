@@ -47,7 +47,7 @@ public class ItemManager : NetworkBehaviour {
 		if (myRank == 1) {
 			type = ItemType.Spiderweb;
 		} else if (myRank > totalPlayers / 2) {
-			type = (ItemType)Random.Range(3, 5);
+			type = (ItemType)Random.Range(2, 5);
 		} else {
 			type = (ItemType)Random.Range(1, 4);
 		}

@@ -14,7 +14,7 @@ public class PlayerItemController : NetworkBehaviour
 
     [Header("Player Attached Particles")]
     [SerializeField] private ParticleSystem item_WeightAcceleration;
-    [SerializeField] private ParticleSystem item_Shockwave;
+    [SerializeField] private ParticleSystem[] item_Shockwave;
     [SerializeField] private ParticleSystem item_Magnetic;
     [SerializeField] private ParticleSystem item_Spiderweb;
 
@@ -111,11 +111,26 @@ public class PlayerItemController : NetworkBehaviour
 
     private void PlayItemParticle(ItemType type)
     {
-        // 아이템 타입에 맞춰 할당된 파티클 Play
+        if (type == ItemType.Shockwave)
+        {
+            if (item_Shockwave != null)
+            {
+                foreach (var particle in item_Shockwave)
+                {
+                    if (particle != null)
+                    {
+                        particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                        particle.Play();
+                    }
+                }
+            }
+            return; // 쇼크웨이브 처리가 끝났으므로 리턴
+        }
+
+        // 그 외 기존 싱글 파티클 아이템들 처리
         ParticleSystem targetParticle = type switch
         {
             ItemType.WeightAcceleration => item_WeightAcceleration,
-            ItemType.Shockwave => item_Shockwave,
             ItemType.Magnetic => item_Magnetic,
             ItemType.Spiderweb => item_Spiderweb,
             _ => null
@@ -123,8 +138,7 @@ public class PlayerItemController : NetworkBehaviour
 
         if (targetParticle != null)
         {
-            targetParticle.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
-
+            targetParticle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             targetParticle.Play();
         }
     }
