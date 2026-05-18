@@ -34,7 +34,7 @@ EditorBuildSettings:
     guid: a1cb03aaf4baab54e9c9f1c5e98cb9ce
   - enabled: 0
     path: Assets/1.Scene/Main/ClientIngame.unity
-    guid: e98869c6417189449a9f90367e9ceffb
+    guid: fb4871409b52b6f448a1b9be6e130e36
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 4a0a069c32ac0154fb4fd05ddd3923b8, type: 2}
   m_UseUCBPForAssetBundles: 0

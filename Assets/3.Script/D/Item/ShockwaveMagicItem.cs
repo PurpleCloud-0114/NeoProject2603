@@ -16,15 +16,12 @@ public class ShockwaveMagicItem : ScriptableObject, IUseable {
 	public float range = 15f;
 	public float push_force = 25f;
 	public float stun_duration = 2f;
+	public float charge_duration = 2f; // 차지 시간 추가
 
 	public void Use(GameObject user) {
-		Collider[] hits = Physics.OverlapSphere(user.transform.position, range);
-		foreach(Collider hit in hits) {
-			if (hit.gameObject == user) continue;
-			if(hit.TryGetComponent(out PlayerEffectController _playerEffectController)) {
-				Vector3 normal = (hit.transform.position - user.transform.position).normalized;
-				_playerEffectController.HitShockwave(normal * push_force, stun_duration);
-			}
+		// 유저의 PlayerEffectController를 찾아 충격파 차지 시퀀스를 시작합니다.
+		if (user.TryGetComponent(out PlayerEffectController effectController)) {
+			effectController.UseShockwaveItem(range, push_force, stun_duration, charge_duration);
 		}
 	}
 }
