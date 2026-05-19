@@ -13,7 +13,7 @@ public class PlayerMovement : NetworkBehaviour {
 	private Vector2 _moveVector;
 	private Vector3 _moveDir;
 
-	//[SerializeField] private Vector3 _velocityTracker;
+	[SerializeField] private Vector3 _velocityTracker;
 
 	[Header("조작 이동속도 조절")]
 	[SerializeField, Range(0, 100)] public float _moveSpeed = 45f;              //임시 퍼블릭
@@ -73,7 +73,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_wing_button_clicked -= OpenWing;
 		_playerCore.on_max_drop_speed_change_requested -= ApplySpeedChange;
 		_playerCore.on_impulse_requested -= ApplyImpulse;
-		_playerCore.on_continuous_force_requested += ApplyContinuousForce;
+		_playerCore.on_continuous_force_requested -= ApplyContinuousForce;
 		_playerCore.on_obstacle_hit -= HitObstacle;
 		_playerCore.on_redzone_entered -= SetDecreaseDropSpeedTimeOnWing;
 		_playerCore.on_stun_requested -= ApplyStun;
@@ -82,8 +82,9 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 
 	private void FixedUpdate() {
+		_velocityTracker = _rigidBody.linearVelocity;
 		if ((!RaceManager.Instance.isSinglePlay && !isLocalPlayer) || _playerInputSystem == null) return;
-		if (_playerCore.player_state == PlayerState.Falling) {
+		if (_playerCore.player_state != PlayerState.Wait) {
 			LimitDropSpeed();
 			if (_playerCore.status_effect != StatusEffect.Stun) {
 				Move();
@@ -92,7 +93,6 @@ public class PlayerMovement : NetworkBehaviour {
 		}
 
 		ClampPositionToMapBounds();
-		//_velocityTracker = _rigidBody.linearVelocity;
 	}
 	private void Update() {
 		if (!isLocalPlayer || _playerInputSystem == null || _playerCore.player_state != PlayerState.Falling) return;
@@ -106,6 +106,7 @@ public class PlayerMovement : NetworkBehaviour {
 		if (isLocalPlayer) {
 			if (playerState == PlayerState.Falling) {
 				_rigidBody.isKinematic = false;
+				ApplyImpulse(Vector3.down * 20f);
 			} else {
 				_rigidBody.isKinematic = true;
 			}

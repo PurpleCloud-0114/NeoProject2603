@@ -77,6 +77,26 @@ public class PlayerEffectController : NetworkBehaviour {
 	// =========================
 	// [ 충격파 마법 ] - 피격시.
 	// =========================
+	public void UseShockwaveItem(float range, float pushForce, float stunDuration, float chargeDuration) {
+		if (isServer) {
+			// 서버에서 차지 코루틴 시작
+			StartCoroutine(Co_ShockwaveChargeAndCast(range, pushForce, stunDuration, chargeDuration));
+		}
+	}
+
+	private IEnumerator Co_ShockwaveChargeAndCast(float range, float pushForce, float stunDuration, float chargeDuration) {
+		yield return new WaitForSeconds(chargeDuration);
+
+		Collider[] hits = Physics.OverlapSphere(transform.position, range);
+		foreach(Collider hit in hits) {
+			if (hit.gameObject == gameObject) continue;
+
+			if(hit.TryGetComponent(out PlayerEffectController targetEffectController)) {
+				Vector3 normal = (hit.transform.position - transform.position).normalized;
+				targetEffectController.HitShockwave(normal * pushForce, stunDuration);
+			}
+		}
+	}
 	public void HitShockwave(Vector3 force, float stunDuration) {
 		// 이 함수는 서버에서 OverlapSphere로 찾아낸 '맞은 플레이어'의 컨트롤러에서 실행됨
 		if (isServer) {
@@ -106,6 +126,17 @@ public class PlayerEffectController : NetworkBehaviour {
 	[TargetRpc]
 	public void TargetApplyMagneticEffect(NetworkConnectionToClient target, GameObject opponent, bool isAttacker, float duration, float power) {
 		if (opponent == null) return;
+		if (_playerCore.player_state != PlayerState.Falling) return;
+		// 1. 공격자가 아닌 '당한 사람'일 경우에만 UI 표시 및 파티클 재생
+		if (UIManager.Instance != null)
+		{
+			UIManager.Instance.ShowMagneticIndicator(isAttacker, 2.5f);
+		}
+		// 2. 각자 역할에 맞는 파티클 재생
+		if (TryGetComponent(out PlayerTrigger trigger))
+		{
+			trigger.PlayHitEffect(isAttacker ? 4 : 6);
+		}
 		StartCoroutine(Co_MagneticForce(opponent, isAttacker, duration, power));
 	}
 	private IEnumerator Co_MagneticForce(GameObject opponent, bool isAttacker, float duration, float power) {

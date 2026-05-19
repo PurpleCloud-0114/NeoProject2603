@@ -6,6 +6,7 @@ public class LobbyTextUI : MonoBehaviour
     [SerializeField] private Transform[] player = new Transform[10];
     [SerializeField] private TMP_Text[] playerName = new TMP_Text[10];
     [SerializeField] private TMP_Text[] playerReadyState = new TMP_Text[10];
+    [SerializeField] private GameObject[] playerReadyObjects = new GameObject[10];
     [SerializeField] public CountDownUI ui;
     public static LobbyTextUI Instance;
 
@@ -36,6 +37,7 @@ public class LobbyTextUI : MonoBehaviour
         {
             if (playerName[i] != null) playerName[i].text = "";
             if (playerReadyState[i] != null) playerReadyState[i].text = "";
+            if (playerReadyObjects[i] != null) playerReadyObjects[i].SetActive(false);
         }
     }
 
@@ -55,6 +57,11 @@ public class LobbyTextUI : MonoBehaviour
         Debug.Log($"[LobbyTextUI] UpdateUI ½ÇÇà: index={playerNum}, name={newName}, isReady={_isReady}");
         playerName[playerNum].text = newName;
         playerReadyState[playerNum].text = _isReady ? "Ready" : "Not Ready";
+
+        if (playerReadyObjects[playerNum] != null)
+        {
+            playerReadyObjects[playerNum].SetActive(_isReady);
+        }
     }
 
     private void OnDestroy()

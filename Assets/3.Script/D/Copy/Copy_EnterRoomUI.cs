@@ -8,17 +8,17 @@ using TMPro;
 
 public class Copy_EnterRoomUI : MonoBehaviour
 {
-    [SerializeField] private TMP_Text _inputField;
+    //[SerializeField] private TMP_Text _inputField;
     public void EnterRoom()
     {
-        _inputField.text = "EnterRoom";
+        //_inputField.text = "EnterRoom";
         NetworkManager networkManager = NetworkManager.singleton;
         //lan
         //networkManager.networkAddress = "192.168.45.93";
         //wifi
         //networkManager.networkAddress = "192.168.45.59";
         networkManager.networkAddress = "localhost";
-        _inputField.text = "Server Address: " + NetworkManager.singleton.networkAddress;
+        //_inputField.text = "Server Address: " + NetworkManager.singleton.networkAddress;
         networkManager.StartClient();
     }
 }

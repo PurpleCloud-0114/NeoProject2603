@@ -13,6 +13,7 @@ public enum RaceState {
 
 public struct PlayerResult {
 	public NetworkIdentity player;
+	public string name;
 	public double finishTime;
 	public bool isDead;
 }
@@ -47,6 +48,7 @@ public class RaceManager : NetworkBehaviour {
 
 	[Header("레이스 종료")]
 	[SerializeField] private float returnDelay = 7.5f;
+	private bool isSceneChanging = false;
 
 	[Header("라운드 관리")]
 	[SyncVar] public int current_round_sync = 0;
@@ -73,7 +75,7 @@ public class RaceManager : NetworkBehaviour {
 
 		//NetworkTime.time = 서버 시간
 		//5초 뒤 출발 하는거. (나중에 수정)
-		race_start_time_sync = NetworkTime.time + 4.0;
+		race_start_time_sync = NetworkTime.time + 0.1f;
 
 		//TODO - ClientRPC로 카운트다운 UI 넣을건가?
 	}
@@ -93,7 +95,7 @@ public class RaceManager : NetworkBehaviour {
 
 	[Server]
 	//서버 수신 - 클라이언트 통과 정보 받기
-	public void GetArriveResult(NetworkConnectionToClient sender, float impactSpeed, double finishTime) {
+	public void GetArriveResult(NetworkConnectionToClient sender, string name, float impactSpeed, double finishTime) {
 		//TODO - 순위 리스트 업데이트 및 결과 RPC 전송
 		if (current_state_sync != RaceState.Racing) return;
 		bool isDead = impactSpeed > _deathOverSpeedSync;
@@ -102,12 +104,21 @@ public class RaceManager : NetworkBehaviour {
 			_roundResults.Add(sender.identity,
 				new PlayerResult {
 					player = sender.identity,
+					name = name,
 					finishTime = finishTime,
 					isDead = isDead
 				}
 			);	
 		}
 		ReceiveArriveResult(sender, isDead, finishTime);
+
+		if (isDead)
+		{
+			if (sender.identity.TryGetComponent(out PlayerTrigger trigger))
+			{
+				trigger.PlayHitEffect(5);
+			}
+		}
 	}
 
 	[Server]
@@ -119,6 +130,7 @@ public class RaceManager : NetworkBehaviour {
 
 	[TargetRpc]
 	private void ReceiveArriveResult(NetworkConnectionToClient target, bool isDead, double finishTime) {
+		//플레이어에게 결과값에 대한 반응 처리.
 		UIManager.Instance.SetResult(isDead, finishTime);
 		if (!isDead) StageManager.Instance.ChangeFloorTrigger(true);
 	}
@@ -159,6 +171,9 @@ public class RaceManager : NetworkBehaviour {
 	//결과창 7.5초
 	private IEnumerator Co_ReturnToLobby()
 	{
+		if (isSceneChanging) yield break;
+		isSceneChanging = true;
+
 		Debug.Log($"시상식중...(7.5초 걸림) | 현재 라운드: {current_round_sync + 1} / {MAX_ROUND}");
 		yield return new WaitForSeconds(returnDelay);
 
@@ -224,20 +239,19 @@ public class RaceManager : NetworkBehaviour {
 		Debug.Log($"플레이어 준비 완료: {_playersReadyCount} / {total_players}");
 
 		if(_playersReadyCount >= total_players && current_state_sync == RaceState.Waiting) {
-		//if(_playersReadyCount >= START_MAX_PLAYER) { 
-			StartCountdown();
+			//if(_playersReadyCount >= START_MAX_PLAYER) { 
+			//StartCountdown();
+			CutsceneController.Instance.PlayIntro();
 		}
 	}
 
 	//플레이어 생성시, PlayerCore에서 호출됨.
 	public void RegisterPlayer(Transform player) {
-		if (!isServer) return;
 		if (!active_players.Contains(player)) {
 			active_players.Add(player);
 		}
 	}
 	public void UnregisterPlayer(Transform player) {
-		if (!isServer) return;
 		if (active_players.Contains(player)) {
 			active_players.Remove(player);
 			_previousRanks.Remove(player);
