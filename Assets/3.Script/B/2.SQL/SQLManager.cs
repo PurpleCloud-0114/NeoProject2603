@@ -232,25 +232,31 @@ public class SQLManager : MonoBehaviour
     }
 
     // ── 점수 관리 ──
-    public bool GetScore(string name, out int outscore)
+    public bool GetScore(string nickname, out int outscore)
     {
         outscore = 0;
         try
         {
             if (!ConnectionCheck(_connection)) return false;
-            string sql = "SELECT user_score FROM user_info WHERE user_name=@name";
+
+            string sql = "SELECT user_score FROM user_info WHERE user_nickname=@nickname";
             using (MySqlCommand cmd = new MySqlCommand(sql, _connection))
             {
-                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@nickname", nickname);
                 object result = cmd.ExecuteScalar();
-                if (result != null) { outscore = Convert.ToInt32(result); return true; }
+
+                if (result != null)
+                {
+                    outscore = Convert.ToInt32(result);
+                    return true;
+                }
             }
             return false;
         }
         catch (Exception e) { Debug.LogError($"GetScore Error: {e.Message}"); return false; }
     }
 
-    public bool SetScore(string name, int score)
+    public bool SetScore(string nickname, int score)
     {
         if (_is_it_Client)
         {
@@ -261,18 +267,25 @@ public class SQLManager : MonoBehaviour
         try
         {
             if (!ConnectionCheck(_connection)) return false;
-            string sql = "UPDATE user_info SET user_score=@score WHERE user_name=@name";
+
+            string sql = "UPDATE user_info SET user_score=@score WHERE user_nickname=@nickname";
             using (MySqlCommand cmd = new MySqlCommand(sql, _connection))
             {
                 cmd.Parameters.AddWithValue("@score", score);
-                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@nickname", nickname);
+
                 int rows = cmd.ExecuteNonQuery();
-                if (rows > 0 && user_info != null) user_info.user_score = score;
+
+                if (rows > 0 && user_info != null && user_info.user_nickname == nickname)
+                {
+                    user_info.user_score = score;
+                }
                 return rows > 0;
             }
         }
         catch (Exception e) { Debug.LogError($"SetScore Error: {e.Message}"); return false; }
     }
+
     public bool GetNickname(string name, out string outNickname)
     {
         outNickname = "";
@@ -295,6 +308,43 @@ public class SQLManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"[SQLManager] GetNickname Error: {e.Message}");
+            return false;
+        }
+    }
+
+    public bool AddScore(string nickname, int amount)
+    {
+        if (_is_it_Client)
+        {
+            Debug.LogWarning("[SQLManager] 클라이언트에서 AddScore 호출 차단");
+            return false;
+        }
+
+        try
+        {
+            if (!ConnectionCheck(_connection)) return false;
+
+            string sql = "UPDATE user_info SET user_score = user_score + @amount WHERE user_nickname = @nickname";
+
+            using (MySqlCommand cmd = new MySqlCommand(sql, _connection))
+            {
+                cmd.Parameters.AddWithValue("@amount", amount);
+                cmd.Parameters.AddWithValue("@nickname", nickname);
+
+                int rows = cmd.ExecuteNonQuery();
+
+                if (rows > 0 && user_info != null && user_info.user_nickname == nickname)
+                {
+                    user_info.user_score += amount;
+                    Debug.Log($"[SQLManager] DB 점수 가산 완료: {nickname} (+{amount}) -> 현재: {user_info.user_score}");
+                }
+
+                return rows > 0;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"AddScore Error: {e.Message}");
             return false;
         }
     }
