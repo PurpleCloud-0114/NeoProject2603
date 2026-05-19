@@ -78,7 +78,7 @@ MonoBehaviour:
   evaluationMethod: 0
   evaluationInterval: 3
   timeInterpolationGui: 0
-  showRoomGUI: 1
+  showRoomGUI: 0
   minPlayers: 2
   roomPlayerPrefab: {fileID: 3521452114632184150, guid: 436ff6d38b307bd4c97abe8a0868a21d, type: 3}
   RoomScene: Assets/1.Scene/Main/ClientLobby.unity
