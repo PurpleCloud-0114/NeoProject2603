@@ -49,17 +49,11 @@ public class LoginController : MonoBehaviour
 
         if (result == 0)
         {
-            // PlayerPrefs에 닉네임 저장 (TitleController 환영 메시지용)
             PlayerPrefs.SetString("PlayerNickname", nickname);
             PlayerPrefs.SetInt("PlayerScore", score);
             PlayerPrefs.Save();
 
-            /* 
-             * [수정 사항]
-             * Mirror의 StartClient()는 서버 연결과 동시에 Online Scene으로 자동 이동합니다.
-             * 단순히 다음 오프라인 씬으로 이동하고 싶다면 아래처럼 SceneManager를 사용합니다.
-             */
-            Debug.Log("로그인 성공 Sceneload!");
+            Debug.Log($"로그인 성공 '{_load_scene}' Sceneload!");
             SceneManager.LoadScene(_load_scene);
         }
         else

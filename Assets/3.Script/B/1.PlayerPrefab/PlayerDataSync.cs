@@ -9,22 +9,22 @@ public class PlayerDataSync : NetworkBehaviour
     [SyncVar]
     [SerializeField] private string _syncNickname;
     [SyncVar]
-    [SerializeField] private int _syncScore;
+    [SerializeField] private int _syncRoundScore;
 
     //이거 가져다 쓰면 됍니다.
     public string SyncNickname => _syncNickname;
-    public int SyncScore => _syncScore;
+    public int SyncRoundScore => _syncRoundScore;
 
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
 
         string myNickname = PlayerPrefs.GetString("PlayerNickname", "Unknown");
-        int myScore = PlayerPrefs.GetInt("PlayerScore", 0);
+        int myRoundScore = PlayerPrefs.GetInt("RoundScore",0);
 
-        Debug.Log($"[LocalPlayer] PlayerPrefs 로드 완료 - 이름: {myNickname}, 점수: {myScore} 를 서버로 전송합니다.");
+        Debug.Log($"[LocalPlayer] PlayerPrefs 로드 완료 - 이름: {myNickname}, 라운드 점수: {myRoundScore} 를 서버로 전송합니다.");
 
-        CmdSendPlayerDataToServer(myNickname, myScore);
+        CmdSendPlayerDataToServer(myNickname, myRoundScore);
     }
 
     [Command]
@@ -33,7 +33,7 @@ public class PlayerDataSync : NetworkBehaviour
 
         Debug.Log($"[Server] 클라이언트(NetId: {netId})로부터 데이터 수신 - 이름: {nickname}, 점수: {score}");
         _syncNickname = nickname;
-        _syncScore = score;
-        Debug.Log($"[Server] SyncVar 업데이트 완료 (NetId: {netId}) - _syncNickname: {_syncNickname}, _syncScore: {_syncScore}");
+        _syncRoundScore = score;
+        Debug.Log($"[Server] SyncVar 업데이트 완료 (NetId: {netId}) - _syncNickname: {_syncNickname}, _syncScore: {_syncRoundScore}");
     }
 }

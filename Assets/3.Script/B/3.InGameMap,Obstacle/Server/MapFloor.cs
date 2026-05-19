@@ -17,7 +17,7 @@ public class MapFloor : NetworkBehaviour
     [SyncVar(hook = nameof(OnMaskChanged))]
     private uint _activeMask = 0;
 
-    // ---------------- [추가됨] 런타임 인덱스 설정 ----------------
+    // ---------------- 런타임 인덱스 설정 ----------------
     [Server]
     public void SetupIndices()
     {

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Audio;
 using System.Collections.Generic;
-using Mirror; // NetworkServer 체크를 위해 추가
+using Mirror;
 
 [System.Serializable]
 public class Sound
@@ -44,12 +44,11 @@ public class AudioManager : MonoBehaviour
 
     private void Init()
     {
-        // 1. 서버 전용 빌드라면 딕셔너리 채우기만 하고 리소스 할당은 건너뜀
+        // 서버 전용 빌드라면 딕셔너리 채우기만 하고 리소스 할당은 건너뜀
         // (서버가 클립 이름은 알아야 RPC를 보낼 수 있음)
         foreach (var s in _bgm) _bgmDictionary[s.name] = s.clip;
         foreach (var s in _sfx) _sfxDictionary[s.name] = s.clip;
 
-        // 서버 전용 빌드(오디오 없음)인 경우 여기서 중단하여 NullReference 방지
         if (isServerOnly) return;
 
         if (_bgm_player == null && transform.childCount > 0)
@@ -60,14 +59,12 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        // 서버 전용 빌드라면 볼륨 설정을 하지 않음
         if (isServerOnly) return;
 
         SetVolume("BGM", PlayerPrefs.GetFloat("BGM", 0.6f));
         SetVolume("SFX", PlayerPrefs.GetFloat("SFX", 0.6f));
     }
 
-    // 서버인지 체크하는 프로퍼티 (Mirror가 없는 환경에서도 에러 안 나게 안전장치)
     private bool isServerOnly
     {
         get
@@ -82,7 +79,6 @@ public class AudioManager : MonoBehaviour
 
     public void SetVolume(string parameterName, float sliderValue)
     {
-        // 믹서가 없거나 서버라면 실행 안 함
         if (_audio_mixer == null || isServerOnly) return;
 
         float dB = Mathf.Log10(Mathf.Max(0.0001f, sliderValue)) * 20;
@@ -91,7 +87,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlayBGM(string name)
     {
-        if (isServerOnly) return; // 서버는 소리를 재생하지 않음
+        if (isServerOnly) return;
 
         if (_bgmDictionary.TryGetValue(name, out AudioClip clip))
         {
@@ -112,7 +108,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySFX(string name)
     {
-        if (isServerOnly) return; // 서버는 소리를 재생하지 않음
+        if (isServerOnly) return;
 
         if (_sfxDictionary.TryGetValue(name, out AudioClip clip))
         {
@@ -120,7 +116,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    // 서버가 클립을 찾을 때 사용 (에러 방지용)
     public AudioClip GetSFXClip(string name)
     {
         if (_sfxDictionary.TryGetValue(name, out AudioClip clip))
