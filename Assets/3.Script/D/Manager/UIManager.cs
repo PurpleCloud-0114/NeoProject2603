@@ -164,7 +164,7 @@ public class UIManager : MonoBehaviour {
 
 			// 3. 위치 배치 (위에서부터 150 간격으로 하단 배치)
 			// anchoredPosition의 Y값을 -150 * i 로 설정하여 아래로 나열
-			rect.anchoredPosition = new Vector2(0, -150 * i);
+			rect.anchoredPosition = new Vector2(0, -160 * i);
 
 			// 4. 텍스트 데이터 바인딩
 			var rankTexts = go.GetComponentsInChildren<TextMeshProUGUI>();
