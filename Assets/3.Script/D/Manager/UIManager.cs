@@ -181,7 +181,7 @@ public class UIManager : MonoBehaviour {
 					}
 				} else if (tmp.name == "Name") {
 					// NetworkIdentity를 통해 해당 오브젝트의 이름을 가져옴
-					tmp.text = "플레이어";
+					tmp.text = results[i].name;
 				} else if (tmp.name == "Time") {
 					// 사망자(Retire) 처리
 					if (results[i].isDead) {

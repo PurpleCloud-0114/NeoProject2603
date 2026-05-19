@@ -153,7 +153,10 @@ public class PlayerCore : NetworkBehaviour {
 	[Command]
 	//서버에게 보내는 Finish 신호. (도착 속도 / 시간,
 	public void SendArriveResult(float impactSpeed, double finishTime) {
-		RaceManager.Instance.GetArriveResult(connectionToClient, impactSpeed, finishTime);
+		if(TryGetComponent(out PlayerDataSync playerData)) {
+			string name = playerData.SyncNickname;
+			RaceManager.Instance.GetArriveResult(connectionToClient, name, impactSpeed, finishTime);
+		}
 	}
 
 	[Command]

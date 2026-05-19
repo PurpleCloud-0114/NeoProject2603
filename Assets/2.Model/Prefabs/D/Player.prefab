@@ -54671,6 +54671,7 @@ MonoBehaviour:
   syncInterval: 0
   animator: {fileID: 8558712499247452231}
   _portalPrefabs: {fileID: 1586826114847994, guid: 12712e9362a3c34428b2fba879e7808c, type: 3}
+  _parasuit: {fileID: 8486682212226977689}
   player_state: 0
   status_effect: 0
   player_number: 0
@@ -54928,6 +54929,8 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  _syncNickname: 
+  _syncScore: 0
 --- !u!1 &6524700338615600787
 GameObject:
   m_ObjectHideFlags: 0

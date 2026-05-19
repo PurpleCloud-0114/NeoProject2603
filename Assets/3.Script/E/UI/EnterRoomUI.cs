@@ -16,8 +16,8 @@ public class EnterRoomUI : MonoBehaviour
         //lan
         //networkManager.networkAddress = "192.168.45.197";
         //wifi
-        //networkManager.networkAddress = "192.168.45.95";
-        networkManager.networkAddress = "localhost";
+        networkManager.networkAddress = "192.168.45.40";
+        //networkManager.networkAddress = "localhost";
         _inputField.text = "Server Address: " + NetworkManager.singleton.networkAddress;
         networkManager.StartClient();
     }
