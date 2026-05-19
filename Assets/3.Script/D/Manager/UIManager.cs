@@ -16,9 +16,11 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private Button _itemButton;
 
 	[Header("Player Text Bind")]
-	[SerializeField] private TextMeshProUGUI _itemText;
 	[SerializeField] private TextMeshProUGUI _rankText;
 	//[SerializeField] private TextMeshProUGUI _ResultTextLog;
+
+	[Header("Player Image Bind")]
+	[SerializeField] private Image _itemImage;
 
 	[Header("대상 UI (배치 변경될 UI)")]
 	[SerializeField] private GameObject _touchzone;
@@ -162,7 +164,7 @@ public class UIManager : MonoBehaviour {
 
 			// 3. 위치 배치 (위에서부터 150 간격으로 하단 배치)
 			// anchoredPosition의 Y값을 -150 * i 로 설정하여 아래로 나열
-			rect.anchoredPosition = new Vector2(0, -150 * i);
+			rect.anchoredPosition = new Vector2(0, -160 * i);
 
 			// 4. 텍스트 데이터 바인딩
 			var rankTexts = go.GetComponentsInChildren<TextMeshProUGUI>();
@@ -173,13 +175,13 @@ public class UIManager : MonoBehaviour {
 				if (tmp.name == "Rank") {
 					if(results[i].isDead) {
 						tmp.color = Color.red;
-						tmp.text = "사망";
+						tmp.text = "DEAD";
 					} else {
 						tmp.text = (i + 1).ToString();
 					}
 				} else if (tmp.name == "Name") {
 					// NetworkIdentity를 통해 해당 오브젝트의 이름을 가져옴
-					tmp.text = "플레이어";
+					tmp.text = results[i].name;
 				} else if (tmp.name == "Time") {
 					// 사망자(Retire) 처리
 					if (results[i].isDead) {
@@ -248,5 +250,5 @@ public class UIManager : MonoBehaviour {
 	// ==========================================
 	[Client] public Button BindWingButton() => _wingButton;
 	[Client] public Button BindItemButton() => _itemButton;
-	[Client] public TextMeshProUGUI BindItemText() => _itemText;
+	[Client] public Image BindItemImage() => _itemImage;
 }

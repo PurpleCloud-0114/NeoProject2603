@@ -22,6 +22,7 @@ public class PlayerCore : NetworkBehaviour {
 	private GameObject _mainCamera;
 	public Animator animator;
 	[SerializeField] private GameObject _portalPrefabs;
+	[SerializeField] private GameObject _parasuit;
 
 	public PlayerState player_state = PlayerState.Wait;
 	public StatusEffect status_effect = StatusEffect.None;
@@ -58,10 +59,12 @@ public class PlayerCore : NetworkBehaviour {
 	private void OnEnable() { 
 		on_player_state_change_requested += ChangePlayerState;
 		on_state_effect_change_requested += ChangeStatusEffect;
+		on_wing_button_clicked += CmdShowParasuit;
 	}
 	private void OnDisable() { 
 		on_player_state_change_requested -= ChangePlayerState;
 		on_state_effect_change_requested -= ChangeStatusEffect;
+		on_wing_button_clicked += CmdShowParasuit;
 	}
 
 	private void ChangePlayerState(PlayerState newState) { 
@@ -150,7 +153,10 @@ public class PlayerCore : NetworkBehaviour {
 	[Command]
 	//서버에게 보내는 Finish 신호. (도착 속도 / 시간,
 	public void SendArriveResult(float impactSpeed, double finishTime) {
-		RaceManager.Instance.GetArriveResult(connectionToClient, impactSpeed, finishTime);
+		if(TryGetComponent(out PlayerDataSync playerData)) {
+			string name = playerData.SyncNickname;
+			RaceManager.Instance.GetArriveResult(connectionToClient, name, impactSpeed, finishTime);
+		}
 	}
 
 	[Command]
@@ -163,5 +169,15 @@ public class PlayerCore : NetworkBehaviour {
 		Vector3 spawnPos = new Vector3(transform.position.x, -37f, transform.position.z);
 		Quaternion rotation = Quaternion.Euler(-90, 0, 0);
 		Instantiate(_portalPrefabs, spawnPos, rotation);
+	}
+
+	[Command]
+	public void CmdShowParasuit() {
+		ShowParasuit();
+	}
+
+	[ClientRpc]
+	public void ShowParasuit() {
+		_parasuit.SetActive(true);
 	}
 }

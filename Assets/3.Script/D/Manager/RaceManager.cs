@@ -13,6 +13,7 @@ public enum RaceState {
 
 public struct PlayerResult {
 	public NetworkIdentity player;
+	public string name;
 	public double finishTime;
 	public bool isDead;
 }
@@ -94,7 +95,7 @@ public class RaceManager : NetworkBehaviour {
 
 	[Server]
 	//서버 수신 - 클라이언트 통과 정보 받기
-	public void GetArriveResult(NetworkConnectionToClient sender, float impactSpeed, double finishTime) {
+	public void GetArriveResult(NetworkConnectionToClient sender, string name, float impactSpeed, double finishTime) {
 		//TODO - 순위 리스트 업데이트 및 결과 RPC 전송
 		if (current_state_sync != RaceState.Racing) return;
 		bool isDead = impactSpeed > _deathOverSpeedSync;
@@ -103,6 +104,7 @@ public class RaceManager : NetworkBehaviour {
 			_roundResults.Add(sender.identity,
 				new PlayerResult {
 					player = sender.identity,
+					name = name,
 					finishTime = finishTime,
 					isDead = isDead
 				}
@@ -245,13 +247,11 @@ public class RaceManager : NetworkBehaviour {
 
 	//플레이어 생성시, PlayerCore에서 호출됨.
 	public void RegisterPlayer(Transform player) {
-		if (!isServer) return;
 		if (!active_players.Contains(player)) {
 			active_players.Add(player);
 		}
 	}
 	public void UnregisterPlayer(Transform player) {
-		if (!isServer) return;
 		if (active_players.Contains(player)) {
 			active_players.Remove(player);
 			_previousRanks.Remove(player);

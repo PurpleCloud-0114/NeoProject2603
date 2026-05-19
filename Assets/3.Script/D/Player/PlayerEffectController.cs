@@ -77,6 +77,26 @@ public class PlayerEffectController : NetworkBehaviour {
 	// =========================
 	// [ 충격파 마법 ] - 피격시.
 	// =========================
+	public void UseShockwaveItem(float range, float pushForce, float stunDuration, float chargeDuration) {
+		if (isServer) {
+			// 서버에서 차지 코루틴 시작
+			StartCoroutine(Co_ShockwaveChargeAndCast(range, pushForce, stunDuration, chargeDuration));
+		}
+	}
+
+	private IEnumerator Co_ShockwaveChargeAndCast(float range, float pushForce, float stunDuration, float chargeDuration) {
+		yield return new WaitForSeconds(chargeDuration);
+
+		Collider[] hits = Physics.OverlapSphere(transform.position, range);
+		foreach(Collider hit in hits) {
+			if (hit.gameObject == gameObject) continue;
+
+			if(hit.TryGetComponent(out PlayerEffectController targetEffectController)) {
+				Vector3 normal = (hit.transform.position - transform.position).normalized;
+				targetEffectController.HitShockwave(normal * pushForce, stunDuration);
+			}
+		}
+	}
 	public void HitShockwave(Vector3 force, float stunDuration) {
 		// 이 함수는 서버에서 OverlapSphere로 찾아낸 '맞은 플레이어'의 컨트롤러에서 실행됨
 		if (isServer) {
