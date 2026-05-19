@@ -44,7 +44,6 @@ public class SignupController : MonoBehaviour
             LogTextViewing("Password 는 4자 이상이어야 합니다"); return;
         }
 
-        // SQLManager 직접 호출 (오프라인씬)
         int result = SQLManager.Instance.Signup(
             _name_input.text, _pw_input.text, _nickname_input.text);
 

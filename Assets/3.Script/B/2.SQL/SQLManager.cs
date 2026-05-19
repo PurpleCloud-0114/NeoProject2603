@@ -102,7 +102,6 @@ public class SQLManager : MonoBehaviour
 
         try
         {
-            // JSON 데이터를 기반으로 연결 문자열 생성
             return $"Server={itemData[0]["ip_json"]};" +
                    $"Database={itemData[0]["tablename_json"]};" +
                    $"Uid={itemData[0]["id_json"]};" +
@@ -307,9 +306,9 @@ public class SQLManager : MonoBehaviour
             if (_connection != null && _connection.State == System.Data.ConnectionState.Open)
             {
                 _connection.Close();
-                _connection.Dispose(); // 메모리 해제 추가
+                _connection.Dispose();
             }
         }
-        catch { /* 종료 시 에러 무시 */ }
+        catch { }
     }
 }

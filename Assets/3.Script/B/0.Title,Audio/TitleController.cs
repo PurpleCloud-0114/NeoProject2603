@@ -22,7 +22,6 @@ public class TitleController : MonoBehaviour
 
     private void Start()
     {
-        _start_button.onClick.AddListener(StartGameEvent);
         _option_button.onClick.AddListener(OpenOptionPage);
         _logout_button.onClick.AddListener(LogoutEvent);
     }
@@ -34,12 +33,6 @@ public class TitleController : MonoBehaviour
             string playerName = PlayerPrefs.GetString("PlayerNickname");
             _welcome_text.text = $"{playerName} 님\n환영합니다!";
         }
-    }
-
-    public void StartGameEvent()
-    {
-        Debug.Log("스타트 게임 추후 작업예정");
-        //룸변경
     }
 
     public void OpenOptionPage()
