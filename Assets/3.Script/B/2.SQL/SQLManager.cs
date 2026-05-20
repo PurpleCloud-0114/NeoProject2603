@@ -349,6 +349,45 @@ public class SQLManager : MonoBehaviour
         }
     }
 
+    // ── 라운드 점수 관리 (서버 전용) ──
+
+    public bool AddRoundScore(string nickname, int amount)
+    {
+        if (_is_it_Client)
+        {
+            Debug.LogWarning("[SQLManager] 클라이언트에서 AddRoundScore 호출 차단");
+            return false;
+        }
+
+        if (user_info != null && user_info.user_nickname == nickname)
+        {
+            user_info.round_total_score += amount;
+            Debug.Log($"[SQLManager] 메모리 라운드 점수 가산: {nickname} (+{amount}) -> 현재 라운드 점수: {user_info.round_total_score}");
+            return true;
+        }
+
+        Debug.LogWarning($"[SQLManager] AddRoundScore 실패: {nickname} 유저가 현재 세션에 로드되어 있지 않습니다.");
+        return false;
+    }
+
+    public bool ResetRoundScore(string nickname)
+    {
+        if (_is_it_Client)
+        {
+            Debug.LogWarning("[SQLManager] 클라이언트에서 ResetRoundScore 호출 차단");
+            return false;
+        }
+
+        if (user_info != null && user_info.user_nickname == nickname)
+        {
+            user_info.round_total_score = 0;
+            Debug.Log($"[SQLManager] {nickname}의 라운드 점수가 리셋되었습니다. (0점)");
+            return true;
+        }
+
+        return false;
+    }
+
     private void OnApplicationQuit()
     {
         try
