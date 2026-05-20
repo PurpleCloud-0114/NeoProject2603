@@ -4300,7 +4300,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1399867536
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6235,12 +6235,7 @@ Animator:
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
-    are already bound by a Humanoid avatar. These transforms can only be changed
-    by Humanoid clips.\n\tTransform 'lowerarm.r'\n\tTransform 'upperarm.l'\n\tTransform
-    'chest'\n\tTransform 'hand.r'\n\tTransform 'lowerarm.l'\n\tTransform 'lowerleg.r'\n\tTransform
-    'lowerleg.l'\n\tTransform 'upperleg.l'\n\tTransform 'toes.r'\n\tTransform 'head'\n\tand
-    more ..."
+  m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
