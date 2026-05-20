@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LitJson;
 using MySql.Data.MySqlClient;
+using Mirror;
 
 public class ServerJsonItem
 {
@@ -37,6 +38,45 @@ public class UserInfo
         user_score = score;
     }
 }
+public class PlayerScore
+{
+    public Dictionary<NetworkIdentity, int> player_score_management = new Dictionary<NetworkIdentity, int>();
+    public Dictionary<NetworkIdentity, int> GetPlayerScoreList()
+    {
+        return player_score_management;
+    }
+    public int GetPlayerScore(NetworkIdentity player)
+    {
+        if (!player_score_management.ContainsKey(player))
+        {
+            Debug.LogWarning($"[PlayerScore] 미등록 플레이어 조회: {player.name}");
+            return 0;
+        }
+        return player_score_management[player];
+    }
+    public void SetPlayerScoreList(Dictionary<NetworkIdentity, int> inputList)
+    {
+        player_score_management = inputList;
+    }
+    public void SetPlayerScore(NetworkIdentity player, int score)
+    {
+        player_score_management[player] = score;
+    }
+    public void AddPlayerScore(NetworkIdentity player, int amount)
+    {
+        if (!player_score_management.ContainsKey(player))
+        {
+            Debug.LogWarning($"[PlayerScore] AddScore - 미등록 플레이어: {player.name}");
+            player_score_management[player] = 0;
+        }
+        player_score_management[player] += amount;
+    }
+    public void InitPlayerScore(NetworkIdentity player)
+    {
+        if (!player_score_management.ContainsKey(player))
+            player_score_management.Add(player, 0);
+    }
+}
 
 public class SQLManager : MonoBehaviour
 {
@@ -45,7 +85,7 @@ public class SQLManager : MonoBehaviour
 
     public UserInfo user_info { get; private set; }
     public static SQLManager Instance = null;
-
+    public PlayerScore player_score = new PlayerScore();
     [Header("Network Settings")]
     [SerializeField] private bool _is_it_Client = false;
     [Tooltip("와이파이 연결후 ipconfig, 해당 IPv4 주소 입력")]
