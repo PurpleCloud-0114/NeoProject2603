@@ -83,6 +83,8 @@ public class RaceManager : NetworkBehaviour {
 		race_start_time_sync = NetworkTime.time + 0.1f;
 
 		//TODO - ClientRPC로 카운트다운 UI 넣을건가?
+
+		InitAllPlayerScores();//모든 플레이어 Dictionary에 등록
 	}
 
 	[ServerCallback]
@@ -357,5 +359,30 @@ public class RaceManager : NetworkBehaviour {
 				pc.TargetUpdateRank(pc.connectionToClient, rank);
 			}
 		}
+	}
+	[Server]
+	private void InitAllPlayerScores()
+	{
+		if (SQLManager.Instance == null)
+		{
+			Debug.LogError("[RaceManager] SQLManager.Instance가 null → 점수 초기화 실패");
+			return;
+		}
+
+		SQLManager.Instance.player_score.player_score_management.Clear();
+
+		foreach (var conn in NetworkServer.connections.Values)
+		{
+			if (conn == null || conn.identity == null) continue;
+
+			NetworkIdentity player = conn.identity;
+
+			SQLManager.Instance.player_score.InitPlayerScore(player);
+
+			Debug.Log($"[RaceManager] 점수 초기화 등록: {player.name} | 초기값: 0");
+		}
+
+		Debug.Log($"[RaceManager] 전체 플레이어 점수 초기화 완료 | 등록 수: " +
+				  $"{SQLManager.Instance.player_score.player_score_management.Count}");
 	}
 }
