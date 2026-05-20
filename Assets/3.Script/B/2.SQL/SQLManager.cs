@@ -359,15 +359,31 @@ public class SQLManager : MonoBehaviour
             return false;
         }
 
-        if (user_info != null && user_info.user_nickname == nickname)
+        try
         {
-            user_info.round_total_score += amount;
-            Debug.Log($"[SQLManager] 메모리 라운드 점수 가산: {nickname} (+{amount}) -> 현재 라운드 점수: {user_info.round_total_score}");
-            return true;
-        }
+            if (!ConnectionCheck(_connection)) return false;
 
-        Debug.LogWarning($"[SQLManager] AddRoundScore 실패: {nickname} 유저가 현재 세션에 로드되어 있지 않습니다.");
-        return false;
+            string sql = "UPDATE user_info SET user_round_score = user_round_score + @amount WHERE user_nickname = @nickname";
+            using (MySqlCommand cmd = new MySqlCommand(sql, _connection))
+            {
+                cmd.Parameters.AddWithValue("@amount", amount);
+                cmd.Parameters.AddWithValue("@nickname", nickname);
+
+                int rows = cmd.ExecuteNonQuery();
+
+                if (rows > 0 && user_info != null && user_info.user_nickname == nickname)
+                {
+                    user_info.round_total_score += amount;
+                    Debug.Log($"[SQLManager] DB/메모리 라운드 점수 가산 완료: {nickname} (+{amount}) -> 현재: {user_info.round_total_score}");
+                }
+                return rows > 0;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"AddRoundScore Error: {e.Message}");
+            return false;
+        }
     }
 
     public bool ResetRoundScore(string nickname)
@@ -378,14 +394,30 @@ public class SQLManager : MonoBehaviour
             return false;
         }
 
-        if (user_info != null && user_info.user_nickname == nickname)
+        try
         {
-            user_info.round_total_score = 0;
-            Debug.Log($"[SQLManager] {nickname}의 라운드 점수가 리셋되었습니다. (0점)");
-            return true;
-        }
+            if (!ConnectionCheck(_connection)) return false;
 
-        return false;
+            string sql = "UPDATE user_info SET user_round_score = 0 WHERE user_nickname = @nickname";
+            using (MySqlCommand cmd = new MySqlCommand(sql, _connection))
+            {
+                cmd.Parameters.AddWithValue("@nickname", nickname);
+
+                int rows = cmd.ExecuteNonQuery();
+
+                if (rows > 0 && user_info != null && user_info.user_nickname == nickname)
+                {
+                    user_info.round_total_score = 0;
+                    Debug.Log($"[SQLManager] DB/메모리 {nickname}의 라운드 점수가 리셋되었습니다. (0점)");
+                }
+                return rows > 0;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"ResetRoundScore Error: {e.Message}");
+            return false;
+        }
     }
 
     private void OnApplicationQuit()
