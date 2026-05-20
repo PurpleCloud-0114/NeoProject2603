@@ -148,7 +148,7 @@ public class UIManager : MonoBehaviour {
 		TimeSpan time = TimeSpan.FromSeconds(SetResultTime);
 		_personalRecordText.text = string.Format($"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds / 10:00}");   
 	}
-	public void ShowFinalResult(PlayerResult[] results) {
+	public void ShowRoundResult(PlayerResult[] results, int[] previousScores, int[] roundScores) {
 		HideUIforEndRace();
 		// 1. 기존에 생성된 리스트가 있다면 제거 (초기화)
 		foreach (Transform child in _finalResultContainer) {
@@ -191,9 +191,21 @@ public class UIManager : MonoBehaviour {
 						TimeSpan time = TimeSpan.FromSeconds(results[i].finishTime);
 						tmp.text = string.Format($"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds / 10:00}");
 					}
+				} else if (tmp.name == "Score") {
+					//playerScores.TryGetValue(results[i].player, out int score);
+					//if (score > 0) {
+					//	tmp.text = $"{score} <color=green>+ {scores[i]}</color>";
+					//} else if (score <0) {
+					//	tmp.text = $"{score} <color=red>- {scores[i]}</color>";
+					//} else {
+					//	tmp.text = $"{score} + {scores[i]}";
+					//}
 				}
 			}
 		}
+	}
+	public void ShowScoreResult(TotalScoreResult[] totalResults) {
+
 	}
 
 	// ==========================================
