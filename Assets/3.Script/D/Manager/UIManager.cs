@@ -59,7 +59,9 @@ public class UIManager : MonoBehaviour {
 	[Header("최종 결과 UI")]
 	[SerializeField] private GameObject _finalResultWindow;    // 결과창 부모 오브젝트
 	[SerializeField] private RectTransform _finalResultContainer; // RankPrefab이 생성될 부모 (Content)
-	[SerializeField] private GameObject _finalRankPrefab;
+	
+	[SerializeField] private GameObject _rountRankPrefab;
+	[SerializeField] private GameObject _totalRankPrefab;
 
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -159,7 +161,7 @@ public class UIManager : MonoBehaviour {
 
 		for (int i = 0; i < results.Length; i++) {
 			// 2. 프리팹 생성 및 부모 설정
-			GameObject go = Instantiate(_finalRankPrefab, _finalResultContainer);
+			GameObject go = Instantiate(_rountRankPrefab, _finalResultContainer);
 			RectTransform rect = go.GetComponent<RectTransform>();
 
 			// 3. 위치 배치 (위에서부터 150 간격으로 하단 배치)
@@ -192,20 +194,53 @@ public class UIManager : MonoBehaviour {
 						tmp.text = string.Format($"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds / 10:00}");
 					}
 				} else if (tmp.name == "Score") {
-					//playerScores.TryGetValue(results[i].player, out int score);
-					//if (score > 0) {
-					//	tmp.text = $"{score} <color=green>+ {scores[i]}</color>";
-					//} else if (score <0) {
-					//	tmp.text = $"{score} <color=red>- {scores[i]}</color>";
-					//} else {
-					//	tmp.text = $"{score} + {scores[i]}";
-					//}
+					int previousScore = previousScores[i];
+					int roundScore = roundScores[i];
+					if (roundScore > 0) {
+						tmp.text = $"{previousScore} <color=green>+ {roundScore}</color>";
+					} else if (roundScore < 0) {
+						tmp.text = $"{previousScore} <color=red>- {roundScore}</color>";
+					} else {
+						tmp.text = $"{previousScore} + {roundScore}";
+					}
 				}
 			}
 		}
 	}
 	public void ShowScoreResult(TotalScoreResult[] totalResults) {
+		// 1. 기존에 생성된 리스트가 있다면 제거 (초기화)
+		foreach (Transform child in _finalResultContainer) {
+			Destroy(child.gameObject);
+		}
 
+		_finalResultWindow.SetActive(true);
+
+		for (int i = 0; i < totalResults.Length; i++) {
+			// 2. 프리팹 생성 및 부모 설정
+			GameObject go = Instantiate(_totalRankPrefab, _finalResultContainer);
+			RectTransform rect = go.GetComponent<RectTransform>();
+
+			// 3. 위치 배치 (위에서부터 150 간격으로 하단 배치)
+			// anchoredPosition의 Y값을 -150 * i 로 설정하여 아래로 나열
+			rect.anchoredPosition = new Vector2(0, -160 * i);
+
+			// 4. 텍스트 데이터 바인딩
+			var rankTexts = go.GetComponentsInChildren<TextMeshProUGUI>();
+
+			// 프리팹 구조에 따른 순서 (Rank, Name, Time)
+			// 인덱스는 하이어라키 순서에 따라 다를 수 있으니 확인 필요
+			int index = 0;
+			foreach (var tmp in rankTexts) {
+				index++;
+				if (tmp.name == "Rank") {
+					tmp.text = index.ToString();
+				} else if (tmp.name == "Name") {
+					tmp.text = totalResults[i].name;
+				} else if (tmp.name == "Score") {
+					tmp.text = totalResults[i].totalScore.ToString();
+				}
+			}
+		}
 	}
 
 	// ==========================================

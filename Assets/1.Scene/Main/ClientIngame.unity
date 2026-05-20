@@ -371,6 +371,7 @@ MonoBehaviour:
   active_players: []
   returnDelay: 7.5
   current_round_sync: 0
+  MAX_ROUND: 3
 --- !u!114 &145343252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5737,7 +5738,8 @@ MonoBehaviour:
   _personalRecordText: {fileID: 411239589}
   _finalResultWindow: {fileID: 1399867535}
   _finalResultContainer: {fileID: 1420783096}
-  _finalRankPrefab: {fileID: 4023746934586291815, guid: 66fc766bae1303745ba43ab0e77bd020, type: 3}
+  _rountRankPrefab: {fileID: 4023746934586291815, guid: 66fc766bae1303745ba43ab0e77bd020, type: 3}
+  _totalRankPrefab: {fileID: 4023746934586291815, guid: 83873d46a1899444ea3f6190b47d1b99, type: 3}
 --- !u!1 &1625796551
 GameObject:
   m_ObjectHideFlags: 0

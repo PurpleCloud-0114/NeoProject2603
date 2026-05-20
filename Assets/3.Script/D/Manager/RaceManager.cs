@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Mirror;
 
@@ -57,7 +58,7 @@ public class RaceManager : NetworkBehaviour {
 
 	[Header("라운드 관리")]
 	[SyncVar] public int current_round_sync = 0;
-	public const int MAX_ROUND = 10;
+	public int MAX_ROUND = 10;
 
 	//----- 메서드
 	private void Awake() {
@@ -84,7 +85,9 @@ public class RaceManager : NetworkBehaviour {
 
 		//TODO - ClientRPC로 카운트다운 UI 넣을건가?
 
-		InitAllPlayerScores();//모든 플레이어 Dictionary에 등록
+		if(current_round_sync == 0) {
+			InitAllPlayerScores();//모든 플레이어 Dictionary에 등록
+		}
 	}
 
 	[ServerCallback]
@@ -164,11 +167,13 @@ public class RaceManager : NetworkBehaviour {
 
 		//컴파일 에러 방지용 임시.
 		Dictionary<NetworkIdentity, int> externalTotalScores = new Dictionary<NetworkIdentity, int>();
+
+
 		int[] previousScores = new int[sortedResults.Count];
 		for (int i = 0; i < sortedResults.Count; i++) {
 			NetworkIdentity p = sortedResults[i].player;
 			// 이번 라운드 점수가 더해지기 전의 기존 점수를 저장
-			previousScores[i] = externalTotalScores.ContainsKey(p) ? externalTotalScores[p] : 0;
+			previousScores[i] = SQLManager.Instance.player_score.GetPlayerScore(p);
 		}
 
 		//플레이어 UI 점수 전송.
@@ -177,13 +182,13 @@ public class RaceManager : NetworkBehaviour {
 		//스코어 업데이트 메서드 (점수 추가)
 		//일단 이것도 외부에 추후 추가할거니까 임시로 생략.
 		for (int i = 0; i < sortedResults.Count; i++) {
-			//UpdateExternalScore(sortedResults[i].player, roundScores[i]);
+			SQLManager.Instance.player_score.AddPlayerScore(sortedResults[i].player, roundScores[i]);
 		}
 
 		//현재 토탈 스코어 랭크 정렬
 		List<TotalScoreResult> totalList = new List<TotalScoreResult>();
 		foreach (var res in sortedResults) {
-			int total = externalTotalScores.ContainsKey(res.player) ? externalTotalScores[res.player] : 0;
+			int total = SQLManager.Instance.player_score.GetPlayerScore(res.player);
 			totalList.Add(new TotalScoreResult {
 				name = res.name,
 				totalScore = total
@@ -191,9 +196,14 @@ public class RaceManager : NetworkBehaviour {
 		}
 
 		totalList.Sort((a, b) => b.totalScore.CompareTo(a.totalScore));
-		RpcShowScoreResult(totalList.ToArray());
+		StartCoroutine(Co_RpcShowScoreResult(totalList.ToArray()));
 
 		StartReturnToLobby();
+	}
+
+	private IEnumerator Co_RpcShowScoreResult(TotalScoreResult[] totalResults) {
+		yield return new WaitForSeconds(4f);
+		RpcShowScoreResult(totalResults);
 	}
 
 	//각자 유저들에게 결과창 보여주기.
@@ -229,18 +239,21 @@ public class RaceManager : NetworkBehaviour {
 		var roomManager = NetworkManager.singleton as NetworkRoomManager;
 		if (roomManager == null)
 		{
-			Debug.LogError("[RaceManager] RoomManager를 찾을 수 없습니다.");
+			//Debug.LogError("[RaceManager] RoomManager를 찾을 수 없습니다.");
 			yield break;
 		}
 
 		if (current_round_sync < MAX_ROUND)  // <<--- 10라운드 미만 -> 게임 씬 재시작
 		{
-			Debug.Log($"[RaceManager] 라운드 {current_round_sync} / {MAX_ROUND} → 게임 씬 재시작");
+			//Debug.Log($"[RaceManager] 라운드 {current_round_sync} / {MAX_ROUND} → 게임 씬 재시작");
 			ResetRoundState();                                              // <<--- 상태 초기화
 			roomManager.ServerChangeScene(roomManager.GameplayScene);      // <<--- 게임 씬 재시작
 		}
 		else                                 // <<--- 10라운드 완료 -> 로비 복귀
 		{
+			//여기서 이제 점수 업데이트
+			UpdateRatingScore();
+
 			Debug.Log($"[RaceManager] {MAX_ROUND}라운드 완료 → 로비 복귀");
 			current_round_sync = 0;                                        // <<--- 라운드 초기화
 			roomManager.ServerChangeScene(roomManager.RoomScene);          // <<--- 로비 복귀
@@ -252,7 +265,7 @@ public class RaceManager : NetworkBehaviour {
 		_roundResults.Clear();          // 도착 결과 초기화
 		_playersReadyCount = 0;         // 준비 카운트 초기화
 		current_state_sync = RaceState.Waiting;  // 레이스 상태 초기화
-		Debug.Log("[RaceManager] 라운드 상태 초기화 완료");
+		//Debug.Log("[RaceManager] 라운드 상태 초기화 완료");
 	}
 
 
@@ -278,7 +291,28 @@ public class RaceManager : NetworkBehaviour {
 	}
 
 	//토탈 랭크 업데이트
+	private void UpdateRatingScore() {
+		List<NetworkIdentity> sortedPlayers = 
+			SQLManager.Instance.player_score.player_score_management.OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
 
+		List<NetworkIdentity> netIDkeys = new List<NetworkIdentity>();
+		foreach(NetworkIdentity key in SQLManager.Instance.player_score.player_score_management.Keys) {
+			netIDkeys.Add(key);
+		}
+		Dictionary<NetworkIdentity, string> player_names = new Dictionary<NetworkIdentity, string>();
+		foreach (NetworkIdentity key in SQLManager.Instance.player_score.player_score_management.Keys) {
+			if (_roundResults.TryGetValue(key, out var value)) {
+				player_names.Add(key, value.name);
+			}
+		}
+
+		int[] RatingScroes = { 50, 40, 35, 30, 25, 20, 15, 10, 5, 0 };
+		for(int i = 0; i < sortedPlayers.Count; i++) {
+			if(player_names.TryGetValue(sortedPlayers[i], out string nickname)) {
+				SQLManager.Instance.AddScore(nickname, RatingScroes[i]);
+			}
+		}
+	}
 
 
 
