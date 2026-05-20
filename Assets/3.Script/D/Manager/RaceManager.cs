@@ -18,6 +18,11 @@ public struct PlayerResult {
 	public bool isDead;
 }
 
+public struct TotalScoreResult {
+	public string name;
+	public int totalScore;
+}
+
 public class RaceManager : NetworkBehaviour {
 	public static RaceManager Instance = null;
 
@@ -141,7 +146,9 @@ public class RaceManager : NetworkBehaviour {
 	[Server]
 	private void EndRace() {
 		current_state_sync = RaceState.Finished;
+
 		List<PlayerResult> sortedResults = new List<PlayerResult>(_roundResults.Values);
+
 		sortedResults.Sort((a, b) => {
 			// 생존자(false)는 0, 사망자(true)는 1로 취급됨
 			int deadCompare = a.isDead.CompareTo(b.isDead);
@@ -151,16 +158,54 @@ public class RaceManager : NetworkBehaviour {
 			return a.finishTime.CompareTo(b.finishTime);
 		});
 
-		RpcShowFinalResult(sortedResults.ToArray());
+		List<int> roundScores = ScoreCalculate(sortedResults);
+
+		//컴파일 에러 방지용 임시.
+		Dictionary<NetworkIdentity, int> externalTotalScores = new Dictionary<NetworkIdentity, int>();
+		int[] previousScores = new int[sortedResults.Count];
+		for (int i = 0; i < sortedResults.Count; i++) {
+			NetworkIdentity p = sortedResults[i].player;
+			// 이번 라운드 점수가 더해지기 전의 기존 점수를 저장
+			previousScores[i] = externalTotalScores.ContainsKey(p) ? externalTotalScores[p] : 0;
+		}
+
+		//플레이어 UI 점수 전송.
+		RpcShowRoundResult(sortedResults.ToArray(), previousScores, roundScores.ToArray());
+
+		//스코어 업데이트 메서드 (점수 추가)
+		//일단 이것도 외부에 추후 추가할거니까 임시로 생략.
+		for (int i = 0; i < sortedResults.Count; i++) {
+			//UpdateExternalScore(sortedResults[i].player, roundScores[i]);
+		}
+
+		//현재 토탈 스코어 랭크 정렬
+		List<TotalScoreResult> totalList = new List<TotalScoreResult>();
+		foreach (var res in sortedResults) {
+			int total = externalTotalScores.ContainsKey(res.player) ? externalTotalScores[res.player] : 0;
+			totalList.Add(new TotalScoreResult {
+				name = res.name,
+				totalScore = total
+			});
+		}
+
+		totalList.Sort((a, b) => b.totalScore.CompareTo(a.totalScore));
+		RpcShowScoreResult(totalList.ToArray());
 
 		StartReturnToLobby();
 	}
 
 	//각자 유저들에게 결과창 보여주기.
 	[ClientRpc]
-	private void RpcShowFinalResult(PlayerResult[] results) {
-		UIManager.Instance.ShowFinalResult(results);
+	private void RpcShowRoundResult(PlayerResult[] results, int[] previousScores, int[] roundScores) {
+		// UI에서 results[i]의 점수는 roundScores[i]로 매칭하여 출력
+		UIManager.Instance.ShowRoundResult(results, previousScores, roundScores);
 		UIManager.Instance.HideUIforFinish();
+	}
+
+	[ClientRpc]
+	private void RpcShowScoreResult(TotalScoreResult[] totalResults) {
+		// 높은 점수 순으로 정렬된 토탈 순위 배열 전달
+		UIManager.Instance.ShowScoreResult(totalResults);
 	}
 
 	[Server]
@@ -207,6 +252,32 @@ public class RaceManager : NetworkBehaviour {
 		current_state_sync = RaceState.Waiting;  // 레이스 상태 초기화
 		Debug.Log("[RaceManager] 라운드 상태 초기화 완료");
 	}
+
+
+	// ==========================================
+	// [ 점수 처리 ]
+	// ==========================================
+	//1위 50 / 2위 35 / 3위 25 / 4위 15 / 5위 5
+	//6위 0 / 7위 -5 / 8위 -10 / 9위 -20 / 10위 -35
+	private List<int> ScoreCalculate(List<PlayerResult> sortedResult) {
+		int[] scores_value = { 50, 35, 25, 15, 5, 0, -5, -10, -20, -35 };
+		List<int> scores = new List<int>();
+
+		for (int i = 0; i < sortedResult.Count; i++) {
+			if (sortedResult[i].isDead) {
+				scores.Add(scores_value[9]); // 사망자 점수 (-35)
+			} else {
+				// 인원수가 많아 인덱스를 초과하는 경우 방어 코드 (마지막 등수 점수로 고정)
+				int scoreIndex = Mathf.Min(i, 8);
+				scores.Add(scores_value[scoreIndex]);
+			}
+		}
+		return scores;
+	}
+
+	//토탈 랭크 업데이트
+
+
 
 
 

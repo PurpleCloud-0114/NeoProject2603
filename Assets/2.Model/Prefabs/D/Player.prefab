@@ -5253,7 +5253,7 @@ ParticleSystem:
   startDelay:
     serializedVersion: 2
     minMaxState: 0
-    scalar: 2.5
+    scalar: 1.3
     minScalar: 0
     maxCurve:
       serializedVersion: 2
@@ -10147,7 +10147,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1388748385654575510}
   serializedVersion: 8
-  lengthInSec: 1.2
+  lengthInSec: 2
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 3
@@ -10162,7 +10162,7 @@ ParticleSystem:
   startDelay:
     serializedVersion: 2
     minMaxState: 0
-    scalar: 2.5
+    scalar: 1.2
     minScalar: 0
     maxCurve:
       serializedVersion: 2
@@ -29914,7 +29914,7 @@ ParticleSystem:
   startDelay:
     serializedVersion: 2
     minMaxState: 0
-    scalar: 2.5
+    scalar: 1.7
     minScalar: 0
     maxCurve:
       serializedVersion: 2
@@ -39533,7 +39533,7 @@ ParticleSystem:
   startDelay:
     serializedVersion: 2
     minMaxState: 0
-    scalar: 2.5
+    scalar: 1.55
     minScalar: 0
     maxCurve:
       serializedVersion: 2
@@ -59452,7 +59452,7 @@ ParticleSystem:
   startDelay:
     serializedVersion: 2
     minMaxState: 0
-    scalar: 2.5
+    scalar: 1.55
     minScalar: 0
     maxCurve:
       serializedVersion: 2
@@ -69413,6 +69413,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  _velocityTracker: {x: 0, y: 0, z: 0}
   _moveSpeed: 45
   drop_max_speed: 100
   base_drop_max_speed: 0
@@ -69652,7 +69653,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _syncNickname: 
-  _syncScore: 0
+  _syncRoundScore: 0
 --- !u!1 &6524700338615600787
 GameObject:
   m_ObjectHideFlags: 0
@@ -74749,7 +74750,7 @@ ParticleSystem:
   startDelay:
     serializedVersion: 2
     minMaxState: 0
-    scalar: 2.5
+    scalar: 1.3
     minScalar: 0
     maxCurve:
       serializedVersion: 2
