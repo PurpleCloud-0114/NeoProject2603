@@ -69413,6 +69413,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  _velocityTracker: {x: 0, y: 0, z: 0}
   _moveSpeed: 45
   drop_max_speed: 100
   base_drop_max_speed: 0
@@ -69652,7 +69653,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _syncNickname: 
-  _syncScore: 0
+  _syncRoundScore: 0
 --- !u!1 &6524700338615600787
 GameObject:
   m_ObjectHideFlags: 0
