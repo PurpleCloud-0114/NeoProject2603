@@ -58,7 +58,7 @@ public class RaceManager : NetworkBehaviour {
 
 	[Header("라운드 관리")]
 	[SyncVar] public int current_round_sync = 0;
-	public int MAX_ROUND = 10;
+	public const int MAX_ROUND = 10;
 
 	//----- 메서드
 	private void Awake() {
@@ -178,9 +178,14 @@ public class RaceManager : NetworkBehaviour {
 
 		//플레이어 UI 점수 전송.
 		RpcShowRoundResult(sortedResults.ToArray(), previousScores, roundScores.ToArray());
+		StartCoroutine(Co_RpcShowScoreResult(sortedResults, roundScores));
 
+		StartReturnToLobby();
+	}
+
+	private IEnumerator Co_RpcShowScoreResult(List<PlayerResult> sortedResults, List<int> roundScores) {
+		yield return new WaitForSeconds(4f);
 		//스코어 업데이트 메서드 (점수 추가)
-		//일단 이것도 외부에 추후 추가할거니까 임시로 생략.
 		for (int i = 0; i < sortedResults.Count; i++) {
 			SQLManager.Instance.player_score.AddPlayerScore(sortedResults[i].player, roundScores[i]);
 		}
@@ -196,14 +201,7 @@ public class RaceManager : NetworkBehaviour {
 		}
 
 		totalList.Sort((a, b) => b.totalScore.CompareTo(a.totalScore));
-		StartCoroutine(Co_RpcShowScoreResult(totalList.ToArray()));
-
-		StartReturnToLobby();
-	}
-
-	private IEnumerator Co_RpcShowScoreResult(TotalScoreResult[] totalResults) {
-		yield return new WaitForSeconds(4f);
-		RpcShowScoreResult(totalResults);
+		RpcShowScoreResult(totalList.ToArray());
 	}
 
 	//각자 유저들에게 결과창 보여주기.
@@ -245,7 +243,7 @@ public class RaceManager : NetworkBehaviour {
 
 		if (current_round_sync < MAX_ROUND)  // <<--- 10라운드 미만 -> 게임 씬 재시작
 		{
-			//Debug.Log($"[RaceManager] 라운드 {current_round_sync} / {MAX_ROUND} → 게임 씬 재시작");
+			Debug.Log($"[RaceManager] 라운드 {current_round_sync} / {MAX_ROUND} → 게임 씬 재시작");
 			ResetRoundState();                                              // <<--- 상태 초기화
 			roomManager.ServerChangeScene(roomManager.GameplayScene);      // <<--- 게임 씬 재시작
 		}
@@ -343,7 +341,7 @@ public class RaceManager : NetworkBehaviour {
 	[Command(requiresAuthority = false)]
 	public void CmdReportReady() {
 		_playersReadyCount++;
-		Debug.Log($"플레이어 준비 완료: {_playersReadyCount} / {total_players}");
+		//Debug.Log($"플레이어 준비 완료: {_playersReadyCount} / {total_players}");
 
 		if(_playersReadyCount >= total_players && current_state_sync == RaceState.Waiting) {
 			//if(_playersReadyCount >= START_MAX_PLAYER) { 

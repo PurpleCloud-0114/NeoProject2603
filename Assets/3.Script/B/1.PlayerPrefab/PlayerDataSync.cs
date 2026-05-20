@@ -22,7 +22,7 @@ public class PlayerDataSync : NetworkBehaviour
         string myNickname = PlayerPrefs.GetString("PlayerNickname", "Unknown");
         int myRoundScore = PlayerPrefs.GetInt("RoundScore",0);
 
-        Debug.Log($"[LocalPlayer] PlayerPrefs 로드 완료 - 이름: {myNickname}, 라운드 점수: {myRoundScore} 를 서버로 전송합니다.");
+        //Debug.Log($"[LocalPlayer] PlayerPrefs 로드 완료 - 이름: {myNickname}, 라운드 점수: {myRoundScore} 를 서버로 전송합니다.");
 
         CmdSendPlayerDataToServer(myNickname, myRoundScore);
     }
@@ -31,9 +31,9 @@ public class PlayerDataSync : NetworkBehaviour
     private void CmdSendPlayerDataToServer(string nickname, int score)
     {
 
-        Debug.Log($"[Server] 클라이언트(NetId: {netId})로부터 데이터 수신 - 이름: {nickname}, 점수: {score}");
+        //Debug.Log($"[Server] 클라이언트(NetId: {netId})로부터 데이터 수신 - 이름: {nickname}, 점수: {score}");
         _syncNickname = nickname;
         _syncRoundScore = score;
-        Debug.Log($"[Server] SyncVar 업데이트 완료 (NetId: {netId}) - _syncNickname: {_syncNickname}, _syncScore: {_syncRoundScore}");
+        //Debug.Log($"[Server] SyncVar 업데이트 완료 (NetId: {netId}) - _syncNickname: {_syncNickname}, _syncScore: {_syncRoundScore}");
     }
 }

@@ -12,6 +12,7 @@ public class PlayerTrigger : NetworkBehaviour
     private const string TAG_REDZONE = "Redzone";
     private const string TAG_SPIDERWEB = "Spiderweb";
     private const string TAG_PLAYER = "Player";
+    private const string TAG_WINGPOINT = "WingPoint";
     private const string TAG_FINISHLINE = "FinishLine";
     private const string TAG_ENDPOINT = "EndPoint";
 
@@ -64,15 +65,16 @@ public class PlayerTrigger : NetworkBehaviour
 
     // ---------------- RPC ----------------
 
-    [ClientRpc]
-    private void RpcHidePlayerModel()
-    {
-        if (_characterModel != null)
-            _characterModel.SetActive(false);
-    }
     [Command]
     private void CmdRequestHideModel() {
         RpcHidePlayerModel();
+    }
+    [ClientRpc]
+    private void RpcHidePlayerModel()
+    {
+        gameObject.SetActive(false);
+        //if (_characterModel != null)
+        //    _characterModel.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -159,6 +161,14 @@ public class PlayerTrigger : NetworkBehaviour
                 CmdPlayHitEffect(1);
 
                 CmdPlay3DSFX("PlayerCollision");
+
+                break;
+
+            case TAG_WINGPOINT:
+
+                if (!isLocalPlayer) return;
+
+                _playerCore.on_wingPoint_entered?.Invoke();
 
                 break;
 
@@ -263,7 +273,7 @@ public class PlayerTrigger : NetworkBehaviour
     [ClientRpc]
     private void RpcPlay3DSFX(string sfxName)
     {
-        Debug.Log($"RPC SFX : {sfxName} / {gameObject.name}");
+        //Debug.Log($"RPC SFX : {sfxName} / {gameObject.name}");
 
         Play3DSFXLocal(sfxName);
     }
@@ -330,13 +340,13 @@ public class PlayerTrigger : NetworkBehaviour
     {
         if (_player3DAudioSource == null)
         {
-            Debug.LogWarning($"[{name}] AudioSource NULL");
+            //Debug.LogWarning($"[{name}] AudioSource NULL");
             return;
         }
 
         if (AudioManager.Instance == null)
         {
-            Debug.LogWarning($"[{name}] AudioManager NULL");
+            //Debug.LogWarning($"[{name}] AudioManager NULL");
             return;
         }
 
@@ -344,7 +354,7 @@ public class PlayerTrigger : NetworkBehaviour
 
         if (clip == null)
         {
-            Debug.LogWarning($"[{name}] SFX NOT FOUND : {sfxName}");
+            //Debug.LogWarning($"[{name}] SFX NOT FOUND : {sfxName}");
             return;
         }
 

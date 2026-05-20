@@ -32,6 +32,7 @@ public class PlayerCore : NetworkBehaviour {
 	public Action<IUseable> on_item_acquired;
 	public Action on_race_start;
 	public Action on_race_finish;
+	public Action on_wingPoint_entered;
 	public Action on_redzone_entered;
 	public Action on_endpoint_landed;
 	public Action on_wing_button_clicked;

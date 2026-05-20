@@ -21,7 +21,7 @@ public class MagneticItem : ScriptableObject, IUseable {
 		int myIndex = players.FindIndex(p => p != null && p.gameObject == user);
 
 		if (myIndex > 0) {
-			GameObject target = players[myIndex - 1].gameObject;
+			GameObject target = players[0].gameObject;
 
 			// 1. 공격자(나)의 컨트롤러를 가져와서 '나'를 움직이게 함
 			if (user.TryGetComponent(out PlayerEffectController userController)) {
@@ -29,9 +29,14 @@ public class MagneticItem : ScriptableObject, IUseable {
 			}
 
 			// 2. 피격자(상대)의 컨트롤러를 직접 가져와서 '상대'를 움직이게 함
-			if (target.TryGetComponent(out PlayerEffectController targetController)) {
-				// 타겟 본인의 컨트롤러에서 RPC를 쏴야, 타겟 클라이언트의 '본인 객체'가 이벤트를 발생시킴
-				targetController.TargetApplyMagneticEffect(targetController.connectionToClient, user, false, duration, power);
+			if(target.TryGetComponent(out PlayerCore playerCore)) {
+				if(playerCore.player_state == PlayerState.Falling) {
+					//타겟이 Falling 상태일때만
+					if (target.TryGetComponent(out PlayerEffectController targetController)) {
+						// 타겟 본인의 컨트롤러에서 RPC를 쏴야, 타겟 클라이언트의 '본인 객체'가 이벤트를 발생시킴
+						targetController.TargetApplyMagneticEffect(targetController.connectionToClient, user, false, duration, power);
+					}
+				}
 			}
 		}
 	}

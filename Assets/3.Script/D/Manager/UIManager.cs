@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 using TMPro;
+using DG.Tweening;
 
 public class UIManager : MonoBehaviour {
 	public static UIManager Instance = null;
@@ -43,6 +44,16 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _playUI;
 	[SerializeField] private GameObject _specUI;
 
+	[SerializeField] private RectTransform _warningText;
+	[Header("Punch Settings")]
+	[SerializeField] private float punchDuration = 0.4f;
+	[SerializeField] private Vector3 punchScale = new Vector3(0.2f, 0.2f, 0); // 기존 크기에서 얼마나 더 커질지
+
+	[Header("Sway Settings")]
+	[SerializeField] private float swayAngle = 10f; // 좌우 기울기 각도
+	[SerializeField] private float swayDuration = 2f; // 한 세트 걸리는 시간
+
+
 	[Header("자석 상태 알림 UI")]
 	[SerializeField] private GameObject _magneticWarningUI; // 피격자용 (붉은색/경고)
 	[SerializeField] private GameObject _magneticAttackUI;  // 공격자용 (푸른색/활성)
@@ -55,6 +66,10 @@ public class UIManager : MonoBehaviour {
 
 	private bool SetResultBool;
 	private double SetResultTime;
+	private float blinkInterval = 0.15f;
+	private WaitForSeconds blinkWfs;
+	private Coroutine blinkCoroutine;
+	private Sequence activeSequence;
 
 	[Header("최종 결과 UI")]
 	[SerializeField] private GameObject _finalResultWindow;    // 결과창 부모 오브젝트
@@ -63,12 +78,16 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _rountRankPrefab;
 	[SerializeField] private GameObject _totalRankPrefab;
 
+
+
+
 	private void Awake() {
 		if (Instance == null) Instance = this;
 		else Destroy(gameObject);
 	}
 
 	private void Start() {
+		blinkWfs = new WaitForSeconds(blinkInterval);
 		ApplySettings();
 	}
 
@@ -123,6 +142,78 @@ public class UIManager : MonoBehaviour {
 		}
 	}
 
+
+	public void ToggleWingButtons(bool isTrue) {
+		_wingButtons.gameObject.SetActive(isTrue);
+	}
+	public void StartBlinking() {
+		if (blinkCoroutine != null) return;
+		blinkCoroutine = StartCoroutine(BlinkRoutine());
+	}
+	public void StopBlinking() {
+		if (blinkCoroutine != null) {
+			StopCoroutine(blinkCoroutine);
+			blinkCoroutine = null;
+		}
+
+		if (_wingButtons != null) {
+			ToggleWingButtons(true); // 항상 켜진 상태로 복구
+		}
+	}
+	private IEnumerator BlinkRoutine() {
+		if (_wingButtons == null) yield break;
+
+		while (true) {
+			// 현재 상태의 반대로 토글
+			ToggleWingButtons(!_wingButtons.gameObject.activeSelf);
+			yield return blinkWfs;
+		}
+	}
+	public void PlayIntroSequence() {
+		if (_warningText == null) return;
+
+		// 기존 트윈이 돌고 있다면 초기화
+		KillSequence();
+
+		// 시작 상태 세팅 (크기 0, 회전 0)
+		_warningText.localScale = Vector3.zero;
+		_warningText.localRotation = Quaternion.identity;
+		_warningText.gameObject.SetActive(true);
+
+		// 시퀀스 생성
+		activeSequence = DOTween.Sequence();
+
+		// [단계 1] 크기 0에서 1로 커지며 펀치 효과 (부르르 떨리는 연출)
+		activeSequence.Append(_warningText.DOScale(Vector3.one, punchDuration).From(Vector3.zero));
+		activeSequence.Append(_warningText.DOPunchScale(punchScale, punchDuration, vibrato: 5, elasticity: 0.5f));
+
+		// [단계 2] 펀치 끝나고 무한 좌우 시소 흔들기
+		activeSequence.AppendCallback(() => {
+			_warningText.localRotation = Quaternion.Euler(0, 0, -swayAngle);
+			_warningText.DORotate(new Vector3(0, 0, swayAngle), swayDuration)
+					 .SetLoops(-1, LoopType.Yoyo)
+					 .SetEase(Ease.InOutSine)
+					 .SetId(_warningText); // 나중에 끄기 편하게 ID 부여
+		});
+	}
+	public void PlayOutroSequence() {
+		if (_warningText == null) return;
+
+		// 기존 흔들림 및 시퀀스 정지
+		KillSequence();
+
+		// 크기 0으로 줄어들고 비활성화
+		_warningText.DOScale(Vector3.zero, 0.3f)
+				 .SetEase(Ease.InBack) // 살짝 커졌다가 쏙 사라지는 느낌
+				 .OnComplete(() => _warningText.gameObject.SetActive(false));
+	}
+	private void KillSequence() {
+		if (activeSequence != null) {
+			activeSequence.Kill();
+			activeSequence = null;
+		}
+		DOTween.Kill(_warningText); // 해당 UI에 걸린 회전 트윈 제거
+	}
 
 	// ==========================================
 	// [ 도착 시 결과 집계 ]
@@ -199,7 +290,7 @@ public class UIManager : MonoBehaviour {
 					if (roundScore > 0) {
 						tmp.text = $"{previousScore} <color=green>+ {roundScore}</color>";
 					} else if (roundScore < 0) {
-						tmp.text = $"{previousScore} <color=red>- {roundScore}</color>";
+						tmp.text = $"{previousScore} <color=red>- {Mathf.Abs(roundScore)}</color>";
 					} else {
 						tmp.text = $"{previousScore} + {roundScore}";
 					}
@@ -214,7 +305,6 @@ public class UIManager : MonoBehaviour {
 		}
 
 		_finalResultWindow.SetActive(true);
-
 		for (int i = 0; i < totalResults.Length; i++) {
 			// 2. 프리팹 생성 및 부모 설정
 			GameObject go = Instantiate(_totalRankPrefab, _finalResultContainer);
@@ -229,11 +319,9 @@ public class UIManager : MonoBehaviour {
 
 			// 프리팹 구조에 따른 순서 (Rank, Name, Time)
 			// 인덱스는 하이어라키 순서에 따라 다를 수 있으니 확인 필요
-			int index = 0;
 			foreach (var tmp in rankTexts) {
-				index++;
 				if (tmp.name == "Rank") {
-					tmp.text = index.ToString();
+					tmp.text = (i+1).ToString();
 				} else if (tmp.name == "Name") {
 					tmp.text = totalResults[i].name;
 				} else if (tmp.name == "Score") {
@@ -242,6 +330,11 @@ public class UIManager : MonoBehaviour {
 			}
 		}
 	}
+
+
+
+
+
 
 	// ==========================================
 	// [ 도착 및 관전 시 UI 활성화/비활성화 ]

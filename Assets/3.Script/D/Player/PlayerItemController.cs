@@ -27,20 +27,20 @@ public class PlayerItemController : NetworkBehaviour
             _player3DAudioSource = GetComponentInChildren<AudioSource>(true);
         }
 
-        Debug.Log($"[{name}] AUDIO SOURCE FOUND : " +
-                  $"{(_player3DAudioSource != null ? _player3DAudioSource.name : "NULL")}");
+        //Debug.Log($"[{name}] AUDIO SOURCE FOUND : " +
+        //          $"{(_player3DAudioSource != null ? _player3DAudioSource.name : "NULL")}");
 
         if (_player3DAudioSource != null)
         {
-            Debug.Log(
-                $"[{name}] AUDIO INFO | " +
-                $"enabled={_player3DAudioSource.enabled} | " +
-                $"activeInHierarchy={_player3DAudioSource.gameObject.activeInHierarchy} | " +
-                $"volume={_player3DAudioSource.volume} | " +
-                $"mute={_player3DAudioSource.mute} | " +
-                $"spatialBlend={_player3DAudioSource.spatialBlend}"
-            );
-        }
+			//Debug.Log(
+			//	$"[{name}] AUDIO INFO | " +
+			//	$"enabled={_player3DAudioSource.enabled} | " +
+			//	$"activeInHierarchy={_player3DAudioSource.gameObject.activeInHierarchy} | " +
+			//	$"volume={_player3DAudioSource.volume} | " +
+			//	$"mute={_player3DAudioSource.mute} | " +
+			//	$"spatialBlend={_player3DAudioSource.spatialBlend}"
+			//);
+		}
     }
 
     private void OnEnable()
@@ -66,7 +66,7 @@ public class PlayerItemController : NetworkBehaviour
         {
             string sfxName = GetItemActivationSFX(current_item.Type);
 
-            Debug.Log($"[{name}] USE ITEM : {current_item.Type} / SFX : {sfxName}");
+            //Debug.Log($"[{name}] USE ITEM : {current_item.Type} / SFX : {sfxName}");
 
             // 서버 요청
             CmdUseItem(current_item.Type, sfxName);
@@ -78,19 +78,19 @@ public class PlayerItemController : NetworkBehaviour
     [Command]
     private void CmdUseItem(ItemType itemType, string sfxName)
     {
-        Debug.Log($"[SERVER] CmdUseItem : {itemType} / {sfxName}");
+        //Debug.Log($"[SERVER] CmdUseItem : {itemType} / {sfxName}");
 
         IUseable itemToUse = ItemManager.Instance.GetItemUseable(itemType);
 
         if (itemToUse != null)
         {
-            Debug.Log($"[SERVER] ITEM USE SUCCESS");
+            //Debug.Log($"[SERVER] ITEM USE SUCCESS");
 
             itemToUse.Use(gameObject);
         }
         else
         {
-            Debug.LogError($"[SERVER] ITEM USEABLE NULL");
+            //Debug.LogError($"[SERVER] ITEM USEABLE NULL");
         }
 
         // 모든 클라이언트 재생
@@ -100,7 +100,7 @@ public class PlayerItemController : NetworkBehaviour
     [ClientRpc]
     private void RpcPlayItemEffect(ItemType itemType, string sfxName)
     {
-        Debug.Log($"[CLIENT RPC] ITEM RPC : {itemType} / {gameObject.name}");
+        //Debug.Log($"[CLIENT RPC] ITEM RPC : {itemType} / {gameObject.name}");
 
         Play3DSFXLocal(sfxName);
 
@@ -147,32 +147,32 @@ public class PlayerItemController : NetworkBehaviour
 
     private void Play3DSFXLocal(string sfxName)
     {
-        Debug.Log($"[{name}] TRY PLAY SFX : {sfxName}");
+        //Debug.Log($"[{name}] TRY PLAY SFX : {sfxName}");
 
         if (string.IsNullOrEmpty(sfxName))
         {
-            Debug.LogWarning($"[{name}] SFX NAME EMPTY");
+            //Debug.LogWarning($"[{name}] SFX NAME EMPTY");
             return;
         }
 
         if (_player3DAudioSource == null)
         {
-            Debug.LogError($"[{name}] AudioSource NULL");
+            //Debug.LogError($"[{name}] AudioSource NULL");
             return;
         }
 
-        Debug.Log(
-            $"[{name}] SOURCE INFO | " +
-            $"source={_player3DAudioSource.name} | " +
-            $"enabled={_player3DAudioSource.enabled} | " +
-            $"active={_player3DAudioSource.gameObject.activeInHierarchy} | " +
-            $"volume={_player3DAudioSource.volume} | " +
-            $"mute={_player3DAudioSource.mute}"
-        );
+        //Debug.Log(
+        //    $"[{name}] SOURCE INFO | " +
+        //    $"source={_player3DAudioSource.name} | " +
+        //    $"enabled={_player3DAudioSource.enabled} | " +
+        //    $"active={_player3DAudioSource.gameObject.activeInHierarchy} | " +
+        //    $"volume={_player3DAudioSource.volume} | " +
+        //    $"mute={_player3DAudioSource.mute}"
+        //);
 
         if (AudioManager.Instance == null)
         {
-            Debug.LogError($"[{name}] AudioManager NULL");
+            //Debug.LogError($"[{name}] AudioManager NULL");
             return;
         }
 
@@ -180,19 +180,19 @@ public class PlayerItemController : NetworkBehaviour
 
         if (clip == null)
         {
-            Debug.LogError($"[{name}] SFX NOT FOUND : {sfxName}");
+            //Debug.LogError($"[{name}] SFX NOT FOUND : {sfxName}");
             return;
         }
 
-        Debug.Log(
-            $"[{name}] CLIP FOUND | " +
-            $"clip={clip.name} | " +
-            $"length={clip.length}"
-        );
+        //Debug.Log(
+        //    $"[{name}] CLIP FOUND | " +
+        //    $"clip={clip.name} | " +
+        //    $"length={clip.length}"
+        //);
 
         _player3DAudioSource.PlayOneShot(clip);
 
-        Debug.Log($"[{name}] PlayOneShot CALLED");
+        //Debug.Log($"[{name}] PlayOneShot CALLED");
     }
 
     // ---------------- SFX NAME ----------------
