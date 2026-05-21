@@ -21,8 +21,9 @@ public class PlayerCore : NetworkBehaviour {
 	private ClientPlayer _clientPlayer;
 	private GameObject _mainCamera;
 	public Animator animator;
+	public GameObject _characterModel;
+	public GameObject _parasuit;
 	[SerializeField] private GameObject _portalPrefabs;
-	[SerializeField] private GameObject _parasuit;
 
 	public PlayerState player_state = PlayerState.Wait;
 	public StatusEffect status_effect = StatusEffect.None;

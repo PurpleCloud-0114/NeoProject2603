@@ -28,7 +28,6 @@ public class PlayerTrigger : NetworkBehaviour
     [SerializeField] private ParticleSystem magneticHitParticle_attack;
     [SerializeField] private ParticleSystem deathParticle;
 
-    [SerializeField] private GameObject _characterModel;
     [SerializeField] private float _hitPlayerImpulsePower = 25f;
     [SerializeField] private float _hitObstacleInvincibilityDuration = 1f;
 
@@ -72,9 +71,11 @@ public class PlayerTrigger : NetworkBehaviour
     [ClientRpc]
     private void RpcHidePlayerModel()
     {
-        gameObject.SetActive(false);
-        //if (_characterModel != null)
-        //    _characterModel.SetActive(false);
+        //gameObject.SetActive(false);
+        if (_playerCore._characterModel != null)
+            _playerCore._characterModel.SetActive(false);
+        if (_playerCore._parasuit != null)
+            _playerCore._parasuit.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -211,12 +212,12 @@ public class PlayerTrigger : NetworkBehaviour
     {
         while (Invincibility)
         {
-            _characterModel.SetActive(!_characterModel.activeSelf);
+            _playerCore._characterModel.SetActive(!_playerCore._characterModel.activeSelf);
 
             yield return wfs2;
         }
 
-        _characterModel.SetActive(true);
+        _playerCore._characterModel.SetActive(true);
     }
 
     // ---------------- COMMANDS ----------------

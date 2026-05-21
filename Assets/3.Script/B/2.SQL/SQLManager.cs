@@ -40,41 +40,60 @@ public class UserInfo
 }
 public class PlayerScore
 {
-    public Dictionary<NetworkIdentity, int> player_score_management = new Dictionary<NetworkIdentity, int>();
-    public Dictionary<NetworkIdentity, int> GetPlayerScoreList()
-    {
-        return player_score_management;
+    //public Dictionary<NetworkIdentity, int> player_score_management = new Dictionary<NetworkIdentity, int>();
+    //public Dictionary<NetworkIdentity, int> GetPlayerScoreList()
+    //{
+    //    return player_score_management;
+    //}
+    //public int GetPlayerScore(NetworkIdentity player)
+    //{
+    //    if (!player_score_management.ContainsKey(player))
+    //    {
+    //        Debug.LogWarning($"[PlayerScore] 미등록 플레이어 조회: {player.name}");
+    //        return 0;
+    //    }
+    //    return player_score_management[player];
+    //}
+    //public void SetPlayerScoreList(Dictionary<NetworkIdentity, int> inputList)
+    //{
+    //    player_score_management = inputList;
+    //}
+    //public void SetPlayerScore(NetworkIdentity player, int score)
+    //{
+    //    player_score_management[player] = score;
+    //}
+    //public void AddPlayerScore(NetworkIdentity player, int amount)
+    //{
+    //    if (!player_score_management.ContainsKey(player))
+    //    {
+    //        Debug.LogWarning($"[PlayerScore] AddScore - 미등록 플레이어: {player.name}");
+    //        player_score_management[player] = 0;
+    //    }
+    //    player_score_management[player] += amount;
+    //}
+    //public void InitPlayerScore(NetworkIdentity player)
+    //{
+    //    if (!player_score_management.ContainsKey(player))
+    //        player_score_management.Add(player, 0);
+    //}
+    public Dictionary<string, int> player_score_management = new Dictionary<string, int>();
+
+    public int GetPlayerScore(string playerName) {
+        if (!player_score_management.ContainsKey(playerName)) return 0;
+        return player_score_management[playerName];
     }
-    public int GetPlayerScore(NetworkIdentity player)
-    {
-        if (!player_score_management.ContainsKey(player))
-        {
-            Debug.LogWarning($"[PlayerScore] 미등록 플레이어 조회: {player.name}");
-            return 0;
+
+    public void AddPlayerScore(string playerName, int amount) {
+        // 미등록 상태면 0점으로 자동 등록
+        if (!player_score_management.ContainsKey(playerName)) {
+            player_score_management[playerName] = 0;
         }
-        return player_score_management[player];
+        player_score_management[playerName] += amount;
     }
-    public void SetPlayerScoreList(Dictionary<NetworkIdentity, int> inputList)
-    {
-        player_score_management = inputList;
-    }
-    public void SetPlayerScore(NetworkIdentity player, int score)
-    {
-        player_score_management[player] = score;
-    }
-    public void AddPlayerScore(NetworkIdentity player, int amount)
-    {
-        if (!player_score_management.ContainsKey(player))
-        {
-            Debug.LogWarning($"[PlayerScore] AddScore - 미등록 플레이어: {player.name}");
-            player_score_management[player] = 0;
-        }
-        player_score_management[player] += amount;
-    }
-    public void InitPlayerScore(NetworkIdentity player)
-    {
-        if (!player_score_management.ContainsKey(player))
-            player_score_management.Add(player, 0);
+
+    public void InitPlayerScore(string playerName) {
+        if (!player_score_management.ContainsKey(playerName))
+            player_score_management.Add(playerName, 0);
     }
 }
 
