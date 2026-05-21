@@ -79,6 +79,7 @@ public class PlayerTrigger : NetworkBehaviour {
 	}
 
 	private void OnTriggerEnter(Collider other) {
+		if (_playerCore.player_state == PlayerState.Finish) return;
 		switch (other.tag) {
 			case TAG_ITEMBOX:
 
