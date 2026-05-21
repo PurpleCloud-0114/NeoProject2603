@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
-using Unity.Cinemachine;
+using Mirror;
 
-public class CutsceneController : MonoBehaviour {
+public class CutsceneController : NetworkBehaviour {
 	public static CutsceneController Instance = null;
 
 	[SerializeField] private PlayableDirector _director;
@@ -13,11 +13,13 @@ public class CutsceneController : MonoBehaviour {
 	private void Awake() {
 		if (Instance == null) Instance = this;
 		else Destroy(gameObject);
+
 	}
 
 	private void Start() {
 		UIManager.Instance.PlayerUISetActive(false);
 		_cutsceneCamera.SetActive(true);
+
 	}
 
 	private void OnEnable() {
@@ -31,6 +33,7 @@ public class CutsceneController : MonoBehaviour {
 	public void PlayIntro() {
 		//플레이어 조작 잠금. --> 이미 되어있음.
 		//컷신 카메라 활성화.
+		UIManager.Instance.PlayTextEffect();
 		_director.Play();
 	}
 

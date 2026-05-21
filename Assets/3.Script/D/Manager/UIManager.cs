@@ -80,10 +80,28 @@ public class UIManager : MonoBehaviour {
 
 
 
+	[Header("컷신용 UI")]
+	[SerializeField] private TextMeshProUGUI uiText;
+	[SerializeField] private RectTransform rectTransform;
+
+	[Header("설정값")]
+	[SerializeField] private float fadeInDuration = 0.5f;
+	[SerializeField] private float waitTimeA = 3.33f;
+	[SerializeField] private float pullDownDistance = 30f; // 아래로 튕기는 거리
+	[SerializeField] private float pullDownDuration = 0.15f;
+	[SerializeField] private float rollUpDuration = 0.4f;
+
+	private Vector2 originalPosition;
+	private Sequence rollScreenSequence; // 필드로 선언
+
+
+
 
 	private void Awake() {
 		if (Instance == null) Instance = this;
 		else Destroy(gameObject);
+
+		originalPosition = rectTransform.anchoredPosition;
 	}
 
 	private void Start() {
@@ -141,6 +159,33 @@ public class UIManager : MonoBehaviour {
 			}
 		}
 	}
+
+	[ClientRpc]
+	public void PlayTextEffect() {
+		// 기존 패턴과 동일하게 필드로 Kill
+		if (rollScreenSequence != null) {
+			rollScreenSequence.Kill();
+			rollScreenSequence = null;
+		}
+
+		uiText.text = $"{RoundManager.Instance.current_round_sync + 1} Round";
+		rectTransform.anchoredPosition = originalPosition;
+
+
+		Color c = uiText.color;
+		c.a = 0f;
+		uiText.color = c;
+
+		rollScreenSequence = DOTween.Sequence();
+		rollScreenSequence
+			.Append(uiText.DOColor(new Color(c.r, c.g, c.b, 1f), fadeInDuration))
+			.AppendInterval(waitTimeA)
+			.Append(rectTransform.DOAnchorPosY(originalPosition.y - pullDownDistance, pullDownDuration).SetEase(Ease.InBack))
+			.Append(rectTransform.DOAnchorPosY(originalPosition.y + 1000f, rollUpDuration).SetEase(Ease.InQuad))
+			.Join(uiText.DOColor(new Color(c.r, c.g, c.b, 0f), rollUpDuration))
+			.OnComplete(() => rollScreenSequence = null); // 완료 후 자동 정리
+	}
+
 
 
 	public void ToggleWingButtons(bool isTrue) {
