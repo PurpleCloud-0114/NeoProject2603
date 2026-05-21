@@ -60,6 +60,7 @@ public class RoomPlayer : NetworkRoomPlayer
     {
         LobbyTextUI.Instance?.ui?.SetTime(time);
     }
+    [ClientRpc]
     public void RpcCancelCountdown()
     {
         LobbyTextUI.Instance?.ui?.Hide();
