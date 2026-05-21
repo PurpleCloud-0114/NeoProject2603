@@ -33,14 +33,22 @@ public class PlayerUIController : NetworkBehaviour {
 	}
 
 	private void OnEnable() {
+		_playerCore.on_wingPoint_entered += PlayWarningText;
+		_playerCore.on_wingPoint_entered += BlinkStartWingButton;
 		_playerCore.on_redzone_entered += ActivateWingBtn;
+		_playerCore.on_redzone_entered += BlinkStopWingButton;
+		_playerCore.on_redzone_entered += StopWarningText;
 		_playerCore.on_endpoint_landed += StopTimer;
 		_playerCore.on_item_acquired += ActivateItemBtn;
 		_playerCore.on_item_acquired += SetItemImgOnUI;
 		_playerCore.on_item_button_clicked += UsedItemImgOnUI;
 	}
 	private void OnDisable() {
+		_playerCore.on_wingPoint_entered -= BlinkStartWingButton;
+		_playerCore.on_wingPoint_entered -= PlayWarningText;
 		_playerCore.on_redzone_entered -= ActivateWingBtn;
+		_playerCore.on_redzone_entered -= BlinkStopWingButton;
+		_playerCore.on_redzone_entered -= StopWarningText;
 		_playerCore.on_endpoint_landed -= StopTimer;
 		_playerCore.on_item_acquired -= ActivateItemBtn;
 		_playerCore.on_item_acquired -= SetItemImgOnUI;
@@ -67,4 +75,9 @@ public class PlayerUIController : NetworkBehaviour {
 	public void SetItemImgOnUI(IUseable _item) => _itemImg.sprite = _item.Item_Image;
 	public void UsedItemImgOnUI() => _itemImg.sprite = _noneImg;
 	public void StopTimer() => UIManager.Instance.StopTimer();
+
+	public void PlayWarningText() => UIManager.Instance.PlayIntroSequence();
+	public void StopWarningText() => UIManager.Instance.PlayOutroSequence();	
+	public void BlinkStartWingButton() => UIManager.Instance.StartBlinking();
+	public void BlinkStopWingButton() => UIManager.Instance.StopBlinking();
 }

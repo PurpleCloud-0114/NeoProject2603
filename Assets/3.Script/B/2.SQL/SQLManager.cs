@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LitJson;
 using MySql.Data.MySqlClient;
+using Mirror;
 
 public class ServerJsonItem
 {
@@ -37,6 +38,64 @@ public class UserInfo
         user_score = score;
     }
 }
+public class PlayerScore
+{
+    //public Dictionary<NetworkIdentity, int> player_score_management = new Dictionary<NetworkIdentity, int>();
+    //public Dictionary<NetworkIdentity, int> GetPlayerScoreList()
+    //{
+    //    return player_score_management;
+    //}
+    //public int GetPlayerScore(NetworkIdentity player)
+    //{
+    //    if (!player_score_management.ContainsKey(player))
+    //    {
+    //        Debug.LogWarning($"[PlayerScore] 미등록 플레이어 조회: {player.name}");
+    //        return 0;
+    //    }
+    //    return player_score_management[player];
+    //}
+    //public void SetPlayerScoreList(Dictionary<NetworkIdentity, int> inputList)
+    //{
+    //    player_score_management = inputList;
+    //}
+    //public void SetPlayerScore(NetworkIdentity player, int score)
+    //{
+    //    player_score_management[player] = score;
+    //}
+    //public void AddPlayerScore(NetworkIdentity player, int amount)
+    //{
+    //    if (!player_score_management.ContainsKey(player))
+    //    {
+    //        Debug.LogWarning($"[PlayerScore] AddScore - 미등록 플레이어: {player.name}");
+    //        player_score_management[player] = 0;
+    //    }
+    //    player_score_management[player] += amount;
+    //}
+    //public void InitPlayerScore(NetworkIdentity player)
+    //{
+    //    if (!player_score_management.ContainsKey(player))
+    //        player_score_management.Add(player, 0);
+    //}
+    public Dictionary<string, int> player_score_management = new Dictionary<string, int>();
+
+    public int GetPlayerScore(string playerName) {
+        if (!player_score_management.ContainsKey(playerName)) return 0;
+        return player_score_management[playerName];
+    }
+
+    public void AddPlayerScore(string playerName, int amount) {
+        // 미등록 상태면 0점으로 자동 등록
+        if (!player_score_management.ContainsKey(playerName)) {
+            player_score_management[playerName] = 0;
+        }
+        player_score_management[playerName] += amount;
+    }
+
+    public void InitPlayerScore(string playerName) {
+        if (!player_score_management.ContainsKey(playerName))
+            player_score_management.Add(playerName, 0);
+    }
+}
 
 public class SQLManager : MonoBehaviour
 {
@@ -45,7 +104,7 @@ public class SQLManager : MonoBehaviour
 
     public UserInfo user_info { get; private set; }
     public static SQLManager Instance = null;
-
+    public PlayerScore player_score = new PlayerScore();
     [Header("Network Settings")]
     [SerializeField] private bool _is_it_Client = false;
     [Tooltip("와이파이 연결후 ipconfig, 해당 IPv4 주소 입력")]
@@ -345,6 +404,77 @@ public class SQLManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"AddScore Error: {e.Message}");
+            return false;
+        }
+    }
+
+    // ── 라운드 점수 관리 (서버 전용) ──
+
+    public bool AddRoundScore(string nickname, int amount)
+    {
+        if (_is_it_Client)
+        {
+            Debug.LogWarning("[SQLManager] 클라이언트에서 AddRoundScore 호출 차단");
+            return false;
+        }
+
+        try
+        {
+            if (!ConnectionCheck(_connection)) return false;
+
+            string sql = "UPDATE user_info SET user_round_score = user_round_score + @amount WHERE user_nickname = @nickname";
+            using (MySqlCommand cmd = new MySqlCommand(sql, _connection))
+            {
+                cmd.Parameters.AddWithValue("@amount", amount);
+                cmd.Parameters.AddWithValue("@nickname", nickname);
+
+                int rows = cmd.ExecuteNonQuery();
+
+                if (rows > 0 && user_info != null && user_info.user_nickname == nickname)
+                {
+                    user_info.round_total_score += amount;
+                    Debug.Log($"[SQLManager] DB/메모리 라운드 점수 가산 완료: {nickname} (+{amount}) -> 현재: {user_info.round_total_score}");
+                }
+                return rows > 0;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"AddRoundScore Error: {e.Message}");
+            return false;
+        }
+    }
+
+    public bool ResetRoundScore(string nickname)
+    {
+        if (_is_it_Client)
+        {
+            Debug.LogWarning("[SQLManager] 클라이언트에서 ResetRoundScore 호출 차단");
+            return false;
+        }
+
+        try
+        {
+            if (!ConnectionCheck(_connection)) return false;
+
+            string sql = "UPDATE user_info SET user_round_score = 0 WHERE user_nickname = @nickname";
+            using (MySqlCommand cmd = new MySqlCommand(sql, _connection))
+            {
+                cmd.Parameters.AddWithValue("@nickname", nickname);
+
+                int rows = cmd.ExecuteNonQuery();
+
+                if (rows > 0 && user_info != null && user_info.user_nickname == nickname)
+                {
+                    user_info.round_total_score = 0;
+                    Debug.Log($"[SQLManager] DB/메모리 {nickname}의 라운드 점수가 리셋되었습니다. (0점)");
+                }
+                return rows > 0;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"ResetRoundScore Error: {e.Message}");
             return false;
         }
     }

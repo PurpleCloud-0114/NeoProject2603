@@ -141,22 +141,24 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 	private void ClampPositionToMapBounds() {
 		Vector3 currentPos = transform.position;
-		Vector3 mapCetner = _mapSize.map_center;
-		currentPos.y = mapCetner.y;
-		float distanceFromCenter = Vector3.Distance(currentPos, mapCetner);
+		Vector3 mapCenter = _mapSize.map_center; // 오타 수정: mapCetner -> mapCenter
+		currentPos.y = mapCenter.y;
+		float distanceFromCenter = Vector3.Distance(currentPos, mapCenter);
 
-		//최저-25 | 최고-90 => 75를 백분율화.
-		//높이 3000
-		float percent = 100f;
-		if (transform.position.y > StageManager.Instance.stage_data_sync.map_height) percent = 100f;
-		else {
-			percent = transform.position.y * 0.0003f;
-		}
-		float boundary = _mapSize.boundaryRadius + (75f * percent);
+		// 1. y 높이를 0 ~ 6000 사이로 제한(Clamping)한 후 백분율(0.0 ~ 1.0) 계산
+		float clampedY = Mathf.Clamp(transform.position.y, 0f, 6000f);
+		float t = clampedY / 6000f; // 0일 때 0, 6000일 때 1.0
+
+		// 2. 높이에 따른 반지름 결정
+		// 지름 50(반지름 25)에서 지름 170(반지름 85) 사이를 선형 보간(Lerp)
+		float boundary = Mathf.Lerp(25f, 85f, t);
+
+		// 3. 범위를 벗어났을 때의 예외 처리
 		if (distanceFromCenter > boundary) {
-			Vector3 direction = (currentPos - mapCetner).normalized;
-			Vector3 clampedPosition = mapCetner + (direction * boundary);
+			Vector3 direction = (currentPos - mapCenter).normalized;
+			Vector3 clampedPosition = mapCenter + (direction * boundary);
 			clampedPosition.y = transform.position.y;
+
 			_rigidBody.MovePosition(clampedPosition);
 			_rigidBody.linearVelocity = new Vector3(0, _rigidBody.linearVelocity.y, 0);
 		}
@@ -174,9 +176,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_wingTime = (3f * StageManager.Instance.stage_data_sync.map_redzone) / (drop_max_speed + 2f * _dropWingSpeed);
 	}
 	private void OpenWing() {
-		if (_playerCore.animator != null) {
-			_playerCore.animator.SetTrigger("OnParasuit");
-		}
+		CmdWingAnimate();
 		DOTween.To(() => drop_max_speed, x => drop_max_speed = x, _dropWingSpeed, _wingTime).SetEase(Ease.OutQuad);
 	}
 	private void SetBasePoint() {
@@ -245,5 +245,17 @@ public class PlayerMovement : NetworkBehaviour {
 		_moveVector = Vector3.zero;
 		_moveDir = Vector3.zero;
 		_rigidBody.linearVelocity = new Vector3(0f, _rigidBody.linearVelocity.y, 0f);
+	}
+
+	//------모션 커맨드------
+	[Command]
+	public void CmdWingAnimate() {
+		WingAnimate();
+	}
+	[ClientRpc]
+	public void WingAnimate() {
+		if (_playerCore.animator != null) {
+			_playerCore.animator.SetTrigger("OnParasuit");
+		}
 	}
 }

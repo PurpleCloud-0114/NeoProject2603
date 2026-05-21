@@ -39,7 +39,6 @@ public class CutsceneController : MonoBehaviour {
 		UIManager.Instance.PlayerUISetActive(true);
 		//RaceManager작동
 		RaceManager.Instance.StartCountdown();
-		Debug.Log("컷신 종료.");
 		if (_cutsceneCamera != null) {
 			_cutsceneCamera.SetActive(false);
 		}

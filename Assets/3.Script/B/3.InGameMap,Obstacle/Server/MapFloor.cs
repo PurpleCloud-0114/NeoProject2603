@@ -97,14 +97,14 @@ public class MapFloor : NetworkBehaviour
     {
         if (index < 0 || index >= _attachedObstacles.Count)
         {
-            Debug.LogWarning($"[MapFloor] 잘못된 index: {index}");
+            //Debug.LogWarning($"[MapFloor] 잘못된 index: {index}");
             return;
         }
 
         uint newMask = _activeMask & ~(1u << index);
         _activeMask = newMask;
 
-        Debug.Log($"[MapFloor Server] 장애물 OFF Index: {index}");
+        //Debug.Log($"[MapFloor Server] 장애물 OFF Index: {index}");
 
         // 서버(호스트)에서도 즉시 반영하고 클라이언트로 전파
         Apply(_activeMask);

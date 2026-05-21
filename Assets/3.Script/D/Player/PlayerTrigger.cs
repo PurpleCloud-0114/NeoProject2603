@@ -12,6 +12,7 @@ public class PlayerTrigger : NetworkBehaviour
     private const string TAG_REDZONE = "Redzone";
     private const string TAG_SPIDERWEB = "Spiderweb";
     private const string TAG_PLAYER = "Player";
+    private const string TAG_WINGPOINT = "WingPoint";
     private const string TAG_FINISHLINE = "FinishLine";
     private const string TAG_ENDPOINT = "EndPoint";
 
@@ -27,7 +28,6 @@ public class PlayerTrigger : NetworkBehaviour
     [SerializeField] private ParticleSystem magneticHitParticle_attack;
     [SerializeField] private ParticleSystem deathParticle;
 
-    [SerializeField] private GameObject _characterModel;
     [SerializeField] private float _hitPlayerImpulsePower = 25f;
     [SerializeField] private float _hitObstacleInvincibilityDuration = 1f;
 
@@ -64,15 +64,18 @@ public class PlayerTrigger : NetworkBehaviour
 
     // ---------------- RPC ----------------
 
-    [ClientRpc]
-    private void RpcHidePlayerModel()
-    {
-        if (_characterModel != null)
-            _characterModel.SetActive(false);
-    }
     [Command]
     private void CmdRequestHideModel() {
         RpcHidePlayerModel();
+    }
+    [ClientRpc]
+    private void RpcHidePlayerModel()
+    {
+        //gameObject.SetActive(false);
+        if (_playerCore._characterModel != null)
+            _playerCore._characterModel.SetActive(false);
+        if (_playerCore._parasuit != null)
+            _playerCore._parasuit.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -162,6 +165,14 @@ public class PlayerTrigger : NetworkBehaviour
 
                 break;
 
+            case TAG_WINGPOINT:
+
+                if (!isLocalPlayer) return;
+
+                _playerCore.on_wingPoint_entered?.Invoke();
+
+                break;
+
             case TAG_FINISHLINE:
 
                 if (!isLocalPlayer) return;
@@ -201,12 +212,12 @@ public class PlayerTrigger : NetworkBehaviour
     {
         while (Invincibility)
         {
-            _characterModel.SetActive(!_characterModel.activeSelf);
+            _playerCore._characterModel.SetActive(!_playerCore._characterModel.activeSelf);
 
             yield return wfs2;
         }
 
-        _characterModel.SetActive(true);
+        _playerCore._characterModel.SetActive(true);
     }
 
     // ---------------- COMMANDS ----------------
@@ -263,7 +274,7 @@ public class PlayerTrigger : NetworkBehaviour
     [ClientRpc]
     private void RpcPlay3DSFX(string sfxName)
     {
-        Debug.Log($"RPC SFX : {sfxName} / {gameObject.name}");
+        //Debug.Log($"RPC SFX : {sfxName} / {gameObject.name}");
 
         Play3DSFXLocal(sfxName);
     }
@@ -330,13 +341,13 @@ public class PlayerTrigger : NetworkBehaviour
     {
         if (_player3DAudioSource == null)
         {
-            Debug.LogWarning($"[{name}] AudioSource NULL");
+            //Debug.LogWarning($"[{name}] AudioSource NULL");
             return;
         }
 
         if (AudioManager.Instance == null)
         {
-            Debug.LogWarning($"[{name}] AudioManager NULL");
+            //Debug.LogWarning($"[{name}] AudioManager NULL");
             return;
         }
 
@@ -344,7 +355,7 @@ public class PlayerTrigger : NetworkBehaviour
 
         if (clip == null)
         {
-            Debug.LogWarning($"[{name}] SFX NOT FOUND : {sfxName}");
+            //Debug.LogWarning($"[{name}] SFX NOT FOUND : {sfxName}");
             return;
         }
 

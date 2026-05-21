@@ -21,8 +21,9 @@ public class PlayerCore : NetworkBehaviour {
 	private ClientPlayer _clientPlayer;
 	private GameObject _mainCamera;
 	public Animator animator;
+	public GameObject _characterModel;
+	public GameObject _parasuit;
 	[SerializeField] private GameObject _portalPrefabs;
-	[SerializeField] private GameObject _parasuit;
 
 	public PlayerState player_state = PlayerState.Wait;
 	public StatusEffect status_effect = StatusEffect.None;
@@ -32,6 +33,7 @@ public class PlayerCore : NetworkBehaviour {
 	public Action<IUseable> on_item_acquired;
 	public Action on_race_start;
 	public Action on_race_finish;
+	public Action on_wingPoint_entered;
 	public Action on_redzone_entered;
 	public Action on_endpoint_landed;
 	public Action on_wing_button_clicked;

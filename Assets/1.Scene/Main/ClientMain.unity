@@ -339,7 +339,7 @@ PrefabInstance:
     - target: {fileID: 8849018464848831088, guid: cf88ee5a333bb724186a558656475da2, type: 3}
       propertyPath: 'spawnPrefabs.Array.data[15]'
       value: 
-      objectReference: {fileID: 1871012326604064682, guid: c9ed8e1df49576b488532fe5ddcb0aa7, type: 3}
+      objectReference: {fileID: 159983229567582364, guid: a82b4dec1a2ac4a489ac03a4543963b2, type: 3}
     - target: {fileID: 8849018464848831088, guid: cf88ee5a333bb724186a558656475da2, type: 3}
       propertyPath: 'spawnPrefabs.Array.data[17]'
       value: 
@@ -7260,7 +7260,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5418573885882636161
 Transform:
   m_ObjectHideFlags: 0

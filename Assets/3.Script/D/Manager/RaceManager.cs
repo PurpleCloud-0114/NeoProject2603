@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Mirror;
 
@@ -16,6 +17,11 @@ public struct PlayerResult {
 	public string name;
 	public double finishTime;
 	public bool isDead;
+}
+
+public struct TotalScoreResult {
+	public string name;
+	public int totalScore;
 }
 
 public class RaceManager : NetworkBehaviour {
@@ -40,19 +46,11 @@ public class RaceManager : NetworkBehaviour {
 	// 참가자 리스트 (순위)
 	public List<Transform> active_players = new List<Transform>();
 	// 이전 순위 기록용 딕셔너리
-	private Dictionary<Transform, int> _previousRanks = new Dictionary<Transform, int>();
+	// private Dictionary<Transform, int> _previousRanks = new Dictionary<Transform, int>();
 
 	// 도착 순위
 	//private List<PlayerResult> final_results = new List<PlayerResult>();
 	private Dictionary<NetworkIdentity, PlayerResult> _roundResults = new Dictionary<NetworkIdentity, PlayerResult>();
-
-	[Header("레이스 종료")]
-	[SerializeField] private float returnDelay = 7.5f;
-	private bool isSceneChanging = false;
-
-	[Header("라운드 관리")]
-	[SyncVar] public int current_round_sync = 0;
-	public const int MAX_ROUND = 10;
 
 	//----- 메서드
 	private void Awake() {
@@ -78,6 +76,10 @@ public class RaceManager : NetworkBehaviour {
 		race_start_time_sync = NetworkTime.time + 0.1f;
 
 		//TODO - ClientRPC로 카운트다운 UI 넣을건가?
+
+		if(RoundManager.Instance.current_round_sync == 0) {
+			InitAllPlayerScores();//모든 플레이어 Dictionary에 등록
+		}
 	}
 
 	[ServerCallback]
@@ -140,8 +142,12 @@ public class RaceManager : NetworkBehaviour {
 
 	[Server]
 	private void EndRace() {
+		if (current_state_sync == RaceState.Finished) return;
+
 		current_state_sync = RaceState.Finished;
+
 		List<PlayerResult> sortedResults = new List<PlayerResult>(_roundResults.Values);
+
 		sortedResults.Sort((a, b) => {
 			// 생존자(false)는 0, 사망자(true)는 1로 취급됨
 			int deadCompare = a.isDead.CompareTo(b.isDead);
@@ -151,62 +157,132 @@ public class RaceManager : NetworkBehaviour {
 			return a.finishTime.CompareTo(b.finishTime);
 		});
 
-		RpcShowFinalResult(sortedResults.ToArray());
+		List<int> roundScores = ScoreCalculate(sortedResults);
 
-		StartReturnToLobby();
+		//컴파일 에러 방지용 임시.
+		Dictionary<NetworkIdentity, int> externalTotalScores = new Dictionary<NetworkIdentity, int>();
+
+
+		int[] previousScores = new int[sortedResults.Count];
+		for (int i = 0; i < sortedResults.Count; i++) {
+			NetworkIdentity p = sortedResults[i].player;
+			// 이번 라운드 점수가 더해지기 전의 기존 점수를 저장
+			//previousScores[i] = SQLManager.Instance.player_score.GetPlayerScore(p);
+			previousScores[i] = SQLManager.Instance.player_score.GetPlayerScore(sortedResults[i].name);
+		}
+
+		//플레이어 UI 점수 전송.
+		RpcShowRoundResult(sortedResults.ToArray(), previousScores, roundScores.ToArray());
+		StartCoroutine(Co_RpcShowScoreResult(sortedResults, roundScores));
+
+		RoundManager.Instance.RoundChanger();
+	}
+
+	private IEnumerator Co_RpcShowScoreResult(List<PlayerResult> sortedResults, List<int> roundScores) {
+		yield return new WaitForSeconds(4f);
+		//스코어 업데이트 메서드 (점수 추가)
+		for (int i = 0; i < sortedResults.Count; i++) {
+			//SQLManager.Instance.player_score.AddPlayerScore(sortedResults[i].player, roundScores[i]);
+			SQLManager.Instance.player_score.AddPlayerScore(sortedResults[i].name, roundScores[i]);
+		}
+
+		//현재 토탈 스코어 랭크 정렬
+		List<TotalScoreResult> totalList = new List<TotalScoreResult>();
+		foreach (var res in sortedResults) {
+			//int total = SQLManager.Instance.player_score.GetPlayerScore(res.player);
+			int total = SQLManager.Instance.player_score.GetPlayerScore(res.name);
+			totalList.Add(new TotalScoreResult {
+				name = res.name,
+				totalScore = total
+			});
+		}
+
+		totalList.Sort((a, b) => b.totalScore.CompareTo(a.totalScore));
+		RpcShowScoreResult(totalList.ToArray());
 	}
 
 	//각자 유저들에게 결과창 보여주기.
 	[ClientRpc]
-	private void RpcShowFinalResult(PlayerResult[] results) {
-		UIManager.Instance.ShowFinalResult(results);
+	private void RpcShowRoundResult(PlayerResult[] results, int[] previousScores, int[] roundScores) {
+		// UI에서 results[i]의 점수는 roundScores[i]로 매칭하여 출력
+		UIManager.Instance.ShowRoundResult(results, previousScores, roundScores);
 		UIManager.Instance.HideUIforFinish();
 	}
 
-	[Server]
-	private void StartReturnToLobby() {
-		StartCoroutine(Co_ReturnToLobby());
+	[ClientRpc]
+	private void RpcShowScoreResult(TotalScoreResult[] totalResults) {
+		// 높은 점수 순으로 정렬된 토탈 순위 배열 전달
+		UIManager.Instance.ShowScoreResult(totalResults);
 	}
 
-	//결과창 7.5초
-	private IEnumerator Co_ReturnToLobby()
-	{
-		if (isSceneChanging) yield break;
-		isSceneChanging = true;
-
-		Debug.Log($"시상식중...(7.5초 걸림) | 현재 라운드: {current_round_sync + 1} / {MAX_ROUND}");
-		yield return new WaitForSeconds(returnDelay);
-
-		current_round_sync++;  // <<--- 라운드 증가
-
-		var roomManager = NetworkManager.singleton as NetworkRoomManager;
-		if (roomManager == null)
-		{
-			Debug.LogError("[RaceManager] RoomManager를 찾을 수 없습니다.");
-			yield break;
-		}
-
-		if (current_round_sync < MAX_ROUND)  // <<--- 10라운드 미만 -> 게임 씬 재시작
-		{
-			Debug.Log($"[RaceManager] 라운드 {current_round_sync} / {MAX_ROUND} → 게임 씬 재시작");
-			ResetRoundState();                                              // <<--- 상태 초기화
-			roomManager.ServerChangeScene(roomManager.GameplayScene);      // <<--- 게임 씬 재시작
-		}
-		else                                 // <<--- 10라운드 완료 -> 로비 복귀
-		{
-			Debug.Log($"[RaceManager] {MAX_ROUND}라운드 완료 → 로비 복귀");
-			current_round_sync = 0;                                        // <<--- 라운드 초기화
-			roomManager.ServerChangeScene(roomManager.RoomScene);          // <<--- 로비 복귀
-		}
-	}
 	[Server]
-	private void ResetRoundState()  // <<--- 추가
+	public void ResetRoundState()  // <<--- 추가
 	{
 		_roundResults.Clear();          // 도착 결과 초기화
 		_playersReadyCount = 0;         // 준비 카운트 초기화
 		current_state_sync = RaceState.Waiting;  // 레이스 상태 초기화
-		Debug.Log("[RaceManager] 라운드 상태 초기화 완료");
+		//Debug.Log("[RaceManager] 라운드 상태 초기화 완료");
 	}
+
+
+	// ==========================================
+	// [ 점수 처리 ]
+	// ==========================================
+	//1위 50 / 2위 35 / 3위 25 / 4위 15 / 5위 5
+	//6위 0 / 7위 -5 / 8위 -10 / 9위 -20 / 10위 -35
+	private List<int> ScoreCalculate(List<PlayerResult> sortedResult) {
+		int[] scores_value = { 50, 35, 25, 15, 5, 0, -5, -10, -20, -35 };
+		List<int> scores = new List<int>();
+
+		for (int i = 0; i < sortedResult.Count; i++) {
+			if (sortedResult[i].isDead) {
+				scores.Add(scores_value[9]); // 사망자 점수 (-35)
+			} else {
+				// 인원수가 많아 인덱스를 초과하는 경우 방어 코드 (마지막 등수 점수로 고정)
+				int scoreIndex = Mathf.Min(i, 9);
+				scores.Add(scores_value[scoreIndex]);
+			}
+		}
+		return scores;
+	}
+
+	//토탈 랭크 업데이트
+	public void UpdateRatingScore() {
+		//List<NetworkIdentity> sortedPlayers = 
+		//	SQLManager.Instance.player_score.player_score_management.OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+
+		////List<NetworkIdentity> netIDkeys = new List<NetworkIdentity>();
+		////foreach(NetworkIdentity key in SQLManager.Instance.player_score.player_score_management.Keys) {
+		////	netIDkeys.Add(key);
+		////}
+		//Dictionary<NetworkIdentity, string> player_names = new Dictionary<NetworkIdentity, string>();
+		//foreach (NetworkIdentity key in SQLManager.Instance.player_score.player_score_management.Keys) {
+		//	if (_roundResults.TryGetValue(key, out var value)) {
+		//		player_names.Add(key, value.name);
+		//	}
+		//}
+
+		//int[] RatingScroes = { 50, 40, 35, 30, 25, 20, 15, 10, 5, 0 };
+		//for(int i = 0; i < sortedPlayers.Count; i++) {
+		//	if(player_names.TryGetValue(sortedPlayers[i], out string nickname)) {
+		//		SQLManager.Instance.AddScore(nickname, RatingScroes[i]);
+		//	}
+		//}
+
+		// Key가 이미 string(닉네임)이므로 복잡한 변환 없이 바로 정렬 및 추출 가능
+		List<string> sortedPlayers =
+			SQLManager.Instance.player_score.player_score_management.OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+
+		int[] RatingScroes = { 50, 40, 35, 30, 25, 20, 15, 10, 5, 0 };
+
+		for (int i = 0; i < sortedPlayers.Count; i++) {
+			// 인원이 많아도 배열의 마지막 등수 점수(0점)로 안전하게 고정
+			int scoreIndex = Mathf.Min(i, RatingScroes.Length - 1);
+
+			SQLManager.Instance.AddScore(sortedPlayers[i], RatingScroes[scoreIndex]);
+		}
+	}
+
 
 
 
@@ -236,9 +312,12 @@ public class RaceManager : NetworkBehaviour {
 	[Command(requiresAuthority = false)]
 	public void CmdReportReady() {
 		_playersReadyCount++;
-		Debug.Log($"플레이어 준비 완료: {_playersReadyCount} / {total_players}");
+		//Debug.Log($"플레이어 준비 완료: {_playersReadyCount} / {total_players}");
 
-		if(_playersReadyCount >= total_players && current_state_sync == RaceState.Waiting) {
+		//Int로 카운트만 한다면 악의적으로 혼자서 여러번 보낼 수 있음., 해시셋을 써서 검증하는게 안전.
+		//HashSet<NetworkConnection>
+
+		if (_playersReadyCount >= total_players && current_state_sync == RaceState.Waiting) {
 			//if(_playersReadyCount >= START_MAX_PLAYER) { 
 			//StartCountdown();
 			CutsceneController.Instance.PlayIntro();
@@ -254,7 +333,7 @@ public class RaceManager : NetworkBehaviour {
 	public void UnregisterPlayer(Transform player) {
 		if (active_players.Contains(player)) {
 			active_players.Remove(player);
-			_previousRanks.Remove(player);
+			//_previousRanks.Remove(player);
 		}
 	}
 
@@ -286,5 +365,35 @@ public class RaceManager : NetworkBehaviour {
 				pc.TargetUpdateRank(pc.connectionToClient, rank);
 			}
 		}
+	}
+	[Server]
+	private void InitAllPlayerScores()
+	{
+		if (SQLManager.Instance == null)
+		{
+			Debug.LogError("[RaceManager] SQLManager.Instance가 null → 점수 초기화 실패");
+			return;
+		}
+
+		SQLManager.Instance.player_score.player_score_management.Clear();
+
+		foreach (var conn in NetworkServer.connections.Values) {
+			if (conn == null || conn.identity == null) continue;
+
+			NetworkIdentity player = conn.identity;
+
+			//SQLManager.Instance.player_score.InitPlayerScore(player);
+
+			//Debug.Log($"[RaceManager] 점수 초기화 등록: {player.name} | 초기값: 0");
+
+			// [수정] player.name(프리팹 이름) 대신, 플레이어 스크립트에서 진짜 닉네임을 가져옵니다.
+			if (player.TryGetComponent(out PlayerDataSync playerData)) {
+				SQLManager.Instance.player_score.InitPlayerScore(playerData.SyncNickname);
+				Debug.Log($"[RaceManager] 점수 초기화 등록: {playerData.SyncNickname} | 초기값: 0");
+			}
+		}
+
+		Debug.Log($"[RaceManager] 전체 플레이어 점수 초기화 완료 | 등록 수: " +
+				  $"{SQLManager.Instance.player_score.player_score_management.Count}");
 	}
 }
