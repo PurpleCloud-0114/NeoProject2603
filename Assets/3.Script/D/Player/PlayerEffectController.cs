@@ -67,10 +67,12 @@ public class PlayerEffectController : NetworkBehaviour {
 	}
 	//맞는 판정
 	public void HitSpiderweb(Collider spiderweb) {
-		if (spiderweb.TryGetComponent(out SpiderwebObstacle _spiderweb)) {
-			_playerCore.on_max_drop_speed_change_requested(_spiderweb.SetPlayerVelocity, _spiderweb.duration, 0f, StatusEffect.Stun);
-			_playerCore.on_stun_requested?.Invoke(_spiderweb.duration);
-		}
+		_playerCore.on_obstacle_hit();
+
+		//if (spiderweb.TryGetComponent(out SpiderwebObstacle _spiderweb)) {
+		//	_playerCore.on_max_drop_speed_change_requested(_spiderweb.SetPlayerVelocity, _spiderweb.duration, 0f, StatusEffect.Stun);
+		//	_playerCore.on_stun_requested?.Invoke(_spiderweb.duration);
+		//}
 	}
 
 
@@ -88,10 +90,10 @@ public class PlayerEffectController : NetworkBehaviour {
 		yield return new WaitForSeconds(chargeDuration);
 
 		Collider[] hits = Physics.OverlapSphere(transform.position, range);
-		foreach(Collider hit in hits) {
+		foreach (Collider hit in hits) {
 			if (hit.gameObject == gameObject) continue;
 
-			if(hit.TryGetComponent(out PlayerEffectController targetEffectController)) {
+			if (hit.TryGetComponent(out PlayerEffectController targetEffectController)) {
 				Vector3 normal = (hit.transform.position - transform.position).normalized;
 				targetEffectController.HitShockwave(normal * pushForce, stunDuration);
 			}
@@ -119,7 +121,7 @@ public class PlayerEffectController : NetworkBehaviour {
 		if (!isServer) return;
 
 		TargetApplyMagneticEffect(netIdentity.connectionToClient, target, true, duration, power);
-		if(target.TryGetComponent(out NetworkIdentity targetIdentity)) {
+		if (target.TryGetComponent(out NetworkIdentity targetIdentity)) {
 			TargetApplyMagneticEffect(targetIdentity.connectionToClient, gameObject, false, duration, power);
 		}
 	}
@@ -128,13 +130,11 @@ public class PlayerEffectController : NetworkBehaviour {
 		if (opponent == null) return;
 		if (_playerCore.player_state != PlayerState.Falling) return;
 		// 1. 공격자가 아닌 '당한 사람'일 경우에만 UI 표시 및 파티클 재생
-		if (UIManager.Instance != null)
-		{
+		if (UIManager.Instance != null) {
 			UIManager.Instance.ShowMagneticIndicator(isAttacker, 2.5f);
 		}
 		// 2. 각자 역할에 맞는 파티클 재생
-		if (TryGetComponent(out PlayerTrigger trigger))
-		{
+		if (TryGetComponent(out PlayerTrigger trigger)) {
 			trigger.PlayHitEffect(isAttacker ? 4 : 6);
 		}
 		StartCoroutine(Co_MagneticForce(opponent, isAttacker, duration, power));
@@ -162,7 +162,7 @@ public class PlayerEffectController : NetworkBehaviour {
 	// =========================
 	public void UseAntiMagicItem(float duration) {
 		StopCoroutine("Invinsibling_co");
-		StartCoroutine("Invinsibling_co",duration);
+		StartCoroutine("Invinsibling_co", duration);
 	}
 
 	// =========================

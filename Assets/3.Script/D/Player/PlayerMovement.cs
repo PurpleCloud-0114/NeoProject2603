@@ -50,8 +50,6 @@ public class PlayerMovement : NetworkBehaviour {
 		}
 
 		_mapSize = StageManager.Instance.map_size;
-
-		if (RaceManager.Instance.isSinglePlay) StartFalling(PlayerState.Falling);
 	}
 
 	private void OnEnable() {
@@ -95,7 +93,7 @@ public class PlayerMovement : NetworkBehaviour {
 		ClampPositionToMapBounds();
 	}
 	private void Update() {
-		if (!isLocalPlayer || _playerInputSystem == null || _playerCore.player_state != PlayerState.Falling) return;
+		if (!isLocalPlayer || _playerInputSystem == null || _playerCore.player_state == PlayerState.Wait || _playerCore.player_state == PlayerState.Finish) return;
 
 		_moveVector = _playerInputSystem.MovePoint;
 		if (!_playerInputSystem.is_joystick) _moveVector *= MoveMobileSensitive;

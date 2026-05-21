@@ -3,372 +3,326 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class PlayerTrigger : NetworkBehaviour
-{
-    private PlayerCore _playerCore;
-
-    private const string TAG_OBSTACLE = "Obstacle";
-    private const string TAG_ITEMBOX = "ItemBox";
-    private const string TAG_REDZONE = "Redzone";
-    private const string TAG_SPIDERWEB = "Spiderweb";
-    private const string TAG_PLAYER = "Player";
-    private const string TAG_WINGPOINT = "WingPoint";
-    private const string TAG_FINISHLINE = "FinishLine";
-    private const string TAG_ENDPOINT = "EndPoint";
-
-    [Header("Audio")]
-    [SerializeField] private AudioSource _player3DAudioSource;
-
-    [Header("Attached Hit Particles")]
-    [SerializeField] private ParticleSystem obstacleHitParticle;
-    [SerializeField] private ParticleSystem playerHitParticle;
-    [SerializeField] private ParticleSystem spiderwebHitParticle;
-    [SerializeField] private ParticleSystem itemBoxHitParticle;
-    [SerializeField] private ParticleSystem magneticHitParticle;
-    [SerializeField] private ParticleSystem magneticHitParticle_attack;
-    [SerializeField] private ParticleSystem deathParticle;
-
-    [SerializeField] private float _hitPlayerImpulsePower = 25f;
-    [SerializeField] private float _hitObstacleInvincibilityDuration = 1f;
-
-    private bool Invincibility = false;
-
-    private WaitForSeconds wfs;
-    private WaitForSeconds wfs2;
-
-    private void Awake()
-    {
-        TryGetComponent(out _playerCore);
+public class PlayerTrigger : NetworkBehaviour {
+	private PlayerCore _playerCore;
+
+	private const string TAG_OBSTACLE = "Obstacle";
+	private const string TAG_ITEMBOX = "ItemBox";
+	private const string TAG_REDZONE = "Redzone";
+	private const string TAG_SPIDERWEB = "Spiderweb";
+	private const string TAG_PLAYER = "Player";
+	private const string TAG_WINGPOINT = "WingPoint";
+	private const string TAG_FINISHLINE = "FinishLine";
+	private const string TAG_ENDPOINT = "EndPoint";
+
+	[Header("Audio")]
+	[SerializeField] private AudioSource _player3DAudioSource;
+
+	[Header("Attached Hit Particles")]
+	[SerializeField] private ParticleSystem obstacleHitParticle;
+	[SerializeField] private ParticleSystem playerHitParticle;
+	[SerializeField] private ParticleSystem spiderwebHitParticle;
+	[SerializeField] private ParticleSystem itemBoxHitParticle;
+	[SerializeField] private ParticleSystem magneticHitParticle;
+	[SerializeField] private ParticleSystem magneticHitParticle_attack;
+	[SerializeField] private ParticleSystem deathParticle;
 
-        wfs = new WaitForSeconds(_hitObstacleInvincibilityDuration);
-        wfs2 = new WaitForSeconds(_hitObstacleInvincibilityDuration * 0.1f);
-    }
+	[SerializeField] private float _hitPlayerImpulsePower = 25f;
+	[SerializeField] private float _hitObstacleInvincibilityDuration = 1f;
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.transform.CompareTag(TAG_ENDPOINT))
-        {
-            if (isLocalPlayer)
-            {
-                CmdRequestHideModel();
+	private bool Invincibility = false;
 
-                UIManager.Instance.ShowPersonalResult();
-                _playerCore.SendEndpoint();
+	private WaitForSeconds wfs;
+	private WaitForSeconds wfs2;
 
-                _playerCore.SendEndpoint();
+	private void Awake() {
+		TryGetComponent(out _playerCore);
 
-                CmdPlay3DSFX("PlayerLandFail");
-            }
-        }
-    }
+		wfs = new WaitForSeconds(_hitObstacleInvincibilityDuration);
+		wfs2 = new WaitForSeconds(_hitObstacleInvincibilityDuration * 0.1f);
+	}
 
-    // ---------------- RPC ----------------
+	private void OnCollisionEnter(Collision collision) {
+		if (collision.transform.CompareTag(TAG_ENDPOINT)) {
+			if (isLocalPlayer) {
+				CmdRequestHideModel();
 
-    [Command]
-    private void CmdRequestHideModel() {
-        RpcHidePlayerModel();
-    }
-    [ClientRpc]
-    private void RpcHidePlayerModel()
-    {
-        //gameObject.SetActive(false);
-        if (_playerCore._characterModel != null)
-            _playerCore._characterModel.SetActive(false);
-        if (_playerCore._parasuit != null)
-            _playerCore._parasuit.SetActive(false);
-    }
+				UIManager.Instance.ShowPersonalResult();
+				_playerCore.SendEndpoint();
 
-    private void OnTriggerEnter(Collider other)
-    {
-        switch (other.tag)
-        {
-            case TAG_ITEMBOX:
+				_playerCore.SendEndpoint();
 
-                if (!isLocalPlayer) return;
+				CmdPlay3DSFX("PlayerLandFail");
+			}
+		}
+	}
 
-                CmdPlayHitEffect(3);
+	// ---------------- RPC ----------------
 
-                //CmdDisableRoot(other.transform.root.GetComponent<NetworkIdentity>());
+	[Command]
+	private void CmdRequestHideModel() {
+		RpcHidePlayerModel();
+	}
+	[ClientRpc]
+	private void RpcHidePlayerModel() {
+		//gameObject.SetActive(false);
+		if (_playerCore._characterModel != null)
+			_playerCore._characterModel.SetActive(false);
+		if (_playerCore._parasuit != null)
+			_playerCore._parasuit.SetActive(false);
+		if (_playerCore._collider != null)
+			_playerCore._collider.isTrigger = true;
+		if (_playerCore._collider != null) {
+			LayerMask targetLayers = LayerMask.GetMask("Nothing");
+			_playerCore._playerpush_collider.includeLayers = targetLayers;
+		}
+	}
 
-                _playerCore.CmdRequestItemSelection();
+	private void OnTriggerEnter(Collider other) {
+		switch (other.tag) {
+			case TAG_ITEMBOX:
 
-                PlayLocalSFX("ItemWeightActivate");
+				if (!isLocalPlayer) return;
 
-                break;
+				CmdPlayHitEffect(3);
 
-            case TAG_OBSTACLE:
+				//CmdDisableRoot(other.transform.root.GetComponent<NetworkIdentity>());
 
-                ObstacleIdentity obs = other.GetComponentInParent<ObstacleIdentity>();
+				_playerCore.CmdRequestItemSelection();
 
-                if (isLocalPlayer)
-                {
-                    CmdPlayHitEffect(0);
+				PlayLocalSFX("ItemWeightActivate");
 
-                    // 모듈형 장애물
-                    if (obs != null && obs.parentFloor != null)
-                    {
-                        CmdHitModuleObstacle(obs.parentFloor.netIdentity, obs.obstacleIndex);
-                    }
-                    // 독립 장애물
-                    else
-                    {
-                        NetworkIdentity identity =
-                            other.transform.root.GetComponent<NetworkIdentity>();
+				break;
 
-                        if (identity != null)
-                        {
-                            CmdDisableRoot(identity);
-                        }
-                    }
+			case TAG_OBSTACLE:
 
-                    CmdPlay3DSFX("ObstacleBreak");
-                }
+				ObstacleIdentity obs = other.GetComponentInParent<ObstacleIdentity>();
 
-                if (!Invincibility)
-                {
-                    StartCoroutine(Co_Invincibility());
+				if (isLocalPlayer) {
+					CmdPlayHitEffect(0);
 
-                    _playerCore.on_obstacle_hit?.Invoke();
-                }
+					// 모듈형 장애물
+					if (obs != null && obs.parentFloor != null) {
+						CmdHitModuleObstacle(obs.parentFloor.netIdentity, obs.obstacleIndex);
+					}
+					// 독립 장애물
+					else {
+						NetworkIdentity identity =
+							other.transform.root.GetComponent<NetworkIdentity>();
 
-                break;
+						if (identity != null) {
+							CmdDisableRoot(identity);
+						}
+					}
 
-            case TAG_REDZONE:
+					CmdPlay3DSFX("ObstacleBreak");
+				}
 
-                if (!isLocalPlayer) return;
+				if (!Invincibility) {
+					StartCoroutine(Co_Invincibility());
 
-                _playerCore.on_redzone_entered?.Invoke();
+					_playerCore.on_obstacle_hit?.Invoke();
+				}
 
-                break;
+				break;
 
-            case TAG_SPIDERWEB:
+			case TAG_REDZONE:
 
-                if (!isLocalPlayer) return;
+				if (!isLocalPlayer) return;
 
-                _playerCore.on_spiderweb_hit?.Invoke(other);
+				_playerCore.on_redzone_entered?.Invoke();
 
-                CmdPlayHitEffect(2);
+				break;
 
-                CmdPlay3DSFX("ItemWebHit");
+			case TAG_SPIDERWEB:
 
-                break;
+				if (!isLocalPlayer) return;
 
-            case TAG_PLAYER:
+				_playerCore.on_spiderweb_hit?.Invoke(other);
 
-                if (!isLocalPlayer) return;
+				CmdPlayHitEffect(2);
 
-                PushPlayer(other);
+				CmdPlay3DSFX("ItemWebHit");
 
-                CmdPlayHitEffect(1);
+				break;
 
-                CmdPlay3DSFX("PlayerCollision");
+			case TAG_PLAYER:
 
-                break;
+				if (!isLocalPlayer) return;
 
-            case TAG_WINGPOINT:
+				PushPlayer(other);
 
-                if (!isLocalPlayer) return;
+				CmdPlayHitEffect(1);
 
-                _playerCore.on_wingPoint_entered?.Invoke();
+				CmdPlay3DSFX("PlayerCollision");
 
-                break;
+				break;
 
-            case TAG_FINISHLINE:
+			case TAG_WINGPOINT:
 
-                if (!isLocalPlayer) return;
+				if (!isLocalPlayer) return;
 
-                float impactSpeed = 0f;
+				_playerCore.on_wingPoint_entered?.Invoke();
 
-                if (TryGetComponent(out Rigidbody rb))
-                {
-                    impactSpeed = Mathf.Abs(rb.linearVelocity.y);
-                }
+				break;
 
-                double myFinishTime =
-                    NetworkTime.time - RaceManager.Instance.race_start_time_sync;
+			case TAG_FINISHLINE:
 
-                _playerCore.player_state = PlayerState.Finish;
+				if (!isLocalPlayer) return;
 
-                _playerCore.SpawnPortal();
+				float impactSpeed = 0f;
 
-                _playerCore.SendArriveResult(impactSpeed, myFinishTime);
+				if (TryGetComponent(out Rigidbody rb)) {
+					impactSpeed = Mathf.Abs(rb.linearVelocity.y);
+				}
 
-                break;
-        }
-    }
+				double myFinishTime =
+					NetworkTime.time - RaceManager.Instance.race_start_time_sync;
 
-    private IEnumerator Co_Invincibility()
-    {
-        Invincibility = true;
+				_playerCore.CmdSetPlayerState(PlayerState.Finish);
+				_playerCore.SpawnPortal();
+				_playerCore.SendArriveResult(impactSpeed, myFinishTime);
 
-        StartCoroutine(Co_InvincibilityVisual());
+				break;
+		}
+	}
 
-        yield return wfs;
+	private IEnumerator Co_Invincibility() {
+		Invincibility = true;
 
-        Invincibility = false;
-    }
+		StartCoroutine(Co_InvincibilityVisual());
 
-    private IEnumerator Co_InvincibilityVisual()
-    {
-        while (Invincibility)
-        {
-            _playerCore._characterModel.SetActive(!_playerCore._characterModel.activeSelf);
+		yield return wfs;
 
-            yield return wfs2;
-        }
+		Invincibility = false;
+	}
 
-        _playerCore._characterModel.SetActive(true);
-    }
+	private IEnumerator Co_InvincibilityVisual() {
+		while (Invincibility) {
+			_playerCore._characterModel.SetActive(!_playerCore._characterModel.activeSelf);
 
-    // ---------------- COMMANDS ----------------
+			yield return wfs2;
+		}
 
-    [Command]
-    private void CmdHitModuleObstacle(NetworkIdentity floorId, int index)
-    {
-        if (floorId != null &&
-            floorId.TryGetComponent(out MapFloor floor))
-        {
-            floor.DisableByIndex(index);
-        }
-    }
+		_playerCore._characterModel.SetActive(true);
+	}
 
-    [Command]
-    private void CmdDisableRoot(NetworkIdentity identity)
-    {
-        if (identity == null) return;
+	// ---------------- COMMANDS ----------------
 
-        NetworkServer.UnSpawn(identity.gameObject);
+	[Command]
+	private void CmdHitModuleObstacle(NetworkIdentity floorId, int index) {
+		if (floorId != null &&
+			floorId.TryGetComponent(out MapFloor floor)) {
+			floor.DisableByIndex(index);
+		}
+	}
 
-        identity.gameObject.SetActive(false);
-    }
+	[Command]
+	private void CmdDisableRoot(NetworkIdentity identity) {
+		if (identity == null) return;
 
-    [Command]
-    private void CmdPlay3DSFX(string sfxName)
-    {
-        RpcPlay3DSFX(sfxName);
-    }
+		NetworkServer.UnSpawn(identity.gameObject);
 
-    public void PlayHitEffect(int effectType)
-    {
-        if (isServer)
-        {
-            // 서버에서 직접 호출한 경우 바로 모든 클라이언트에게 RPC 전송
-            RpcPlayHitEffect(effectType);
-        }
-        else if (isLocalPlayer)
-        {
-            // 클라이언트에서 호출한 경우 서버로 요청 (Command)
-            CmdPlayHitEffect(effectType);
-        }
-    }
+		identity.gameObject.SetActive(false);
+	}
 
+	[Command]
+	private void CmdPlay3DSFX(string sfxName) {
+		RpcPlay3DSFX(sfxName);
+	}
 
-    [Command]
-    public void CmdPlayHitEffect(int effectType)
-    {
-        RpcPlayHitEffect(effectType);
-    }
+	public void PlayHitEffect(int effectType) {
+		if (isServer) {
+			// 서버에서 직접 호출한 경우 바로 모든 클라이언트에게 RPC 전송
+			RpcPlayHitEffect(effectType);
+		} else if (isLocalPlayer) {
+			// 클라이언트에서 호출한 경우 서버로 요청 (Command)
+			CmdPlayHitEffect(effectType);
+		}
+	}
 
-    // ---------------- RPC ----------------
 
-    [ClientRpc]
-    private void RpcPlay3DSFX(string sfxName)
-    {
-        //Debug.Log($"RPC SFX : {sfxName} / {gameObject.name}");
+	[Command]
+	public void CmdPlayHitEffect(int effectType) {
+		RpcPlayHitEffect(effectType);
+	}
 
-        Play3DSFXLocal(sfxName);
-    }
+	// ---------------- RPC ----------------
 
-    [ClientRpc]
-    private void RpcPlayHitEffect(int effectType)
-    {
-        switch (effectType)
-        {
-            case 0:
-                PlayParticle(obstacleHitParticle);break;
+	[ClientRpc]
+	private void RpcPlay3DSFX(string sfxName) {
+		//Debug.Log($"RPC SFX : {sfxName} / {gameObject.name}");
 
-            case 1:
-                PlayParticle(playerHitParticle);break;
+		Play3DSFXLocal(sfxName);
+	}
 
-            case 2:
-                PlayParticle(spiderwebHitParticle);break;
+	[ClientRpc]
+	private void RpcPlayHitEffect(int effectType) {
+		switch (effectType) {
+			case 0: PlayParticle(obstacleHitParticle); break;
+			case 1: PlayParticle(playerHitParticle); break;
+			case 2: PlayParticle(spiderwebHitParticle); break;
+			case 3: PlayParticle(itemBoxHitParticle); break;
+			case 4: PlayParticle(magneticHitParticle); break;
+			case 5: PlayParticle(deathParticle); break;
+			case 6: PlayParticle(magneticHitParticle_attack); break;
+		}
+	}
 
-            case 3:
-                PlayParticle(itemBoxHitParticle);break;
+	// ---------------- PARTICLE ----------------
 
-            case 4:
-                PlayParticle(magneticHitParticle);break;
+	private void PlayParticle(ParticleSystem ps) {
+		if (ps == null)
+			return;
 
-            case 5:
-                PlayParticle(deathParticle);break;
+		ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-            case 6:
-                PlayParticle(magneticHitParticle_attack);break;
-        }
-    }
+		ps.Play();
+	}
 
-    // ---------------- PARTICLE ----------------
+	// ---------------- PUSH ----------------
 
-    private void PlayParticle(ParticleSystem ps)
-    {
-        if (ps == null)
-            return;
+	private void PushPlayer(Collider other) {
+		Vector3 dir = transform.position - other.transform.position;
 
-        ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+		dir.y = 0;
 
-        ps.Play();
-    }
+		if (dir.sqrMagnitude > 0.001f) {
+			_playerCore.on_impulse_requested?.Invoke(
+				dir.normalized * _hitPlayerImpulsePower
+			);
+		}
+	}
 
-    // ---------------- PUSH ----------------
+	// ---------------- LOCAL 3D SOUND ----------------
 
-    private void PushPlayer(Collider other)
-    {
-        Vector3 dir = transform.position - other.transform.position;
+	private void Play3DSFXLocal(string sfxName) {
+		if (_player3DAudioSource == null) {
+			//Debug.LogWarning($"[{name}] AudioSource NULL");
+			return;
+		}
 
-        dir.y = 0;
+		if (AudioManager.Instance == null) {
+			//Debug.LogWarning($"[{name}] AudioManager NULL");
+			return;
+		}
 
-        if (dir.sqrMagnitude > 0.001f)
-        {
-            _playerCore.on_impulse_requested?.Invoke(
-                dir.normalized * _hitPlayerImpulsePower
-            );
-        }
-    }
+		AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
 
-    // ---------------- LOCAL 3D SOUND ----------------
+		if (clip == null) {
+			//Debug.LogWarning($"[{name}] SFX NOT FOUND : {sfxName}");
+			return;
+		}
 
-    private void Play3DSFXLocal(string sfxName)
-    {
-        if (_player3DAudioSource == null)
-        {
-            //Debug.LogWarning($"[{name}] AudioSource NULL");
-            return;
-        }
+		_player3DAudioSource.PlayOneShot(clip);
+	}
 
-        if (AudioManager.Instance == null)
-        {
-            //Debug.LogWarning($"[{name}] AudioManager NULL");
-            return;
-        }
+	// ---------------- 2D/UI SOUND ----------------
 
-        AudioClip clip = AudioManager.Instance.GetSFXClip(sfxName);
+	private void PlayLocalSFX(string sfxName) {
+		if (AudioManager.Instance == null)
+			return;
 
-        if (clip == null)
-        {
-            //Debug.LogWarning($"[{name}] SFX NOT FOUND : {sfxName}");
-            return;
-        }
-
-        _player3DAudioSource.PlayOneShot(clip);
-    }
-
-    // ---------------- 2D/UI SOUND ----------------
-
-    private void PlayLocalSFX(string sfxName)
-    {
-        if (AudioManager.Instance == null)
-            return;
-
-        AudioManager.Instance.PlaySFX(sfxName);
-    }
+		AudioManager.Instance.PlaySFX(sfxName);
+	}
 }

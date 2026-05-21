@@ -20,16 +20,22 @@ public class MagneticItem : ScriptableObject, IUseable {
 		var players = RaceManager.Instance.active_players;
 		int myIndex = players.FindIndex(p => p != null && p.gameObject == user);
 
-		if (myIndex > 0) {
-			GameObject target = players[0].gameObject;
+		for(int i = 0; i < myIndex; i++) {
+			GameObject target = players[i].gameObject;
+			if(target.TryGetComponent(out PlayerCore playerCore)) {
+				if (playerCore.player_state != PlayerState.Falling) continue;
+				else {
+					// 1. 공격자(나)의 컨트롤러를 가져와서 '나'를 움직이게 함
+					if (user.TryGetComponent(out PlayerEffectController userController)) {
+						userController.TargetApplyMagneticEffect(userController.connectionToClient, target, true, duration, power);
+					}
+					if (target.TryGetComponent(out PlayerEffectController targetController)) {
+						// 타겟 본인의 컨트롤러에서 RPC를 쏴야, 타겟 클라이언트의 '본인 객체'가 이벤트를 발생시킴
+						targetController.TargetApplyMagneticEffect(targetController.connectionToClient, user, false, duration, power);
+					}
 
-			// 1. 공격자(나)의 컨트롤러를 가져와서 '나'를 움직이게 함
-			if (user.TryGetComponent(out PlayerEffectController userController)) {
-				userController.TargetApplyMagneticEffect(userController.connectionToClient, target, true, duration, power);
-			}
-			if (target.TryGetComponent(out PlayerEffectController targetController)) {
-				// 타겟 본인의 컨트롤러에서 RPC를 쏴야, 타겟 클라이언트의 '본인 객체'가 이벤트를 발생시킴
-				targetController.TargetApplyMagneticEffect(targetController.connectionToClient, user, false, duration, power);
+					return;
+				}
 			}
 		}
 	}

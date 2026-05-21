@@ -8,6 +8,7 @@ using Mirror;
 public enum PlayerState {
 	Wait,
 	Falling,
+	Parasuit,
 	Finish
 }
 
@@ -23,8 +24,11 @@ public class PlayerCore : NetworkBehaviour {
 	public Animator animator;
 	public GameObject _characterModel;
 	public GameObject _parasuit;
+	public CapsuleCollider _collider;
+	public CapsuleCollider _playerpush_collider;
 	[SerializeField] private GameObject _portalPrefabs;
 
+	[SyncVar(hook = nameof(OnStateChanged))]
 	public PlayerState player_state = PlayerState.Wait;
 	public StatusEffect status_effect = StatusEffect.None;
 
@@ -58,19 +62,28 @@ public class PlayerCore : NetworkBehaviour {
 		}
 	}
 
-	private void OnEnable() { 
+	private void OnEnable() {
 		on_player_state_change_requested += ChangePlayerState;
 		on_state_effect_change_requested += ChangeStatusEffect;
 		on_wing_button_clicked += CmdShowParasuit;
 	}
-	private void OnDisable() { 
+	private void OnDisable() {
 		on_player_state_change_requested -= ChangePlayerState;
 		on_state_effect_change_requested -= ChangeStatusEffect;
-		on_wing_button_clicked += CmdShowParasuit;
+		on_wing_button_clicked -= CmdShowParasuit;
 	}
 
-	private void ChangePlayerState(PlayerState newState) { 
+	[Command]
+	public void CmdSetPlayerState(PlayerState newState) {
 		player_state = newState;
+	}
+
+	private void OnStateChanged(PlayerState oldState, PlayerState newState) {
+		player_state = newState;
+	}
+
+	private void ChangePlayerState(PlayerState newState) {
+		CmdSetPlayerState(newState);
 		switch (newState) {
 			case PlayerState.Falling:
 				on_race_start?.Invoke();
@@ -155,7 +168,7 @@ public class PlayerCore : NetworkBehaviour {
 	[Command]
 	//서버에게 보내는 Finish 신호. (도착 속도 / 시간,
 	public void SendArriveResult(float impactSpeed, double finishTime) {
-		if(TryGetComponent(out PlayerDataSync playerData)) {
+		if (TryGetComponent(out PlayerDataSync playerData)) {
 			string name = playerData.SyncNickname;
 			RaceManager.Instance.GetArriveResult(connectionToClient, name, impactSpeed, finishTime);
 		}
@@ -166,7 +179,7 @@ public class PlayerCore : NetworkBehaviour {
 	public void SendEndpoint() {
 		RaceManager.Instance.EndRaceCheck();
 	}
-	
+
 	public void SpawnPortal() {
 		Vector3 spawnPos = new Vector3(transform.position.x, -37f, transform.position.z);
 		Quaternion rotation = Quaternion.Euler(-90, 0, 0);
@@ -175,6 +188,7 @@ public class PlayerCore : NetworkBehaviour {
 
 	[Command]
 	public void CmdShowParasuit() {
+		player_state = PlayerState.Parasuit; // SyncVar를 직접 변경해야 함
 		ShowParasuit();
 	}
 

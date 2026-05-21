@@ -62,9 +62,9 @@ public class PlayerUIController : NetworkBehaviour {
 	}
 
 	private void BindBtnAction() {
-		_wingButton.onClick.AddListener(() => _playerCore.on_wing_button_clicked());
+		_wingButton.onClick.AddListener(() => _playerCore.on_wing_button_clicked?.Invoke());
 		_wingButton.onClick.AddListener(DeActivateWingBtn);
-		_itemButton.onClick.AddListener(() => _playerCore.on_item_button_clicked());
+		_itemButton.onClick.AddListener(() => _playerCore.on_item_button_clicked?.Invoke());
 		_itemButton.onClick.AddListener(DeActivateItemBtn);
 	}
 

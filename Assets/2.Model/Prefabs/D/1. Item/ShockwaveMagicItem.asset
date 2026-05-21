@@ -15,7 +15,7 @@ MonoBehaviour:
   _itemName: "\uCDA9\uACA9\uD30C \uB9C8\uBC95"
   _itemType: 2
   _itmeImage: {fileID: 21300000, guid: 5b96ab30ead3c2942963c92fb886c0c8, type: 3}
-  range: 15
+  range: 30
   push_force: 25
   stun_duration: 2
   charge_duration: 2
