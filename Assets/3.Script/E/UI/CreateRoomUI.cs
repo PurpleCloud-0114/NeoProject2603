@@ -7,7 +7,11 @@ using Mirror;
 
 public class CreateRoomUI : MonoBehaviour
 {
-    public void CreateRoom()
+	private void Start() {
+        CreateRoom();
+	}
+
+	public void CreateRoom()
     {
         NetworkManager networkManager = NetworkManager.singleton;
         networkManager.networkAddress = "192.168.45.104";

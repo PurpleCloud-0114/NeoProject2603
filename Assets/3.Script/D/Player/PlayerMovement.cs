@@ -28,6 +28,9 @@ public class PlayerMovement : NetworkBehaviour {
 
 	private Tween _speedControlSequence;
 	private Tween _stunSequence;
+	[Header("충돌 피드백 설정")]
+	[SerializeField] private float _controlEfficiency = 1f; // 1이면 100% 제어 가능, 0이면 조작 불가
+	private Tween _resistanceSequence;
 
 	//----- 메서드
 
@@ -64,6 +67,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_stun_requested += ApplyStun;
 		_playerCore.on_race_start += SetBasePoint;
 		_playerCore.on_race_finish += EndRace;
+		_playerCore.on_player_collision_entered += ApplyCollisionResistance;
 	}
 	private void OnDisable() {
 		_playerCore.on_player_state_change_requested -= StartFalling;
@@ -77,6 +81,7 @@ public class PlayerMovement : NetworkBehaviour {
 		_playerCore.on_stun_requested -= ApplyStun;
 		_playerCore.on_race_start -= SetBasePoint;
 		_playerCore.on_race_finish -= EndRace;
+		_playerCore.on_player_collision_entered -= ApplyCollisionResistance;
 	}
 
 	private void FixedUpdate() {
@@ -113,7 +118,13 @@ public class PlayerMovement : NetworkBehaviour {
 
 	private void Move() {
 		Vector3 currentVelocity = _rigidBody.linearVelocity;
-		Vector3 targetVel = _moveDir * _moveSpeed;
+		if (_controlEfficiency < 1f) {
+			//플레이어 충돌 시, 제어 방해
+			Vector3 inputForce = _moveDir * _moveSpeed * _controlEfficiency;
+			_rigidBody.AddForce(inputForce, ForceMode.Acceleration);
+			return;
+		}
+		Vector3 targetVel = _moveDir * _moveSpeed * _controlEfficiency;
 		Vector3 velocityDiff = targetVel - new Vector3(currentVelocity.x, 0, currentVelocity.z);
 		_rigidBody.AddForce(velocityDiff, ForceMode.VelocityChange);
 
@@ -220,6 +231,25 @@ public class PlayerMovement : NetworkBehaviour {
 	}
 	private void ApplyContinuousForce(Vector3 force) {
 		_rigidBody.AddForce(force, ForceMode.Acceleration);
+	}
+	public void ApplyCollisionResistance(Vector3 knockbackForce, float peakDuration, float recoveryDuration) {
+		if (!isLocalPlayer) return;
+
+		_resistanceSequence?.Kill();
+
+		// 1) 충돌 즉시 특정 방향으로 세게 밀어버림 (일정 거리 고정 이동 효과의 시작)
+		_rigidBody.AddForce(knockbackForce, ForceMode.Impulse);
+
+		// 2) 즉시 조작력을 10% 수준으로 떡락시킴 (반발하는 힘을 주기 힘들어짐)
+		_controlEfficiency = 0.5f;
+
+		// 3) DOTween 시퀀스로 약화 상태 유지 후 서서히 복구
+		Sequence seq = DOTween.Sequence();
+		seq.AppendInterval(peakDuration); // 특정 방향으로 밀리는 동안 조작 불능 상태 유지
+		seq.Append(DOTween.To(() => _controlEfficiency, x => _controlEfficiency = x, 1f, recoveryDuration)
+			 .SetEase(Ease.OutCubic)); // 서서히 제어력이 돌아옴 (미끄러지다가 접지력을 되찾는 느낌)
+
+		_resistanceSequence = seq;
 	}
 	private void ApplyStun(float duration) {
 		_stunSequence?.Kill();
