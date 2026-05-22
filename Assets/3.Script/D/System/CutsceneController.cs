@@ -30,9 +30,23 @@ public class CutsceneController : NetworkBehaviour {
 		_director.stopped -= OnCutsceneEnd;
 	}
 
+
 	public void PlayIntro() {
-		//플레이어 조작 잠금. --> 이미 되어있음.
-		//컷신 카메라 활성화.
+		// 서버 본인 환경에서 즉시 실행 (데디 서버 포함)
+		ExecuteIntro();
+
+		// 모든 클라이언트들에게도 실행하라고 명령
+		RpcPlayIntro();
+	}
+
+	[ClientRpc]
+	private void RpcPlayIntro() {
+		if (isServer) return; // 서버는 위에서 이미 실행했으므로 중복 실행 방지
+		ExecuteIntro();
+	}
+
+	// 3. 실제 컷신이 실행되는 핵심 로직
+	private void ExecuteIntro() {
 		UIManager.Instance.PlayTextEffect();
 		_director.Play();
 	}

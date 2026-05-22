@@ -160,7 +160,7 @@ public class UIManager : MonoBehaviour {
 		}
 	}
 
-	[ClientRpc]
+
 	public void PlayTextEffect() {
 		// 기존 패턴과 동일하게 필드로 Kill
 		if (rollScreenSequence != null) {

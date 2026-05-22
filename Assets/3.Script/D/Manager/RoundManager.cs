@@ -7,7 +7,7 @@ public class RoundManager : NetworkBehaviour {
 	public static RoundManager Instance = null;
 
 	[Header("라운드 관리")]
-	public int current_round_sync = 0;
+	[SyncVar] public int current_round_sync = 0;
 	public int MAX_ROUND = 5;   //Const 임시 제거
 
 	[Header("레이스 종료")]
@@ -33,6 +33,8 @@ public class RoundManager : NetworkBehaviour {
 			Instance = null;
 		}
 	}
+
+	
 
 	//결과창 7.5초
 	private IEnumerator Co_ReturnToLobby() {

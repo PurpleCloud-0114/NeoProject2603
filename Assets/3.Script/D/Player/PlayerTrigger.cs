@@ -76,6 +76,8 @@ public class PlayerTrigger : NetworkBehaviour {
 			LayerMask targetLayers = LayerMask.GetMask("Nothing");
 			_playerCore._playerpush_collider.includeLayers = targetLayers;
 		}
+		if (TryGetComponent(out Rigidbody rigid))
+			rigid.isKinematic = true;
 	}
 
 	private void OnTriggerEnter(Collider other) {
