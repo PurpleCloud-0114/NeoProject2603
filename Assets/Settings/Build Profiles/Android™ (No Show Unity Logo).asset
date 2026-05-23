@@ -24,7 +24,7 @@ MonoBehaviour:
     m_path: Assets/1.Scene/Main/ClientTitle.unity
   - m_enabled: 1
     m_path: Assets/1.Scene/Main/ClientMain.unity
-  - m_enabled: 1
+  - m_enabled: 0
     m_path: Assets/1.Scene/Main/Server.unity
   - m_enabled: 1
     m_path: Assets/1.Scene/Main/ClientLobby.unity
