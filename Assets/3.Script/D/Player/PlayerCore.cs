@@ -45,6 +45,7 @@ public class PlayerCore : NetworkBehaviour {
 	public Action<Collider> on_spiderweb_hit;
 	public Action on_obstacle_hit;
 
+	public Action<Vector3, float, float> on_player_collision_entered;
 	public Action<float, float, float, StatusEffect> on_max_drop_speed_change_requested;  //속도, 시간
 	public Action<Vector3> on_impulse_requested;
 	public Action<Vector3> on_continuous_force_requested;

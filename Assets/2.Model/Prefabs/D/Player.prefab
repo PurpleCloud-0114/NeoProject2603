@@ -69423,6 +69423,7 @@ MonoBehaviour:
   _dropWingSpeed: 30
   _wingTime: 0
   MoveMobileSensitive: 25
+  _controlEfficiency: 1
 --- !u!114 &546341614421835030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69502,7 +69503,7 @@ MonoBehaviour:
   magneticHitParticle: {fileID: 1846206889146068780}
   magneticHitParticle_attack: {fileID: 9081486949422772410}
   deathParticle: {fileID: 7890368266154654731}
-  _hitPlayerImpulsePower: 25
+  _hitPlayerImpulsePower: 10
   _hitObstacleInvincibilityDuration: 2
 --- !u!114 &-4233077273478090972
 MonoBehaviour:

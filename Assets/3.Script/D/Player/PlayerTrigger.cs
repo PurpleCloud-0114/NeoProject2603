@@ -27,7 +27,7 @@ public class PlayerTrigger : NetworkBehaviour {
 	[SerializeField] private ParticleSystem magneticHitParticle_attack;
 	[SerializeField] private ParticleSystem deathParticle;
 
-	[SerializeField] private float _hitPlayerImpulsePower = 25f;
+	[SerializeField] private float _hitPlayerImpulsePower = 10f;
 	[SerializeField] private float _hitObstacleInvincibilityDuration = 1f;
 
 	private bool Invincibility = false;
@@ -291,9 +291,8 @@ public class PlayerTrigger : NetworkBehaviour {
 		dir.y = 0;
 
 		if (dir.sqrMagnitude > 0.001f) {
-			_playerCore.on_impulse_requested?.Invoke(
-				dir.normalized * _hitPlayerImpulsePower
-			);
+			Vector3 knockbackForce = dir.normalized * _hitPlayerImpulsePower;
+			_playerCore.on_player_collision_entered?.Invoke(knockbackForce, 0.075f, 0.1f);
 		}
 	}
 
