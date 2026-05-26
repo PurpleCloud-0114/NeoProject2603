@@ -66,7 +66,8 @@ public class RoundManager : NetworkBehaviour {
 			RaceManager.Instance.UpdateRatingScore();
 
 			Debug.Log($"[RaceManager] {MAX_ROUND}라운드 완료 → 로비 복귀");
-			current_round_sync = 0;                                        // <<--- 라운드 초기화
+			isSceneChanging = false;
+			//current_round_sync = 0;                                        // <<--- 라운드 초기화
 			roomManager.ServerChangeScene(roomManager.RoomScene);          // <<--- 로비 복귀
 
 			if (NetworkServer.active) {

@@ -159,12 +159,12 @@ public class RoomManagement : NetworkRoomManager
     }
 
     //-- 민찬 비동기로드로 Scene 전환 ---------
-    public override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling) {
+    //public override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling) {
 
-        AsyncOperation op = SceneManager.LoadSceneAsync(newSceneName);
-        if (LoadingManager.Instance != null) {
-            LoadingManager.Instance.ShowLoading(op);
-        }
-        base.OnClientChangeScene(newSceneName, sceneOperation, customHandling);
-    }
+    //    AsyncOperation op = SceneManager.LoadSceneAsync(newSceneName);
+    //    if (LoadingManager.Instance != null) {
+    //        LoadingManager.Instance.ShowLoading(op);
+    //    }
+    //    base.OnClientChangeScene(newSceneName, sceneOperation, customHandling);
+    //}
 }

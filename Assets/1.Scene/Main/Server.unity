@@ -689,7 +689,7 @@ PrefabInstance:
     - target: {fileID: 8849018464848831088, guid: cf88ee5a333bb724186a558656475da2, type: 3}
       propertyPath: 'spawnPrefabs.Array.data[15]'
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 8425437624935338011, guid: 6be168ef93a2bdf4f82cd885826b2de8, type: 3}
     - target: {fileID: 8849018464848831088, guid: cf88ee5a333bb724186a558656475da2, type: 3}
       propertyPath: 'spawnPrefabs.Array.data[17]'
       value: 
@@ -1193,7 +1193,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SQLManager
   _is_it_Client: 0
-  _serverIP: 192.168.45.121
+  _serverIP: 192.168.45.85
   _overwriteConfig: 1
 --- !u!4 &2030898709
 Transform:

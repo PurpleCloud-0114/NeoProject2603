@@ -74,6 +74,7 @@ public class UIManager : MonoBehaviour {
 	[Header("최종 결과 UI")]
 	[SerializeField] private GameObject _finalResultWindow;    // 결과창 부모 오브젝트
 	[SerializeField] private RectTransform _finalResultContainer; // RankPrefab이 생성될 부모 (Content)
+	[SerializeField] private TextMeshProUGUI _finalReusltNoticeText; // RankPrefab이 생성될 부모 (Content)
 	
 	[SerializeField] private GameObject _rountRankPrefab;
 	[SerializeField] private GameObject _totalRankPrefab;
@@ -162,13 +163,18 @@ public class UIManager : MonoBehaviour {
 
 
 	public void PlayTextEffect() {
+		//if (RoundManager.Instance == null || uiText == null || rectTransform == null) return;
 		// 기존 패턴과 동일하게 필드로 Kill
 		if (rollScreenSequence != null) {
 			rollScreenSequence.Kill();
 			rollScreenSequence = null;
 		}
 
-		uiText.text = $"{RoundManager.Instance.current_round_sync + 1} Round";
+		if(RoundManager.Instance == null) {
+			uiText.text = "1 Round";
+		} else {
+			uiText.text = $"{RoundManager.Instance.current_round_sync + 1} Round";
+		}
 		rectTransform.anchoredPosition = originalPosition;
 
 
@@ -288,6 +294,11 @@ public class UIManager : MonoBehaviour {
 	}
 	public void ShowRoundResult(PlayerResult[] results, int[] previousScores, int[] roundScores) {
 		HideUIforEndRace();
+
+		if(RoundManager.Instance.current_round_sync == RoundManager.Instance.MAX_ROUND) {
+			_finalReusltNoticeText.text = "최종 라운드 종료.";
+		}
+
 		// 1. 기존에 생성된 리스트가 있다면 제거 (초기화)
 		foreach (Transform child in _finalResultContainer) {
 			Destroy(child.gameObject);

@@ -52,6 +52,10 @@ public class RaceManager : NetworkBehaviour {
 	//private List<PlayerResult> final_results = new List<PlayerResult>();
 	private Dictionary<NetworkIdentity, PlayerResult> _roundResults = new Dictionary<NetworkIdentity, PlayerResult>();
 
+
+	[Header("Manager Setup")]
+	public GameObject roundManagerPrefab; // 인스펙터에서 프리팹 할당 필수
+
 	//----- 메서드
 	private void Awake() {
 		if (Instance == null) Instance = this;
@@ -63,7 +67,12 @@ public class RaceManager : NetworkBehaviour {
 	// ==========================================
 	//[ServerCallback]
 	private void Start() {
-		if(isServer || isSinglePlay) StageManager.Instance.SetStage();
+		if (isServer && RoundManager.Instance == null) {
+			GameObject rm = Instantiate(roundManagerPrefab);
+			NetworkServer.Spawn(rm);
+		}
+
+		if (isServer || isSinglePlay) StageManager.Instance.SetStage();
 	}
 
 	[Server]

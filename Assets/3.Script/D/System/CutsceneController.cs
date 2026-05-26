@@ -42,13 +42,21 @@ public class CutsceneController : NetworkBehaviour {
 	[ClientRpc]
 	private void RpcPlayIntro() {
 		if (isServer) return; // 서버는 위에서 이미 실행했으므로 중복 실행 방지
+
 		ExecuteIntro();
 	}
 
 	// 3. 실제 컷신이 실행되는 핵심 로직
 	private void ExecuteIntro() {
-		UIManager.Instance.PlayTextEffect();
 		_director.Play();
+		StartCoroutine("Co_Delay");
+	}
+
+	private IEnumerator Co_Delay() {
+		while (RoundManager.Instance == null) {
+			yield return null;
+		}
+		UIManager.Instance.PlayTextEffect();
 	}
 
 	private void OnCutsceneEnd(PlayableDirector obj) {
@@ -59,5 +67,6 @@ public class CutsceneController : NetworkBehaviour {
 		if (_cutsceneCamera != null) {
 			_cutsceneCamera.SetActive(false);
 		}
+		StopCoroutine("Co_Delay");
 	}
 }
