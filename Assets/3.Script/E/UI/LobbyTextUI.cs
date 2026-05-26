@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using Mirror;
 
 public class LobbyTextUI : MonoBehaviour
 {
@@ -16,7 +17,18 @@ public class LobbyTextUI : MonoBehaviour
         else if (Instance != this) { Destroy(gameObject); return; }
         InitializeUIElements();
     }
-
+    private void Start() // <<---
+    {
+        if (NetworkManager.singleton is RoomManagement rm)
+        {
+            Debug.Log("[LobbyTextUI] Start() → RefreshLobbyUI 요청");
+            rm.RefreshLobbyUI(); // <<---
+        }
+        else
+        {
+            Debug.LogWarning("[LobbyTextUI] Start(): RoomManagement를 찾을 수 없음");
+        }
+    }
     private void InitializeUIElements()
     {
         for (int i = 0; i < player.Length; i++)
@@ -31,6 +43,7 @@ public class LobbyTextUI : MonoBehaviour
             playerReadyState[i] = tmp[1];
         }
     }
+
     public void ClearAllUI()
     {
         for (int i = 0; i < playerName.Length; i++)

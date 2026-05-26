@@ -7819,7 +7819,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   current_round_sync: 0
-  MAX_ROUND: 5
+  MAX_ROUND: 1
   returnDelay: 7.5
 --- !u!114 &1915424207
 MonoBehaviour:

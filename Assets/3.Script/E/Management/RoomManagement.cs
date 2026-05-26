@@ -142,4 +142,18 @@ public class RoomManagement : NetworkRoomManager
             rp.RpcCancelCountdown();
         }
     }
+    public override void OnRoomServerSceneChanged(string sceneName)
+    {
+        base.OnRoomServerSceneChanged(sceneName);
+
+        if (sceneName == RoomScene)
+        {
+            foreach (NetworkRoomPlayer slot in roomSlots)
+            {
+                RoomPlayer rp = slot as RoomPlayer;
+                if (rp == null) continue;
+                rp.RpcSimulateReadyReset();
+            }
+        }
+    }
 }
